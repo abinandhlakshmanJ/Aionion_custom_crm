@@ -106,3 +106,75 @@ def get_customer_products(customer_name):
         })
 
     return products
+
+
+@frappe.whitelist()
+def get_customer_360(customer_name):
+    """
+    Returns filtered product records based on logged-in user role.
+    
+    Rules:
+    - Insurance Sales/Service RM: sees only Insurance Records where they are rm_employee_code
+    - Insurance Renewals RM: sees only Renewal Records assigned to them
+    - Capital RM: sees only Bonds/MF/Equity records assigned to them
+    - Administrator/System Manager: sees everything
+    """
+    user = frappe.session.user
+    user_roles = frappe.get_roles(user)
+    employee = frappe.db.get_value("Employee", {"user_id": user}, "name")
+
+    # Get customer details
+    customer = frappe.db.get_value("Customer", customer_name,
+        ["customer_name", "custom_aionion_master_id", "custom_mobile", "pan"],
+        as_dict=True)
+
+    products = {
+        "insurance": [],
+        "renewals": [],
+        "bonds": [],
+        "mf": [],
+        "equity": []
+    }
+
+    is_admin = "System Manager" in user_roles or "Administrator" in user_roles
+
+    # Insurance Records
+    if any(r in user_roles for r in ["Insurance Sales RM", "Insurance Service RM", "Insurance MIS"]) or is_admin:
+        ins_filters = {"customer": customer_name}
+        if not is_admin and "Insurance MIS" not in user_roles and employee:
+            ins_filters["rm_employee_code"] = employee
+
+        products["insurance"] = frappe.get_all("Insurance Record",
+            filters=ins_filters,
+            fields=["name", "insurance_products", "policy_number",
+                   "policy_status", "policy_expiry_date", "custom_mis_status",
+                   "rm_employee_code"],
+            order_by="creation desc")
+
+    # Renewal Records
+    if any(r in user_roles for r in ["Insurance Renewals RM", "Insurance Renewals Manager"]) or is_admin:
+        rnw_filters = {"customer": customer_name}
+        if not is_admin and "Insurance Renewals Manager" not in user_roles and employee:
+            rnw_filters["renewals_rm"] = employee
+
+        products["renewals"] = frappe.get_all("Insurance Renewal Record",
+            filters=rnw_filters,
+            fields=["name", "insurance_type", "policy_expiry_date",
+                   "renewal_status", "renewals_rm_name", "mis_status"],
+            order_by="creation desc")
+
+    # Bonds Records
+    if any(r in user_roles for r in ["Capital RM", "Global RM"]) or is_admin:
+        try:
+            products["bonds"] = frappe.get_all("Bonds Purchase Record",
+                filters={"customer": customer_name},
+                fields=["name", "docstatus"],
+                order_by="creation desc")
+        except Exception:
+            pass
+
+    return {
+        "customer": customer,
+        "products": products,
+        "roles": user_roles
+    }

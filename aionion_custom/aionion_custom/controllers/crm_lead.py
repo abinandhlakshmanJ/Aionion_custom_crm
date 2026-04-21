@@ -132,13 +132,18 @@ def process_post_mis_approval(lead_name):
 
 def _get_or_create_customer(lead):
     existing_customer = None
+
+    # Rule: Only match on PAN — PAN is unique per individual in India
+    # Mobile alone is NOT enough — family members share phones
+    # Example: Father's insurance + Son's demat → same mobile, different PAN → different customers
     if lead.custom_pan_number:
         existing_customer = frappe.db.get_value("Customer", {"pan": lead.custom_pan_number}, "name")
-    if not existing_customer and lead.mobile_no:
-        existing_customer = frappe.db.get_value("Customer", {"custom_mobile": lead.mobile_no}, "name")
-    if existing_customer:
-        frappe.db.set_value("CRM Lead", lead.name, "custom_customer", existing_customer, update_modified=False)
-        return frappe.get_doc("Customer", existing_customer)
+        if existing_customer:
+            frappe.db.set_value("CRM Lead", lead.name, "custom_customer", existing_customer, update_modified=False)
+            return frappe.get_doc("Customer", existing_customer)
+
+    # No PAN match → always create new customer
+    # Even if mobile matches — could be family member
     company = frappe.db.get_single_value("Global Defaults", "default_company")
     customer = frappe.get_doc({
         "doctype": "Customer",
