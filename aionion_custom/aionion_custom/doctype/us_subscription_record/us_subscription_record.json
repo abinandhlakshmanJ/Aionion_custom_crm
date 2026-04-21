@@ -1,0 +1,197 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "US-.###",
+ "creation": "2026-03-14 08:21:57.858066",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_lhe6",
+  "task",
+  "customer",
+  "lead",
+  "company",
+  "client_name",
+  "client_status",
+  "column_break_us_1",
+  "rm_employee_code",
+  "rm_employee_name",
+  "branch",
+  "department",
+  "amended_from",
+  "us_subscription_section",
+  "payment_date",
+  "amount_paid_us_subs",
+  "subscription_type",
+  "mode_of_payment",
+  "chola_client_code",
+  "column_break_us_2",
+  "quantity",
+  "currency",
+  "subscription_end_date"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_lhe6",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "task",
+   "fieldtype": "Link",
+   "label": "Task",
+   "options": "Aionion Task",
+   "read_only": 1
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer"
+  },
+  {
+   "fieldname": "lead",
+   "fieldtype": "Link",
+   "label": "Lead",
+   "options": "CRM Lead"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "client_name",
+   "fieldtype": "Data",
+   "label": "Client Name"
+  },
+  {
+   "fieldname": "client_status",
+   "fieldtype": "Select",
+   "label": "Client Status",
+   "options": "New\nRenewal"
+  },
+  {
+   "fieldname": "column_break_us_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "rm_employee_code",
+   "fieldtype": "Link",
+   "label": "RM Employee Code",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "rm_employee_code.employee_name",
+   "fieldname": "rm_employee_name",
+   "fieldtype": "Data",
+   "label": "RM Employee Name"
+  },
+  {
+   "fetch_from": "rm_employee_code.branch",
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch"
+  },
+  {
+   "fetch_from": "rm_employee_code.department",
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Department",
+   "options": "Department"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "US Subscription Record",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "us_subscription_section",
+   "fieldtype": "Section Break",
+   "label": "US Subscription Transaction"
+  },
+  {
+   "fieldname": "payment_date",
+   "fieldtype": "Date",
+   "label": "Payment Date"
+  },
+  {
+   "fieldname": "amount_paid_us_subs",
+   "fieldtype": "Currency",
+   "label": "Amount Paid (US Subs)"
+  },
+  {
+   "fieldname": "subscription_type",
+   "fieldtype": "Link",
+   "label": "Subscription Type",
+   "options": "Subscription Plan"
+  },
+  {
+   "fieldname": "mode_of_payment",
+   "fieldtype": "Link",
+   "label": "Mode of Payment",
+   "options": "Mode of Payment"
+  },
+  {
+   "fieldname": "chola_client_code",
+   "fieldtype": "Data",
+   "label": "Chola Client Code"
+  },
+  {
+   "fieldname": "column_break_us_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "quantity",
+   "fieldtype": "Int",
+   "label": "Quantity",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "currency",
+   "fieldtype": "Link",
+   "label": "Currency",
+   "options": "Currency"
+  },
+  {
+   "fieldname": "subscription_end_date",
+   "fieldtype": "Date",
+   "label": "Subscription End Date"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-03-24 10:30:37.491357",
+ "modified_by": "Administrator",
+ "module": "Aionion Custom",
+ "name": "US Subscription Record",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

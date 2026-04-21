@@ -1,0 +1,212 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "MF-.###",
+ "creation": "2026-03-14 08:24:20.054848",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "task",
+  "customer",
+  "lead",
+  "company",
+  "client_name",
+  "pan",
+  "client_code",
+  "column_break_mf_1",
+  "rm_employee_code",
+  "rm_employee_name",
+  "branch",
+  "department",
+  "sales_done_by",
+  "amended_from",
+  "mutual_funds_section",
+  "investment_type",
+  "scheme_name",
+  "amount_mf",
+  "order_type",
+  "poa_type",
+  "client_confirmation",
+  "column_break_mf_2",
+  "ucc_code",
+  "bank_name",
+  "amount_limit"
+ ],
+ "fields": [
+  {
+   "fieldname": "task",
+   "fieldtype": "Link",
+   "label": "Task",
+   "options": "Aionion Task",
+   "read_only": 1
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer"
+  },
+  {
+   "fieldname": "lead",
+   "fieldtype": "Link",
+   "label": "Lead",
+   "options": "CRM Lead"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "client_name",
+   "fieldtype": "Data",
+   "label": "Client Name"
+  },
+  {
+   "fieldname": "pan",
+   "fieldtype": "Data",
+   "label": "PAN"
+  },
+  {
+   "fieldname": "client_code",
+   "fieldtype": "Data",
+   "label": "Client Code"
+  },
+  {
+   "fieldname": "column_break_mf_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "rm_employee_code",
+   "fieldtype": "Link",
+   "label": "RM Employee Code",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "rm_employee_code.employee_name",
+   "fieldname": "rm_employee_name",
+   "fieldtype": "Data",
+   "label": "RM Employee Name"
+  },
+  {
+   "fetch_from": "rm_employee_code.branch",
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch"
+  },
+  {
+   "fetch_from": "rm_employee_code.department",
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Department",
+   "options": "Department"
+  },
+  {
+   "fieldname": "sales_done_by",
+   "fieldtype": "Link",
+   "label": "Sales Done by",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Mutual Funds Record",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "mutual_funds_section",
+   "fieldtype": "Section Break",
+   "label": "Mutual Funds"
+  },
+  {
+   "fieldname": "investment_type",
+   "fieldtype": "Link",
+   "label": "Investment Type",
+   "options": "Investment Type"
+  },
+  {
+   "fieldname": "scheme_name",
+   "fieldtype": "Link",
+   "label": "Scheme Name",
+   "options": "Scheme"
+  },
+  {
+   "fieldname": "amount_mf",
+   "fieldtype": "Currency",
+   "label": "Amount (MF)"
+  },
+  {
+   "fieldname": "order_type",
+   "fieldtype": "Select",
+   "label": "Order Type",
+   "options": "Buying\nSelling"
+  },
+  {
+   "fieldname": "poa_type",
+   "fieldtype": "Select",
+   "label": "POA Type",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "client_confirmation",
+   "fieldtype": "Select",
+   "label": "Client Confirmation",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "column_break_mf_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "ucc_code",
+   "fieldtype": "Data",
+   "label": "UCC Code"
+  },
+  {
+   "fieldname": "bank_name",
+   "fieldtype": "Link",
+   "label": "Bank Name",
+   "options": "Bank"
+  },
+  {
+   "fieldname": "amount_limit",
+   "fieldtype": "Currency",
+   "label": "Amount Limit"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-03-24 10:27:57.621917",
+ "modified_by": "Administrator",
+ "module": "Aionion Custom",
+ "name": "Mutual Funds Record",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

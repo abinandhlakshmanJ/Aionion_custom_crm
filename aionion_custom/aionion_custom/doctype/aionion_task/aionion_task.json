@@ -1,0 +1,686 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "T-.###",
+ "creation": "2026-03-11 23:51:47.954552",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_mjuq",
+  "company",
+  "lead",
+  "client_code",
+  "profession",
+  "employee_status",
+  "pan",
+  "order_type",
+  "description",
+  "column_break_wnkn",
+  "product",
+  "client_name",
+  "client_organization",
+  "lead_source",
+  "task_status",
+  "client_status",
+  "client_confirmation",
+  "subject",
+  "is_existing_customer",
+  "customer",
+  "amended_from",
+  "address_and_contact_section",
+  "primary_address",
+  "state",
+  "current_location",
+  "country",
+  "mobile_no",
+  "column_break_buhp",
+  "current_address",
+  "city",
+  "event_location",
+  "client_email",
+  "alternate_mobile",
+  "rm_details_section",
+  "rm_employee_code",
+  "rm_employee_name",
+  "rm_user_id",
+  "sales_done_by",
+  "column_break_fieb",
+  "branch",
+  "department",
+  "follow_up",
+  "bonds_details_section",
+  "number_of_units",
+  "beneficiary_adding_status",
+  "amount_bonds",
+  "face_value",
+  "column_break_lzyt",
+  "isin_number",
+  "bond_company_name",
+  "execution_date",
+  "poa_status",
+  "mutual_funds_section",
+  "poa_type",
+  "investment_type",
+  "scheme_name",
+  "amount_mf",
+  "column_break_pxde",
+  "ucc_code",
+  "bank_name",
+  "amount_limit",
+  "insurance_details_section",
+  "transaction_type",
+  "insurance_products",
+  "issued_date",
+  "gross_premium_value",
+  "net_premium_value",
+  "income_category",
+  "insurance_company",
+  "proposal_number",
+  "premium_paying_term",
+  "gst_waiver",
+  "column_break_swww",
+  "interested_in",
+  "sum_insured",
+  "insurance_type",
+  "policy_number",
+  "policy_status",
+  "policy_start_date",
+  "policy_expiry_date",
+  "client_reference_number",
+  "next_premium_payment_due_date",
+  "payment_period",
+  "us_subscription_transaction_section",
+  "payment_date",
+  "amount_paid_us_subs",
+  "subscription_type",
+  "mode_of_payment",
+  "column_break_hovn",
+  "quantity",
+  "currency",
+  "subscription_end_date",
+  "chola_client_code"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_mjuq",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Aionion Task",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "lead",
+   "fieldtype": "Link",
+   "label": "Lead",
+   "options": "CRM Lead",
+   "reqd": 1
+  },
+  {
+   "fieldname": "country",
+   "fieldtype": "Link",
+   "label": "Country",
+   "options": "Country"
+  },
+  {
+   "fieldname": "mobile_no",
+   "fieldtype": "Data",
+   "label": "Mobile no"
+  },
+  {
+   "fieldname": "alternate_mobile",
+   "fieldtype": "Data",
+   "label": "Alternate Mobile"
+  },
+  {
+   "fieldname": "client_email",
+   "fieldtype": "Data",
+   "label": "Client Email"
+  },
+  {
+   "fieldname": "primary_address",
+   "fieldtype": "Data",
+   "label": "Primary Address"
+  },
+  {
+   "fieldname": "current_address",
+   "fieldtype": "Data",
+   "label": "Current Address"
+  },
+  {
+   "fieldname": "state",
+   "fieldtype": "Data",
+   "label": "State"
+  },
+  {
+   "fieldname": "city",
+   "fieldtype": "Data",
+   "label": "City"
+  },
+  {
+   "depends_on": "eval:doc.product == 'Bonds' || doc.product == 'US Subscription'",
+   "fieldname": "lead_source",
+   "fieldtype": "Link",
+   "label": "Lead Source",
+   "options": "CRM Lead Source"
+  },
+  {
+   "fieldname": "event_location",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Event Location",
+   "options": "Location"
+  },
+  {
+   "fieldname": "rm_employee_code",
+   "fieldtype": "Link",
+   "label": "RM Employee Code",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "rm_employee_code.employee_name",
+   "fieldname": "rm_employee_name",
+   "fieldtype": "Data",
+   "label": "RM Employee Name"
+  },
+  {
+   "fieldname": "follow_up",
+   "fieldtype": "Date",
+   "label": "Follow up"
+  },
+  {
+   "depends_on": "eval:doc.product == 'Bonds' || doc.product == 'Mutual Funds' || doc.product == 'Insurance' || doc.product == 'US Subscription'",
+   "fieldname": "client_code",
+   "fieldtype": "Data",
+   "label": "Client Code"
+  },
+  {
+   "fieldname": "client_organization",
+   "fieldtype": "Data",
+   "label": "Client Organization"
+  },
+  {
+   "fieldname": "current_location",
+   "fieldtype": "Data",
+   "label": "Current Location"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  },
+  {
+   "fieldname": "employee_status",
+   "fieldtype": "Select",
+   "label": "Employee Status",
+   "options": "Employed\nSelf-Employed"
+  },
+  {
+   "fieldname": "client_name",
+   "fieldtype": "Data",
+   "label": "Client Name"
+  },
+  {
+   "fieldname": "task_status",
+   "fieldtype": "Select",
+   "label": "Task Status",
+   "options": "Not Started\nIn Progress\nCompleted\nQty Not Available\nMaturity Bond\nRejected\nCancelled\nWaiting for Client Authentication\nMandate Link initiated\nProvide the NACH Form\nNACH Form Upload Pending\nApproved\nPending with Bank - Under Process\nNACH Form Pending\nNot Eligible\nNot Interested\nNo Response\nPayment Completed\nCurrent Month Prospect\nNext Month Prospect\nFuture Prospect\nCall Back\nPending\nIssued\nProposal Number not available\nAwaiting Feedback"
+  },
+  {
+   "fetch_from": "rm_employee_code.branch",
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch"
+  },
+  {
+   "fetch_from": "rm_employee_code.department",
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Department",
+   "options": "Department"
+  },
+  {
+   "fieldname": "subject",
+   "fieldtype": "Data",
+   "label": "Subject"
+  },
+  {
+   "depends_on": "eval:doc.product == 'Equity' || doc.product == 'Mutual Funds'",
+   "fieldname": "sales_done_by",
+   "fieldtype": "Link",
+   "label": "Sales Done by",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "profession",
+   "fieldtype": "Data",
+   "label": "Profession"
+  },
+  {
+   "fieldname": "payment_date",
+   "fieldtype": "Date",
+   "label": "Payment Date"
+  },
+  {
+   "fieldname": "quantity",
+   "fieldtype": "Int",
+   "label": "Quantity",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "mode_of_payment",
+   "fieldtype": "Link",
+   "label": "Mode of Payment",
+   "options": "Mode of Payment"
+  },
+  {
+   "fieldname": "subscription_type",
+   "fieldtype": "Link",
+   "label": "Subscription Type",
+   "options": "Subscription Plan"
+  },
+  {
+   "fieldname": "client_status",
+   "fieldtype": "Select",
+   "label": "Client Status",
+   "options": "New\nRenewal"
+  },
+  {
+   "fieldname": "subscription_end_date",
+   "fieldtype": "Date",
+   "label": "Subscription End Date"
+  },
+  {
+   "fieldname": "currency",
+   "fieldtype": "Link",
+   "label": "Currency",
+   "options": "Currency"
+  },
+  {
+   "fieldname": "chola_client_code",
+   "fieldtype": "Data",
+   "label": "Chola Client Code"
+  },
+  {
+   "depends_on": "eval:doc.product == 'Equity' || doc.product == 'Insurance' || doc.product == 'Mutual Funds' || doc.product == 'Bonds'",
+   "fetch_from": "customer.pan",
+   "fetch_if_empty": 1,
+   "fieldname": "pan",
+   "fieldtype": "Data",
+   "label": "PAN",
+   "mandatory_depends_on": "eval:doc.product == 'Equity' || doc.product == 'Insurance' || doc.product == 'Mutual Funds' || doc.product == 'Bonds'"
+  },
+  {
+   "fieldname": "issued_date",
+   "fieldtype": "Date",
+   "label": "Issued Date"
+  },
+  {
+   "fieldname": "gross_premium_value",
+   "fieldtype": "Currency",
+   "label": "Gross Premium Value"
+  },
+  {
+   "fieldname": "interested_in",
+   "fieldtype": "Small Text",
+   "label": "Interested In"
+  },
+  {
+   "fieldname": "income_category",
+   "fieldtype": "Select",
+   "label": "Income Category"
+  },
+  {
+   "fieldname": "sum_insured",
+   "fieldtype": "Currency",
+   "label": "Sum Insured"
+  },
+  {
+   "fieldname": "insurance_company",
+   "fieldtype": "Link",
+   "label": "Insurance Company",
+   "options": "Insurance Company"
+  },
+  {
+   "fieldname": "insurance_type",
+   "fieldtype": "Select",
+   "label": "Insurance Type"
+  },
+  {
+   "fieldname": "proposal_number",
+   "fieldtype": "Data",
+   "label": "Proposal Number"
+  },
+  {
+   "fieldname": "policy_number",
+   "fieldtype": "Data",
+   "label": "Policy Number"
+  },
+  {
+   "fieldname": "policy_status",
+   "fieldtype": "Select",
+   "label": "Policy Status"
+  },
+  {
+   "fieldname": "policy_start_date",
+   "fieldtype": "Date",
+   "label": "Policy Start Date"
+  },
+  {
+   "fieldname": "net_premium_value",
+   "fieldtype": "Currency",
+   "label": "Net Premium Value"
+  },
+  {
+   "fieldname": "premium_paying_term",
+   "fieldtype": "Int",
+   "label": "Premium Paying Term"
+  },
+  {
+   "fieldname": "gst_waiver",
+   "fieldtype": "Small Text",
+   "label": "GST Waiver"
+  },
+  {
+   "fieldname": "client_reference_number",
+   "fieldtype": "Data",
+   "label": "Client Reference Number"
+  },
+  {
+   "depends_on": "eval:doc.transaction_type == 'Renewal'",
+   "fieldname": "next_premium_payment_due_date",
+   "fieldtype": "Date",
+   "label": "Next Premium Payment Due Date"
+  },
+  {
+   "depends_on": "eval:doc.transaction_type == 'Renewal'",
+   "fieldname": "payment_period",
+   "fieldtype": "Date",
+   "label": "Payment Period"
+  },
+  {
+   "fieldname": "transaction_type",
+   "fieldtype": "Select",
+   "label": "Transaction Type",
+   "options": "Sales\nRenewal"
+  },
+  {
+   "depends_on": "eval:doc.product == 'Mutual Funds' || doc.product == 'Bonds'",
+   "fieldname": "order_type",
+   "fieldtype": "Select",
+   "label": "Order Type",
+   "options": "Buying\nSelling"
+  },
+  {
+   "depends_on": "eval:doc.product == 'Mutual Funds' || doc.product == 'Bonds'",
+   "fieldname": "poa_type",
+   "fieldtype": "Select",
+   "label": "POA Type",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "isin_number",
+   "fieldtype": "Link",
+   "label": "ISIN Number",
+   "options": "Company ISIN"
+  },
+  {
+   "fieldname": "beneficiary_adding_status",
+   "fieldtype": "Select",
+   "label": "Beneficiary Adding Status",
+   "options": "Yes\nNo"
+  },
+  {
+   "depends_on": "eval:doc.product == 'Mutual Funds' || doc.product == 'Bonds'",
+   "fieldname": "client_confirmation",
+   "fieldtype": "Select",
+   "label": "Client Confirmation",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "execution_date",
+   "fieldtype": "Date",
+   "label": "Execution Date"
+  },
+  {
+   "fieldname": "face_value",
+   "fieldtype": "Select",
+   "label": "Face Value",
+   "options": "1000\n10000\n100000\n5000000\n10000000\n100000000"
+  },
+  {
+   "fetch_from": "isin_number.company_name",
+   "fieldname": "bond_company_name",
+   "fieldtype": "Data",
+   "label": "Bond Company Name",
+   "options": "Company ISIN",
+   "read_only": 1
+  },
+  {
+   "fieldname": "investment_type",
+   "fieldtype": "Link",
+   "label": "Investment Type",
+   "options": "Investment Type"
+  },
+  {
+   "fieldname": "scheme_name",
+   "fieldtype": "Link",
+   "label": "Scheme Name",
+   "options": "Scheme"
+  },
+  {
+   "fieldname": "ucc_code",
+   "fieldtype": "Data",
+   "label": "UCC Code"
+  },
+  {
+   "fieldname": "bank_name",
+   "fieldtype": "Link",
+   "label": "Bank Name",
+   "options": "Bank"
+  },
+  {
+   "fieldname": "amount_limit",
+   "fieldtype": "Currency",
+   "label": "Amount Limit"
+  },
+  {
+   "fieldname": "product",
+   "fieldtype": "Link",
+   "label": "Product",
+   "options": "Aionion Product",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_wnkn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.product == 'US Subscription'",
+   "fieldname": "us_subscription_transaction_section",
+   "fieldtype": "Section Break",
+   "label": "US Subscription Transaction"
+  },
+  {
+   "fieldname": "column_break_hovn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.product == 'Insurance'",
+   "fieldname": "insurance_details_section",
+   "fieldtype": "Section Break",
+   "label": "Insurance Details"
+  },
+  {
+   "fieldname": "column_break_swww",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.product == 'Bonds'",
+   "fieldname": "bonds_details_section",
+   "fieldtype": "Section Break",
+   "label": "Bonds Details"
+  },
+  {
+   "fieldname": "number_of_units",
+   "fieldtype": "Int",
+   "label": "Number of Units"
+  },
+  {
+   "fieldname": "column_break_lzyt",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.product == 'Mutual Funds'",
+   "fieldname": "mutual_funds_section",
+   "fieldtype": "Section Break",
+   "label": "Mutual Funds"
+  },
+  {
+   "fieldname": "column_break_pxde",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "poa_status",
+   "fieldtype": "Select",
+   "label": "POA Status",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "amount_bonds",
+   "fieldtype": "Currency",
+   "label": "Amount (Bonds)"
+  },
+  {
+   "fieldname": "amount_mf",
+   "fieldtype": "Currency",
+   "label": "Amount (MF)"
+  },
+  {
+   "fieldname": "insurance_products",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Insurance Products",
+   "options": "\nTerm Insurance\nHealth Insurance\nMotor Insurance\nTravel Insurance\nHome Insurance\nFire Insurance\nGroup medical Insurance\nGroup Personal Accident Insurance\nDoctors Indemnity Insurance\nProfessional Indemnity Insurance\nWorkmen Compensation\nContractor All Risk Policy\nCyber Insurance\nMarine Insurance"
+  },
+  {
+   "depends_on": "eval:doc.transaction_type == 'Renewal'",
+   "fieldname": "policy_expiry_date",
+   "fieldtype": "Date",
+   "label": "Policy Expiry Date"
+  },
+  {
+   "fieldname": "amount_paid_us_subs",
+   "fieldtype": "Currency",
+   "label": "Amount Paid (US Subs)"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_existing_customer",
+   "fieldtype": "Check",
+   "label": "Is Existing Customer?",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.is_existing_customer == 1",
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_buhp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "rm_details_section",
+   "fieldtype": "Section Break",
+   "label": "RM Details"
+  },
+  {
+   "fieldname": "column_break_fieb",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "address_and_contact_section",
+   "fieldtype": "Section Break",
+   "label": "Address & Contact"
+  },
+  {
+   "fieldname": "rm_user_id",
+   "fieldtype": "Link",
+   "label": "RM User ID",
+   "options": "User"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [
+  {
+   "link_doctype": "Bonds Purchase Record",
+   "link_fieldname": "task"
+  },
+  {
+   "link_doctype": "Equity Record",
+   "link_fieldname": "task"
+  },
+  {
+   "link_doctype": "Mutual Funds Record",
+   "link_fieldname": "task"
+  },
+  {
+   "link_doctype": "Insurance Record",
+   "link_fieldname": "task"
+  },
+  {
+   "link_doctype": "US Subscription Record",
+   "link_fieldname": "task"
+  },
+  {
+   "link_doctype": "Customer",
+   "link_fieldname": "custom_task"
+  }
+ ],
+ "modified": "2026-03-25 10:57:53.888430",
+ "modified_by": "Administrator",
+ "module": "Aionion Custom",
+ "name": "Aionion Task",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

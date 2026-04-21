@@ -1,0 +1,225 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "BONDS-.###",
+ "creation": "2026-03-14 08:21:44.173755",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_dfos",
+  "task",
+  "customer",
+  "lead",
+  "company",
+  "client_name",
+  "pan",
+  "client_code",
+  "column_break_bonds_1",
+  "rm_employee_code",
+  "rm_employee_name",
+  "branch",
+  "department",
+  "amended_from",
+  "bonds_details_section",
+  "number_of_units",
+  "beneficiary_adding_status",
+  "amount_bonds",
+  "face_value",
+  "order_type",
+  "poa_type",
+  "client_confirmation",
+  "column_break_bonds_2",
+  "isin_number",
+  "bond_company_name",
+  "execution_date",
+  "poa_status"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_dfos",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "task",
+   "fieldtype": "Link",
+   "label": "Task",
+   "options": "Aionion Task",
+   "read_only": 1
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer"
+  },
+  {
+   "fieldname": "lead",
+   "fieldtype": "Link",
+   "label": "Lead",
+   "options": "CRM Lead"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "client_name",
+   "fieldtype": "Data",
+   "label": "Client Name"
+  },
+  {
+   "fieldname": "pan",
+   "fieldtype": "Data",
+   "label": "PAN"
+  },
+  {
+   "fieldname": "client_code",
+   "fieldtype": "Data",
+   "label": "Client Code"
+  },
+  {
+   "fieldname": "column_break_bonds_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "rm_employee_code",
+   "fieldtype": "Link",
+   "label": "RM Employee Code",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "rm_employee_code.employee_name",
+   "fieldname": "rm_employee_name",
+   "fieldtype": "Data",
+   "label": "RM Employee Name"
+  },
+  {
+   "fetch_from": "rm_employee_code.branch",
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch"
+  },
+  {
+   "fetch_from": "rm_employee_code.department",
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Department",
+   "options": "Department"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Bonds Purchase Record",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "bonds_details_section",
+   "fieldtype": "Section Break",
+   "label": "Bonds Details"
+  },
+  {
+   "fieldname": "number_of_units",
+   "fieldtype": "Int",
+   "label": "Number of Units"
+  },
+  {
+   "fieldname": "beneficiary_adding_status",
+   "fieldtype": "Select",
+   "label": "Beneficiary Adding Status",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "amount_bonds",
+   "fieldtype": "Currency",
+   "label": "Amount (Bonds)"
+  },
+  {
+   "fieldname": "face_value",
+   "fieldtype": "Select",
+   "label": "Face Value",
+   "options": "1000\n10000\n100000\n5000000\n10000000\n100000000"
+  },
+  {
+   "fieldname": "order_type",
+   "fieldtype": "Select",
+   "label": "Order Type",
+   "options": "Buying\nSelling"
+  },
+  {
+   "fieldname": "poa_type",
+   "fieldtype": "Select",
+   "label": "POA Type",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "client_confirmation",
+   "fieldtype": "Select",
+   "label": "Client Confirmation",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "column_break_bonds_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "isin_number",
+   "fieldtype": "Link",
+   "label": "ISIN Number",
+   "options": "Company ISIN"
+  },
+  {
+   "fetch_from": "isin_number.company_name",
+   "fieldname": "bond_company_name",
+   "fieldtype": "Data",
+   "label": "Bond Company Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "execution_date",
+   "fieldtype": "Date",
+   "label": "Execution Date"
+  },
+  {
+   "fieldname": "poa_status",
+   "fieldtype": "Select",
+   "label": "POA Status",
+   "options": "Yes\nNo"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-03-24 10:31:03.202116",
+ "modified_by": "Administrator",
+ "module": "Aionion Custom",
+ "name": "Bonds Purchase Record",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}
