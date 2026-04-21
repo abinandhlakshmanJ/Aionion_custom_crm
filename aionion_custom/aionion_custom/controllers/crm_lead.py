@@ -122,8 +122,8 @@ def process_post_mis_approval(lead_name):
         if not customer.custom_aionion_master_id:
             _generate_aionion_master_id(customer)
         ins_record = _create_insurance_record(lead, customer)
-        renewal_lead = _create_renewal_lead(lead, customer, ins_record)
-        _notify_renewals_manager(renewal_lead, lead)
+        renewal_record = _create_renewal_record(lead, customer, ins_record)
+        _notify_renewals_manager(renewal_record, lead)
         frappe.db.commit()
         frappe.logger().info("Phase4 Complete for lead " + lead_name)
     except Exception as e:
@@ -259,11 +259,11 @@ def _notify_renewals_manager(renewal_lead, original_lead):
     try:
         notification = frappe.get_doc({
             "doctype": "Notification Log",
-            "subject": "New Renewal Lead: " + original_lead.lead_name + " - " + insurance_type,
-            "email_content": "New renewal lead for " + original_lead.lead_name + ". Type: " + insurance_type + ". Expires: " + expiry,
+            "subject": "New Renewal: " + original_lead.lead_name + " - " + insurance_type + " expires " + expiry,
+            "email_content": "New renewal record for " + original_lead.lead_name + ". Type: " + insurance_type + ". Expires: " + expiry,
             "for_user": dilip_user,
             "type": "Alert",
-            "document_type": "CRM Lead",
+            "document_type": "Insurance Renewal Record",
             "document_name": renewal_lead.name,
         })
         notification.insert(ignore_permissions=True)
