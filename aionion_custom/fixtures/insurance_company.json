@@ -1,110 +1,121 @@
 [
  {
+  "company_name": "Tata AIG",
   "docstatus": 0,
   "doctype": "Insurance Company",
   "modified": "2026-04-17 17:26:21.974779",
-  "name": "fns86ikvld"
+  "name": "Tata AIG"
  },
  {
+  "company_name": "ICICI Lombard",
   "docstatus": 0,
   "doctype": "Insurance Company",
   "modified": "2026-04-18 20:13:07.538011",
-  "name": "t6kepntufg"
+  "name": "ICICI Lombard"
  },
  {
+  "company_name": "Manipal Cigna",
   "docstatus": 0,
   "doctype": "Insurance Company",
   "modified": "2026-04-18 20:13:07.692151",
-  "name": "t6khmtueiq"
+  "name": "Manipal Cigna"
  },
  {
+  "company_name": "Care Health",
   "docstatus": 0,
   "doctype": "Insurance Company",
   "modified": "2026-04-18 20:13:07.694529",
-  "name": "t6kg8vmvkj"
+  "name": "Care Health"
  },
  {
+  "company_name": "HDFC Ergo",
   "docstatus": 0,
   "doctype": "Insurance Company",
   "modified": "2026-04-18 20:13:07.696165",
-  "name": "t6kjispsi9"
+  "name": "HDFC Ergo"
  },
  {
+  "company_name": "Max Life",
   "docstatus": 0,
   "doctype": "Insurance Company",
   "modified": "2026-04-18 20:13:07.697787",
-  "name": "t6kp940h5r"
+  "name": "Max Life"
  },
  {
+  "company_name": "HDFC Life",
   "docstatus": 0,
   "doctype": "Insurance Company",
   "modified": "2026-04-18 20:13:07.699317",
-  "name": "t6kg8994s6"
+  "name": "HDFC Life"
  },
  {
+  "company_name": "LIC",
   "docstatus": 0,
   "doctype": "Insurance Company",
   "modified": "2026-04-18 20:13:07.700781",
-  "name": "t6llup2jqe"
+  "name": "LIC"
  },
  {
+  "company_name": "ICICI Prudential",
   "docstatus": 0,
   "doctype": "Insurance Company",
   "modified": "2026-04-18 20:13:07.703600",
-  "name": "t6lrp1pvdn"
+  "name": "ICICI Prudential"
  },
  {
+  "company_name": "ICICI Lombard Motor",
   "docstatus": 0,
   "doctype": "Insurance Company",
   "modified": "2026-04-18 20:13:07.706160",
-  "name": "t6lshfj3g9"
+  "name": "ICICI Lombard Motor"
  },
  {
+  "company_name": "Tata AIG Motor",
   "docstatus": 0,
   "doctype": "Insurance Company",
   "modified": "2026-04-18 20:13:07.707710",
-  "name": "t6lm7s2ksi"
+  "name": "Tata AIG Motor"
  },
  {
+  "company_name": "Kotak General",
   "docstatus": 0,
   "doctype": "Insurance Company",
   "modified": "2026-04-18 20:13:07.709170",
-  "name": "t6ld1rf77k"
+  "name": "Kotak General"
  },
  {
+  "company_name": "Royal Sundaram",
   "docstatus": 0,
   "doctype": "Insurance Company",
   "modified": "2026-04-18 20:13:07.710937",
-  "name": "t6lkjlv0ll"
+  "name": "Royal Sundaram"
  },
  {
+  "company_name": "Bajaj Allianz",
   "docstatus": 0,
   "doctype": "Insurance Company",
   "modified": "2026-04-18 20:13:07.712493",
-  "name": "t6lbumaebm"
+  "name": "Bajaj Allianz"
  },
  {
+  "company_name": "Star Health",
   "docstatus": 0,
   "doctype": "Insurance Company",
   "modified": "2026-04-18 20:13:07.713877",
-  "name": "t6lesctv5c"
+  "name": "Star Health"
  },
  {
+  "company_name": "New India Assurance",
   "docstatus": 0,
   "doctype": "Insurance Company",
   "modified": "2026-04-18 20:13:07.715273",
-  "name": "t6lk5iiikd"
+  "name": "New India Assurance"
  },
  {
+  "company_name": "United India Insurance",
   "docstatus": 0,
   "doctype": "Insurance Company",
   "modified": "2026-04-18 20:13:07.716610",
-  "name": "t6l5pqb8uc"
- },
- {
-  "docstatus": 0,
-  "doctype": "Insurance Company",
-  "modified": "2026-04-18 20:13:07.718316",
-  "name": "t6la3urnm4"
+  "name": "United India Insurance"
  }
 ]
