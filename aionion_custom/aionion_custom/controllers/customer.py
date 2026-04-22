@@ -125,7 +125,8 @@ def get_customer_360(customer_name):
 
     # Get customer details
     customer = frappe.db.get_value("Customer", customer_name,
-        ["customer_name", "custom_aionion_master_id", "custom_mobile", "pan"],
+        ["customer_name", "custom_aionion_master_id as aionion_master_id",
+         "custom_mobile as mobile", "pan"],
         as_dict=True)
 
     products = {
