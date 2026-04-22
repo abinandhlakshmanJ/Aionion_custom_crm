@@ -157,7 +157,7 @@ fixtures = [
     # Property Setters
     {"dt": "Property Setter", "filters": [["doc_type", "in", ["CRM Lead", "Customer"]]]},
     # Custom Permissions
-    {"dt": "Custom DocPerm", "filters": [["parent", "in", ["CRM Lead", "Insurance Record", "Customer"]]]},
+    {"dt": "Custom DocPerm", "filters": [["parent", "in", ["CRM Lead", "Insurance Record", "Customer", "Insurance Renewal Record"]]]},
     # Insurance Company master data
     "Insurance Company",
     # CRM Lead Sources
@@ -170,6 +170,13 @@ fixtures = [
         "Customer Call Button",
         "Navigate to Customers and Aionion Tasks"
     ]]]},
+    # Client Scripts
+    {"dt": "Client Script", "filters": [["name", "in", [
+        "Customer 360 View",
+        "Create Lead from Customer",
+        "Go to CRM Leads from Customer",
+        "Call Button for Customer"
+    ]]]},
     # Roles
     {"dt": "Role", "filters": [["role_name", "in", [
         "Insurance Sales RM",
@@ -181,6 +188,8 @@ fixtures = [
         "Capital RM",
         "Global RM"
     ]]]},
+    # Workspace
+    {"dt": "Workspace", "filters": [["name", "in", ["Aionion Insurance"]]]},
 ]
 
 scheduler_events = {
