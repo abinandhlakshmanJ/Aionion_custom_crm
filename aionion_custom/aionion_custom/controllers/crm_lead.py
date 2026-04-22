@@ -732,7 +732,11 @@ def get_permission_query_conditions(user=None):
         user = frappe.session.user
 
     # Administrators and top management see everything
-    if user in ["Administrator", "administrator"] or "System Manager" in frappe.get_roles(user):
+    # Only true admins bypass — not Insurance Sales Manager
+    if user in ["Administrator", "administrator"]:
+        return ""
+    user_roles = frappe.get_roles(user)
+    if "System Manager" in user_roles:
         return ""
 
     user_roles = frappe.get_roles(user)
