@@ -1,0 +1,360 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "RNW-.###",
+ "creation": "2026-04-19 22:26:19.711301",
+ "custom": 1,
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "client_section",
+  "customer",
+  "client_name",
+  "col1",
+  "mobile_no",
+  "email",
+  "policy_section",
+  "source_insurance_record",
+  "insurance_type",
+  "col2",
+  "insurance_company",
+  "existing_policy_number",
+  "renewal_section",
+  "policy_expiry_date",
+  "renewal_due_date",
+  "col3",
+  "renewal_status",
+  "renewal_remarks",
+  "new_policy_section",
+  "new_insurance_company",
+  "new_proposal_number",
+  "col4",
+  "new_policy_number",
+  "new_policy_status",
+  "new_expiry_date",
+  "new_premium",
+  "new_sum_assured",
+  "rm_section",
+  "renewals_rm",
+  "renewals_rm_name",
+  "col5",
+  "assigned_by",
+  "assigned_date",
+  "mis_section",
+  "mis_status",
+  "mis_verified_by",
+  "mis_verified_date",
+  "source_section",
+  "source_lead",
+  "aionion_master_id",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "client_section",
+   "fieldtype": "Section Break",
+   "label": "Client Details"
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Customer",
+   "options": "Customer",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "customer.customer_name",
+   "fieldname": "client_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Client Name"
+  },
+  {
+   "fieldname": "col1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "customer.custom_mobile",
+   "fieldname": "mobile_no",
+   "fieldtype": "Data",
+   "label": "Mobile No"
+  },
+  {
+   "fetch_from": "customer.custom_email",
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "label": "Email"
+  },
+  {
+   "fieldname": "policy_section",
+   "fieldtype": "Section Break",
+   "label": "Policy Details"
+  },
+  {
+   "fieldname": "source_insurance_record",
+   "fieldtype": "Link",
+   "label": "Source Insurance Record",
+   "options": "Insurance Record",
+   "reqd": 1
+  },
+  {
+   "fieldname": "insurance_type",
+   "fieldtype": "Select",
+   "label": "Insurance Type",
+   "options": "\nHealth\nTerm\nMotor\nTravel\nLife"
+  },
+  {
+   "fieldname": "col2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "insurance_company",
+   "fieldtype": "Link",
+   "label": "Insurance Company",
+   "options": "Insurance Company"
+  },
+  {
+   "fieldname": "existing_policy_number",
+   "fieldtype": "Data",
+   "label": "Existing Policy Number"
+  },
+  {
+   "fieldname": "renewal_section",
+   "fieldtype": "Section Break",
+   "label": "Renewal Details"
+  },
+  {
+   "fieldname": "policy_expiry_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Policy Expiry Date"
+  },
+  {
+   "fieldname": "renewal_due_date",
+   "fieldtype": "Date",
+   "label": "Renewal Due Date"
+  },
+  {
+   "fieldname": "col3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Pending",
+   "fieldname": "renewal_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Renewal Status",
+   "options": "\nPending\nIn Progress\nRenewed\nLapsed\nNot Interested"
+  },
+  {
+   "fieldname": "renewal_remarks",
+   "fieldtype": "Small Text",
+   "label": "Renewal Remarks"
+  },
+  {
+   "fieldname": "new_policy_section",
+   "fieldtype": "Section Break",
+   "label": "New Policy Details"
+  },
+  {
+   "fieldname": "new_insurance_company",
+   "fieldtype": "Link",
+   "label": "New Insurance Company",
+   "options": "Insurance Company"
+  },
+  {
+   "fieldname": "new_proposal_number",
+   "fieldtype": "Data",
+   "label": "New Proposal Number"
+  },
+  {
+   "fieldname": "col4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "new_policy_number",
+   "fieldtype": "Data",
+   "label": "New Policy Number"
+  },
+  {
+   "fieldname": "new_policy_status",
+   "fieldtype": "Select",
+   "label": "New Policy Status",
+   "options": "\nIssued\nPending on Client Side\nPending on Company Side\nRejected\nNot Responding"
+  },
+  {
+   "fieldname": "new_expiry_date",
+   "fieldtype": "Date",
+   "label": "New Expiry Date"
+  },
+  {
+   "fieldname": "new_premium",
+   "fieldtype": "Currency",
+   "label": "New Premium"
+  },
+  {
+   "fieldname": "new_sum_assured",
+   "fieldtype": "Currency",
+   "label": "New Sum Assured"
+  },
+  {
+   "fieldname": "rm_section",
+   "fieldtype": "Section Break",
+   "label": "RM Details"
+  },
+  {
+   "fieldname": "renewals_rm",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Renewals RM",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "renewals_rm.employee_name",
+   "fieldname": "renewals_rm_name",
+   "fieldtype": "Data",
+   "label": "Renewals RM Name"
+  },
+  {
+   "fieldname": "col5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "assigned_by",
+   "fieldtype": "Link",
+   "label": "Assigned By",
+   "options": "User"
+  },
+  {
+   "fieldname": "assigned_date",
+   "fieldtype": "Date",
+   "label": "Assigned Date"
+  },
+  {
+   "fieldname": "mis_section",
+   "fieldtype": "Section Break",
+   "label": "MIS Verification"
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "Pending",
+   "fieldname": "mis_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "MIS Status",
+   "options": "\nPending\nApproved\nRejected"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "mis_verified_by",
+   "fieldtype": "Link",
+   "label": "MIS Verified By",
+   "options": "User"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "mis_verified_date",
+   "fieldtype": "Date",
+   "label": "MIS Verified Date"
+  },
+  {
+   "fieldname": "source_section",
+   "fieldtype": "Section Break",
+   "label": "Source Tracking"
+  },
+  {
+   "fieldname": "source_lead",
+   "fieldtype": "Link",
+   "label": "Source Lead",
+   "options": "CRM Lead"
+  },
+  {
+   "fetch_from": "customer.custom_aionion_master_id",
+   "fieldname": "aionion_master_id",
+   "fieldtype": "Data",
+   "label": "Aionion Master ID"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Insurance Renewal Record",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-04-19 22:26:19.711301",
+ "modified_by": "Administrator",
+ "module": "Aionion Custom",
+ "name": "Insurance Renewal Record",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Insurance Renewals RM",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "amend": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Insurance Renewals Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Insurance MIS",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "amend": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}
