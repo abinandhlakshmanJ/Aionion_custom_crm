@@ -732,7 +732,7 @@ def get_permission_query_conditions(user=None):
         user = frappe.session.user
 
     # Administrators and top management see everything
-    if user == "Administrator":
+    if user in ["Administrator", "administrator"] or "System Manager" in frappe.get_roles(user):
         return ""
 
     user_roles = frappe.get_roles(user)
