@@ -721,3 +721,57 @@ def get_user_ids_for_employees(employee_names):
         fields=["user_id"])
 
     return [e.user_id for e in employees if e.user_id]
+
+
+def get_permission_query_conditions(user=None):
+    """
+    Filter CRM Leads based on employee hierarchy.
+    Each user sees only their own leads + their team's leads.
+    """
+    if not user:
+        user = frappe.session.user
+
+    # Administrators and top management see everything
+    if user == "Administrator":
+        return ""
+
+    user_roles = frappe.get_roles(user)
+    top_roles = ["System Manager", "CEO", "Director", "Zonal Head"]
+    if any(r in user_roles for r in top_roles):
+        return ""
+
+    # Get current user's employee
+    current_emp = frappe.db.get_value("Employee", {"user_id": user}, "name")
+    if not current_emp:
+        # No employee record — show only own leads
+        return f"`tabCRM Lead`.`lead_owner` = '{user}'"
+
+    # Get all team members recursively
+    def get_reportees(emp_name, visited=None):
+        if visited is None:
+            visited = set()
+        if emp_name in visited:
+            return []
+        visited.add(emp_name)
+        reportees = frappe.get_all("Employee",
+            filters={"reports_to": emp_name, "status": "Active"},
+            fields=["name"])
+        result = [emp_name]
+        for r in reportees:
+            result.extend(get_reportees(r.name, visited))
+        return result
+
+    team_emps = get_reportees(current_emp)
+
+    # Get user IDs for team employees
+    team_users = frappe.get_all("Employee",
+        filters={"name": ["in", team_emps], "user_id": ["!=", ""]},
+        fields=["user_id"])
+
+    user_ids = [u.user_id for u in team_users if u.user_id]
+
+    if not user_ids:
+        return f"`tabCRM Lead`.`lead_owner` = '{user}'"
+
+    user_ids_str = "', '".join(user_ids)
+    return f"`tabCRM Lead`.`lead_owner` in ('{user_ids_str}')"
