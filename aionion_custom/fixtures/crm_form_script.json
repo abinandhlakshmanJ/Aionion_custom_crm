@@ -42,5 +42,16 @@
   "name": "Insurance MIS Actions",
   "script": "function setupForm({ doc, call, toast, $dialog }) {\n    if (doc.custom_entity !== \"Aionion Insurance\") return\n    if (doc.docstatus !== 1) return\n    if (doc.custom_product === \"Insurance Renewals\") return\n\n    const actions = []\n\n    if (doc.custom_mis_status !== \"Approved\") {\n        actions.push({\n            label: \"Verify MIS\",\n            onClick: () => {\n                $dialog({\n                    title: \"Verify MIS\",\n                    message: \"Have you verified Policy No \" + (doc.custom_policy_number || \"N/A\") + \" in the insurer portal?\",\n                    actions: [{ label: \"Verify\", variant: \"solid\", onClick: (close) => {\n                        call(\"aionion_custom.aionion_custom.controllers.crm_lead.approve_mis\",\n                            { lead_name: doc.name }\n                        ).then(() => {\n                            close()\n                            toast.success(\"MIS Verified!\")\n                            setTimeout(() => window.location.href = window.location.href, 1500)\n                        }).catch((e) => { close(); toast.error(e.message || \"Error\") })\n                    }}]\n                })\n            }\n        })\n    }\n\n    if (doc.custom_mis_status !== \"Rejected\") {\n        actions.push({\n            label: \"Reject MIS\",\n            onClick: () => {\n                $dialog({\n                    title: \"Reject MIS\",\n                    message: \"Reject MIS for \" + doc.lead_name + \"? Lead will be unlocked for Service RM to refill.\",\n                    actions: [{ label: \"Reject\", variant: \"solid\", onClick: (close) => {\n                        call(\"aionion_custom.aionion_custom.controllers.crm_lead.reject_mis\",\n                            { lead_name: doc.name }\n                        ).then(() => {\n                            close()\n                            toast.success(\"MIS Rejected. Lead unlocked.\")\n                            setTimeout(() => window.location.href = window.location.href, 1500)\n                        }).catch((e) => { close(); toast.error(e.message || \"Error\") })\n                    }}]\n                })\n            }\n        })\n    }\n\n    return { actions }\n}",
   "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "CRM Form Script",
+  "dt": "CRM Lead",
+  "enabled": 1,
+  "is_standard": 0,
+  "modified": "2026-04-22 17:17:11.021136",
+  "name": "Lead Hierarchy Filter",
+  "script": "function setupList({ call, columns, filters, setFilters }) {\n    // Get current user's team employees from server\n    call(\"aionion_custom.aionion_custom.controllers.crm_lead.get_my_team_employees\", {})\n    .then((employees) => {\n        if (!employees || employees.length === 0) return\n\n        // Get user IDs for these employees\n        call(\"aionion_custom.aionion_custom.controllers.crm_lead.get_user_ids_for_employees\",\n            { employee_names: employees }\n        ).then((userIds) => {\n            if (!userIds || userIds.length === 0) return\n\n            // Set filter to show only leads owned by team members\n            setFilters([\n                { fieldname: \"lead_owner\", operator: \"in\", value: userIds }\n            ])\n        })\n    })\n}",
+  "view": "List"
  }
 ]

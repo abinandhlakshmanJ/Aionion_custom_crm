@@ -168,7 +168,8 @@ fixtures = [
         "Insurance MIS Actions",
         "Customer Actions",
         "Customer Call Button",
-        "Navigate to Customers and Aionion Tasks"
+        "Navigate to Customers and Aionion Tasks",
+        "Lead Hierarchy Filter"
     ]]]},
     # Client Scripts
     {"dt": "Client Script", "filters": [["name", "in", [
