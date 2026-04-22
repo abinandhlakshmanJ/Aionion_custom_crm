@@ -1,353 +1,344 @@
 {
-  "actions": [],
-  "allow_rename": 1,
-  "autoname": "INS-.###",
-  "creation": "2026-03-14 08:22:52.469647",
-  "doctype": "DocType",
-  "engine": "InnoDB",
-  "field_order": [
-    "section_break_zzpz",
-    "task",
-    "customer",
-    "lead",
-    "company",
-    "client_name",
-    "mobile_no",
-    "email",
-    "pan",
-    "client_code",
-    "column_break_ins_1",
-    "rm_employee_code",
-    "rm_employee_name",
-    "branch",
-    "department",
-    "amended_from",
-    "insurance_details_section",
-    "transaction_type",
-    "business_type",
-    "insurance_products",
-    "custom_type_fresh_port",
-    "issued_date",
-    "gross_premium_value",
-    "net_premium_value",
-    "income_category",
-    "insurance_company",
-    "proposal_number",
-    "premium_paying_term",
-    "custom_tenure",
-    "gst_waiver",
-    "column_break_ins_2",
-    "interested_in",
-    "sum_insured",
-    "insurance_type",
-    "policy_number",
-    "policy_status",
-    "custom_mis_status",
-    "custom_mis_verified_by",
-    "custom_mis_verified_date",
-    "policy_start_date",
-    "policy_expiry_date",
-    "custom_new_expiry_date",
-    "client_reference_number",
-    "next_premium_payment_due_date",
-    "payment_period"
-  ],
-  "fields": [
-    {
-      "fieldname": "section_break_zzpz",
-      "fieldtype": "Section Break"
-    },
-    {
-      "fieldname": "task",
-      "fieldtype": "Link",
-      "label": "Task",
-      "options": "Aionion Task",
-      "read_only": 1
-    },
-    {
-      "fieldname": "customer",
-      "fieldtype": "Link",
-      "label": "Customer",
-      "options": "Customer"
-    },
-    {
-      "fieldname": "lead",
-      "fieldtype": "Link",
-      "label": "Lead",
-      "options": "CRM Lead"
-    },
-    {
-      "fieldname": "company",
-      "fieldtype": "Link",
-      "label": "Company",
-      "options": "Company"
-    },
-    {
-      "fieldname": "client_name",
-      "fieldtype": "Data",
-      "label": "Client Name"
-    },
-    {
-      "fieldname": "pan",
-      "fieldtype": "Data",
-      "label": "PAN"
-    },
-    {
-      "fieldname": "client_code",
-      "fieldtype": "Data",
-      "label": "Client Code"
-    },
-    {
-      "fieldname": "column_break_ins_1",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "rm_employee_code",
-      "fieldtype": "Link",
-      "label": "RM Employee Code",
-      "options": "Employee"
-    },
-    {
-      "fetch_from": "rm_employee_code.employee_name",
-      "fieldname": "rm_employee_name",
-      "fieldtype": "Data",
-      "label": "RM Employee Name"
-    },
-    {
-      "fetch_from": "rm_employee_code.branch",
-      "fieldname": "branch",
-      "fieldtype": "Link",
-      "label": "Branch",
-      "options": "Branch"
-    },
-    {
-      "fetch_from": "rm_employee_code.department",
-      "fieldname": "department",
-      "fieldtype": "Link",
-      "label": "Department",
-      "options": "Department"
-    },
-    {
-      "fieldname": "amended_from",
-      "fieldtype": "Link",
-      "label": "Amended From",
-      "no_copy": 1,
-      "options": "Insurance Record",
-      "print_hide": 1,
-      "read_only": 1,
-      "search_index": 1
-    },
-    {
-      "fieldname": "insurance_details_section",
-      "fieldtype": "Section Break",
-      "label": "Insurance Details"
-    },
-    {
-      "fieldname": "transaction_type",
-      "fieldtype": "Select",
-      "label": "Transaction Type",
-      "options": "Sales\nRenewal"
-    },
-    {
-      "fieldname": "insurance_products",
-      "fieldtype": "Select",
-      "in_list_view": 1,
-      "label": "Insurance Products",
-      "options": "\nHealth\nTerm\nMotor\nTravel\nSME\nMarine\nHome\nULIP\nOther\nTerm Insurance\nHealth Insurance\nMotor Insurance\nTravel Insurance\nHome Insurance\nFire Insurance\nGroup medical Insurance\nGroup Personal Accident Insurance\nDoctors Indemnity Insurance\nProfessional Indemnity Insurance\nWorkmen Compensation\nContractor All Risk Policy\nCyber Insurance\nMarine Insurance"
-    },
-    {
-      "fieldname": "issued_date",
-      "fieldtype": "Date",
-      "label": "Issued Date"
-    },
-    {
-      "fieldname": "gross_premium_value",
-      "fieldtype": "Currency",
-      "label": "Gross Premium Value"
-    },
-    {
-      "fieldname": "net_premium_value",
-      "fieldtype": "Currency",
-      "label": "Net Premium Value"
-    },
-    {
-      "fieldname": "income_category",
-      "fieldtype": "Select",
-      "label": "Income Category",
-      "options": "\nIndividual\nHUF\nFirm\nCompany\nTrust\nAOP/BOI"
-    },
-    {
-      "fieldname": "insurance_company",
-      "fieldtype": "Link",
-      "label": "Insurance Company",
-      "options": "Insurance Company"
-    },
-    {
-      "fieldname": "proposal_number",
-      "fieldtype": "Data",
-      "label": "Proposal Number"
-    },
-    {
-      "fieldname": "premium_paying_term",
-      "fieldtype": "Int",
-      "label": "Premium Paying Term"
-    },
-    {
-      "fieldname": "gst_waiver",
-      "fieldtype": "Small Text",
-      "label": "GST Waiver"
-    },
-    {
-      "fieldname": "column_break_ins_2",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "interested_in",
-      "fieldtype": "Small Text",
-      "label": "Interested In"
-    },
-    {
-      "fieldname": "sum_insured",
-      "fieldtype": "Currency",
-      "label": "Sum Insured"
-    },
-    {
-      "fieldname": "insurance_type",
-      "fieldtype": "Select",
-      "label": "Insurance Type"
-    },
-    {
-      "fieldname": "policy_number",
-      "fieldtype": "Data",
-      "label": "Policy Number"
-    },
-    {
-      "fieldname": "policy_status",
-      "fieldtype": "Select",
-      "label": "Policy Status",
-      "options": "\nIssued\nPending on Client Side\nPending on Company Side\nRejected\nRenewed\nNot Responding"
-    },
-    {
-      "fieldname": "policy_start_date",
-      "fieldtype": "Date",
-      "label": "Policy Start Date"
-    },
-    {
-      "fieldname": "policy_expiry_date",
-      "fieldtype": "Date",
-      "label": "Policy Expiry Date"
-    },
-    {
-      "fieldname": "client_reference_number",
-      "fieldtype": "Data",
-      "label": "Client Reference Number"
-    },
-    {
-      "depends_on": "eval:doc.transaction_type == 'Renewal'",
-      "fieldname": "next_premium_payment_due_date",
-      "fieldtype": "Date",
-      "label": "Next Premium Payment Due Date"
-    },
-    {
-      "depends_on": "eval:doc.transaction_type == 'Renewal'",
-      "fieldname": "payment_period",
-      "fieldtype": "Date",
-      "label": "Payment Period"
-    },
-    {
-      "fieldname": "mobile_no",
-      "fieldtype": "Data",
-      "label": "Mobile Number",
-      "insert_after": "client_name",
-      "reqd": 1
-    },
-    {
-      "fieldname": "email",
-      "fieldtype": "Data",
-      "label": "Email",
-      "insert_after": "mobile_no"
-    },
-    {
-      "fieldname": "business_type",
-      "fieldtype": "Select",
-      "label": "Business Type",
-      "insert_after": "transaction_type",
-      "options": "\nNew Business\nRenewal",
-      "read_only": 1
-    },
-    {
-      "fieldname": "custom_tenure",
-      "fieldtype": "Int",
-      "label": "Tenure (Years)",
-      "insert_after": "premium_paying_term"
-    },
-    {
-      "fieldname": "custom_type_fresh_port",
-      "fieldtype": "Select",
-      "label": "Type",
-      "insert_after": "insurance_products",
-      "options": "\nFRESH\nPORT",
-      "reqd": 1
-    },
-    {
-      "fieldname": "custom_mis_status",
-      "fieldtype": "Select",
-      "label": "MIS Status",
-      "insert_after": "policy_status",
-      "options": "\nPending\nApproved\nRejected",
-      "default": "Pending",
-      "read_only": 1
-    },
-    {
-      "fieldname": "custom_mis_verified_by",
-      "fieldtype": "Link",
-      "label": "MIS Verified By",
-      "insert_after": "custom_mis_status",
-      "options": "User",
-      "read_only": 1
-    },
-    {
-      "fieldname": "custom_mis_verified_date",
-      "fieldtype": "Date",
-      "label": "MIS Verified Date",
-      "insert_after": "custom_mis_verified_by",
-      "read_only": 1
-    },
-    {
-      "fieldname": "custom_new_expiry_date",
-      "fieldtype": "Date",
-      "label": "New Expiry Date",
-      "insert_after": "policy_expiry_date",
-      "depends_on": "eval:doc.transaction_type == 'Renewal'"
-    }
-  ],
-  "grid_page_length": 50,
-  "index_web_pages_for_search": 1,
-  "is_submittable": 1,
-  "links": [],
-  "modified": "2026-04-17 00:00:00.000000",
-  "modified_by": "Administrator",
-  "module": "Aionion Custom",
-  "name": "Insurance Record",
-  "naming_rule": "Expression",
-  "owner": "Administrator",
-  "permissions": [
-    {
-      "create": 1,
-      "delete": 1,
-      "email": 1,
-      "export": 1,
-      "print": 1,
-      "read": 1,
-      "report": 1,
-      "role": "System Manager",
-      "share": 1,
-      "write": 1
-    }
-  ],
-  "row_format": "Dynamic",
-  "rows_threshold_for_grid_search": 20,
-  "sort_field": "creation",
-  "sort_order": "DESC",
-  "states": []
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "INS-.###",
+ "creation": "2026-03-14 08:22:52.469647",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_zzpz",
+  "task",
+  "customer",
+  "lead",
+  "company",
+  "client_name",
+  "mobile_no",
+  "email",
+  "pan",
+  "client_code",
+  "column_break_ins_1",
+  "rm_employee_code",
+  "rm_employee_name",
+  "branch",
+  "department",
+  "amended_from",
+  "insurance_details_section",
+  "transaction_type",
+  "business_type",
+  "insurance_products",
+  "custom_type_fresh_port",
+  "issued_date",
+  "gross_premium_value",
+  "net_premium_value",
+  "income_category",
+  "insurance_company",
+  "proposal_number",
+  "premium_paying_term",
+  "custom_tenure",
+  "gst_waiver",
+  "column_break_ins_2",
+  "interested_in",
+  "sum_insured",
+  "insurance_type",
+  "policy_number",
+  "policy_status",
+  "custom_mis_status",
+  "custom_mis_verified_by",
+  "custom_mis_verified_date",
+  "policy_start_date",
+  "policy_expiry_date",
+  "custom_new_expiry_date",
+  "client_reference_number",
+  "next_premium_payment_due_date",
+  "payment_period"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_zzpz",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "task",
+   "fieldtype": "Link",
+   "label": "Task",
+   "options": "Aionion Task",
+   "read_only": 1
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer"
+  },
+  {
+   "fieldname": "lead",
+   "fieldtype": "Link",
+   "label": "Lead",
+   "options": "CRM Lead"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "client_name",
+   "fieldtype": "Data",
+   "label": "Client Name"
+  },
+  {
+   "fieldname": "pan",
+   "fieldtype": "Data",
+   "label": "PAN"
+  },
+  {
+   "fieldname": "client_code",
+   "fieldtype": "Data",
+   "label": "Client Code"
+  },
+  {
+   "fieldname": "column_break_ins_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "rm_employee_code",
+   "fieldtype": "Link",
+   "label": "RM Employee Code",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "rm_employee_code.employee_name",
+   "fieldname": "rm_employee_name",
+   "fieldtype": "Data",
+   "label": "RM Employee Name"
+  },
+  {
+   "fetch_from": "rm_employee_code.branch",
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch"
+  },
+  {
+   "fetch_from": "rm_employee_code.department",
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Department",
+   "options": "Department"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Insurance Record",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "insurance_details_section",
+   "fieldtype": "Section Break",
+   "label": "Insurance Details"
+  },
+  {
+   "fieldname": "transaction_type",
+   "fieldtype": "Select",
+   "label": "Transaction Type",
+   "options": "Sales\nRenewal"
+  },
+  {
+   "fieldname": "insurance_products",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Insurance Products",
+   "options": "\nHealth\nTerm\nMotor\nTravel\nSME\nMarine\nHome\nULIP\nOther\nTerm Insurance\nHealth Insurance\nMotor Insurance\nTravel Insurance\nHome Insurance\nFire Insurance\nGroup medical Insurance\nGroup Personal Accident Insurance\nDoctors Indemnity Insurance\nProfessional Indemnity Insurance\nWorkmen Compensation\nContractor All Risk Policy\nCyber Insurance\nMarine Insurance"
+  },
+  {
+   "fieldname": "issued_date",
+   "fieldtype": "Date",
+   "label": "Issued Date"
+  },
+  {
+   "fieldname": "gross_premium_value",
+   "fieldtype": "Currency",
+   "label": "Gross Premium Value"
+  },
+  {
+   "fieldname": "net_premium_value",
+   "fieldtype": "Currency",
+   "label": "Net Premium Value"
+  },
+  {
+   "fieldname": "income_category",
+   "fieldtype": "Select",
+   "label": "Income Category",
+   "options": "\nIndividual\nHUF\nFirm\nCompany\nTrust\nAOP/BOI"
+  },
+  {
+   "fieldname": "insurance_company",
+   "fieldtype": "Link",
+   "label": "Insurance Company",
+   "options": "Insurance Company"
+  },
+  {
+   "fieldname": "proposal_number",
+   "fieldtype": "Data",
+   "label": "Proposal Number"
+  },
+  {
+   "fieldname": "premium_paying_term",
+   "fieldtype": "Int",
+   "label": "Premium Paying Term"
+  },
+  {
+   "fieldname": "gst_waiver",
+   "fieldtype": "Small Text",
+   "label": "GST Waiver"
+  },
+  {
+   "fieldname": "column_break_ins_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "interested_in",
+   "fieldtype": "Small Text",
+   "label": "Interested In"
+  },
+  {
+   "fieldname": "sum_insured",
+   "fieldtype": "Currency",
+   "label": "Sum Insured"
+  },
+  {
+   "fieldname": "insurance_type",
+   "fieldtype": "Select",
+   "label": "Insurance Type"
+  },
+  {
+   "fieldname": "policy_number",
+   "fieldtype": "Data",
+   "label": "Policy Number"
+  },
+  {
+   "fieldname": "policy_status",
+   "fieldtype": "Select",
+   "label": "Policy Status",
+   "options": "\nIssued\nPending on Client Side\nPending on Company Side\nRejected\nRenewed\nNot Responding"
+  },
+  {
+   "fieldname": "policy_start_date",
+   "fieldtype": "Date",
+   "label": "Policy Start Date"
+  },
+  {
+   "fieldname": "policy_expiry_date",
+   "fieldtype": "Date",
+   "label": "Policy Expiry Date"
+  },
+  {
+   "fieldname": "client_reference_number",
+   "fieldtype": "Data",
+   "label": "Client Reference Number"
+  },
+  {
+   "depends_on": "eval:doc.transaction_type == 'Renewal'",
+   "fieldname": "next_premium_payment_due_date",
+   "fieldtype": "Date",
+   "label": "Next Premium Payment Due Date"
+  },
+  {
+   "depends_on": "eval:doc.transaction_type == 'Renewal'",
+   "fieldname": "payment_period",
+   "fieldtype": "Date",
+   "label": "Payment Period"
+  },
+  {
+   "fieldname": "mobile_no",
+   "fieldtype": "Data",
+   "label": "Mobile Number",
+   "reqd": 1
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "label": "Email"
+  },
+  {
+   "fieldname": "business_type",
+   "fieldtype": "Select",
+   "label": "Business Type",
+   "options": "\nNew Business\nRenewal",
+   "read_only": 1
+  },
+  {
+   "fieldname": "custom_tenure",
+   "fieldtype": "Int",
+   "label": "Tenure (Years)"
+  },
+  {
+   "fieldname": "custom_type_fresh_port",
+   "fieldtype": "Select",
+   "label": "Type",
+   "options": "\nFRESH\nPORT",
+   "reqd": 1
+  },
+  {
+   "default": "Pending",
+   "fieldname": "custom_mis_status",
+   "fieldtype": "Select",
+   "label": "MIS Status",
+   "options": "\nPending\nApproved\nRejected",
+   "read_only": 1
+  },
+  {
+   "fieldname": "custom_mis_verified_by",
+   "fieldtype": "Link",
+   "label": "MIS Verified By",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "custom_mis_verified_date",
+   "fieldtype": "Date",
+   "label": "MIS Verified Date",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.transaction_type == 'Renewal'",
+   "fieldname": "custom_new_expiry_date",
+   "fieldtype": "Date",
+   "label": "New Expiry Date"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-04-17 00:00:00",
+ "modified_by": "Administrator",
+ "module": "Aionion Custom",
+ "name": "Insurance Record",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
 }
