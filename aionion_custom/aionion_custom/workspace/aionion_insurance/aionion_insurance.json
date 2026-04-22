@@ -1,0 +1,101 @@
+{
+ "app": "aionion_custom",
+ "charts": [],
+ "content": "[]",
+ "creation": "2026-04-22 13:29:35.185751",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "hide_custom": 0,
+ "icon": "shield",
+ "idx": 0,
+ "indicator_color": "green",
+ "is_hidden": 0,
+ "label": "Aionion Insurance",
+ "link_type": "DocType",
+ "links": [
+  {
+   "hidden": 0,
+   "icon": "refresh-cw",
+   "is_query_report": 0,
+   "label": "Renewals",
+   "link_count": 0,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Insurance Renewal Record",
+   "link_count": 0,
+   "link_to": "Insurance Renewal Record",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "shield",
+   "is_query_report": 0,
+   "label": "Insurance",
+   "link_count": 0,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Insurance Record",
+   "link_count": 0,
+   "link_to": "Insurance Record",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Insurance Company",
+   "link_count": 0,
+   "link_to": "Insurance Company",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "users",
+   "is_query_report": 0,
+   "label": "Customers",
+   "link_count": 0,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Customer",
+   "link_count": 0,
+   "link_to": "Customer",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2026-04-22 13:29:35.185751",
+ "modified_by": "Administrator",
+ "module": "Aionion Custom",
+ "name": "Aionion Insurance",
+ "number_cards": [],
+ "owner": "Administrator",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [],
+ "sequence_id": 0.0,
+ "shortcuts": [],
+ "title": "Aionion Insurance",
+ "type": "Workspace"
+}
