@@ -175,7 +175,9 @@ fixtures = [
         "Insurance Sales RM",
         "Insurance Service RM",
         "Insurance Renewals RM",
+        "Insurance Renewals Manager",
         "Insurance MIS",
+        "Insurance Sales Manager",
         "Capital RM",
         "Global RM"
     ]]]},
