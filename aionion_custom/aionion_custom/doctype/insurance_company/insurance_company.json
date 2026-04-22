@@ -1,50 +1,50 @@
 {
-  "actions": [],
-  "allow_rename": 1,
-  "creation": "2026-03-12 00:58:24.352313",
-  "doctype": "DocType",
-  "engine": "InnoDB",
-  "field_order": [
-    "section_break_rtzc"
-  ],
-  "fields": [
-    {
-      "fieldname": "company_name",
-      "fieldtype": "Data",
-      "label": "Company Name",
-      "reqd": 1,
-      "in_list_view": 1,
-      "in_standard_filter": 1
-    }
-  ],
-  "grid_page_length": 50,
-  "index_web_pages_for_search": 1,
-  "links": [],
-  "modified": "2026-03-12 00:58:24.352313",
-  "modified_by": "Administrator",
-  "module": "Aionion Custom",
-  "name": "Insurance Company",
-  "owner": "Administrator",
-  "permissions": [
-    {
-      "create": 1,
-      "delete": 1,
-      "email": 1,
-      "export": 1,
-      "print": 1,
-      "read": 1,
-      "report": 1,
-      "role": "System Manager",
-      "share": 1,
-      "write": 1
-    }
-  ],
-  "row_format": "Dynamic",
-  "rows_threshold_for_grid_search": 20,
-  "sort_field": "creation",
-  "sort_order": "DESC",
-  "states": [],
-  "autoname": "field:company_name",
-  "title_field": "company_name",
-  "search_fields": "company_name"
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:company_name",
+ "creation": "2026-03-12 00:58:24.352313",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "company_name"
+ ],
+ "fields": [
+  {
+   "fieldname": "company_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Company Name",
+   "reqd": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-04-21 07:33:48.859565",
+ "modified_by": "Administrator",
+ "module": "Aionion Custom",
+ "name": "Insurance Company",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "search_fields": "company_name",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "company_name"
 }
