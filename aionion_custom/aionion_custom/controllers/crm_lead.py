@@ -656,33 +656,23 @@ def get_my_team_employees(user=None):
     if not user:
         user = frappe.session.user
 
-    # Get current user's employee
-    current_emp = frappe.db.get_value("Employee", {"user_id": user}, "name")
-    if not current_emp:
-        return []
-
-    # Check if user is top level (CEO/Director/Admin) — sees everything
-    top_roles = ["System Manager", "Administrator", "CEO", "Director"]
     user_roles = frappe.get_roles(user)
-    if any(r in user_roles for r in top_roles):
-        # Return all employees
+    if "System Manager" in user_roles or user == "Administrator":
         all_emps = frappe.get_all("Employee", fields=["name"])
         return [e.name for e in all_emps]
 
-    # Build hierarchy — get all reportees recursively
+    current_emps = frappe.get_all("Employee", filters={"user_id": user}, fields=["name"])
+    if not current_emps:
+        return []
+
     def get_reportees(emp_name, visited=None):
         if visited is None:
             visited = set()
         if emp_name in visited:
             return []
         visited.add(emp_name)
-
-        reportees = frappe.get_all("Employee",
-            filters={"reports_to": emp_name, "status": "Active"},
-            fields=["name"])
-
         result = [emp_name]
-        for r in reportees:
+        for r in frappe.get_all("Employee", filters={"reports_to": emp_name}, fields=["name"]):
             result.extend(get_reportees(r.name, visited))
         return result
 
@@ -695,34 +685,11 @@ def get_my_team_employees(user=None):
 @frappe.whitelist()
 def get_user_ids_for_employees(employee_names):
     """Convert employee names to user IDs for lead filtering"""
-    if isinstance(employee_names, str):
-        import json
-        employee_names = json.loads(employee_names)
-
     if not employee_names:
         return []
-
     employees = frappe.get_all("Employee",
         filters={"name": ["in", employee_names], "user_id": ["!=", ""]},
         fields=["user_id"])
-
-    return [e.user_id for e in employees if e.user_id]
-
-
-@frappe.whitelist()
-def get_user_ids_for_employees(employee_names):
-    """Convert employee names to user IDs for lead filtering"""
-    if isinstance(employee_names, str):
-        import json
-        employee_names = json.loads(employee_names)
-
-    if not employee_names:
-        return []
-
-    employees = frappe.get_all("Employee",
-        filters={"name": ["in", employee_names], "user_id": ["!=", ""]},
-        fields=["user_id"])
-
     return [e.user_id for e in employees if e.user_id]
 
 
