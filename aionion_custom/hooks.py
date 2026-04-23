@@ -121,7 +121,7 @@ app_license = "mit"
 # Permissions evaluated in scripted ways
 
 permission_query_conditions = {
-    "CRM Lead": "aionion_custom.aionion_custom.controllers.crm_lead.get_permission_query_conditions",
+    # "CRM Lead": "aionion_custom.aionion_custom.controllers.crm_lead.get_permission_query_conditions",
 }
 #
 # has_permission = {
