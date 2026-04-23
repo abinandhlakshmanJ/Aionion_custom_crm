@@ -131,7 +131,7 @@ permission_query_conditions = {
 # Document Events
 # ---------------
 # Hook on document methods and events
-
+fixtures = ["Custom Field", "Property Setter"]
 doc_events = {
     "CRM Lead": {
         # Task 4 — PRD 6.4: keep lead_owner in sync with Service/Sales RM user_id
