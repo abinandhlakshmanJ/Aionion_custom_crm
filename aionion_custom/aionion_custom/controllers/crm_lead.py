@@ -724,7 +724,7 @@ def get_user_ids_for_employees(employee_names):
 
 
 
-def get_permission_query_conditions(user=None):
+def get_permission_query_conditions(user=None):  # v2 - uses get_all
     if not user:
         user = frappe.session.user
     if user in ["Administrator", "administrator"]:
