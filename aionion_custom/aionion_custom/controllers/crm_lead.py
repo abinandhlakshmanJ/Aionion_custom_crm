@@ -686,7 +686,10 @@ def get_my_team_employees(user=None):
             result.extend(get_reportees(r.name, visited))
         return result
 
-    return get_reportees(current_emp)
+    team = set()
+    for emp in current_emps:
+        team.update(get_reportees(emp.name))
+    return list(team)
 
 
 @frappe.whitelist()
