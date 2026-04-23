@@ -724,3 +724,92 @@ def get_permission_query_conditions(user=None):  # v2 - uses get_all
     if not user_ids:
         return "`tabCRM Lead`.`lead_owner` = '{}'".format(user)
     return "`tabCRM Lead`.`lead_owner` in ('{}')".format("', '".join(user_ids))
+
+
+
+def autoname_insurance_record(doc, method=None):
+    """Generate INS-YY-XXXX-NNNNNN format ID"""
+    import datetime
+    import random
+    import string
+
+    yy = str(datetime.datetime.now().year)[2:]
+
+    # Get random part from Customer
+    random_part = ""
+    if doc.customer:
+        random_part = frappe.db.get_value(
+            "Customer", doc.customer, "custom_random_part") or ""
+
+    if not random_part:
+        chars = [c for c in (string.ascii_uppercase + string.digits)
+                 if c not in "0O1IL"]
+        random_part = "".join(random.choices(chars, k=4))
+        if doc.customer:
+            frappe.db.set_value("Customer", doc.customer,
+                "custom_random_part", random_part)
+
+    from frappe.model.naming import make_autoname
+    doc.name = make_autoname(
+        "INS-" + yy + "-" + random_part + "-.######", doc=doc)
+
+
+@frappe.whitelist()
+def get_product_data(lead_name, product):
+    """Get existing product record data for a lead"""
+    product_doctype_map = {
+        "US Subscription": "US Subscription Record",
+        "Bonds": "Bonds Purchase Record",
+        "Mutual Funds": "Mutual Funds Record",
+        "Account Opening": "Equity Record"
+    }
+    dt = product_doctype_map.get(product)
+    if not dt:
+        return {}
+    record = frappe.db.get_value(dt, {"lead": lead_name}, "*", as_dict=True)
+    return record or {}
+
+
+@frappe.whitelist()
+def save_product_data(lead_name, product, data):
+    """Save product-specific data to the respective doctype"""
+    import json
+    if isinstance(data, str):
+        data = json.loads(data)
+
+    product_doctype_map = {
+        "US Subscription": "US Subscription Record",
+        "Bonds": "Bonds Purchase Record",
+        "Mutual Funds": "Mutual Funds Record",
+        "Account Opening": "Equity Record"
+    }
+    dt = product_doctype_map.get(product)
+    if not dt:
+        frappe.throw(f"Unknown product: {product}")
+
+    lead = frappe.get_doc("CRM Lead", lead_name)
+
+    # Check if record exists
+    existing = frappe.db.get_value(dt, {"lead": lead_name}, "name")
+    if existing:
+        rec = frappe.get_doc(dt, existing)
+    else:
+        rec = frappe.get_doc({
+            "doctype": dt,
+            "lead": lead_name,
+            "customer": lead.get("custom_customer") or "",
+            "client_name": lead.lead_name,
+        })
+
+    # Set fields from data
+    for key, val in data.items():
+        if hasattr(rec, key) and val:
+            rec.set(key, val)
+
+    if existing:
+        rec.save(ignore_permissions=True)
+    else:
+        rec.insert(ignore_permissions=True)
+
+    frappe.db.commit()
+    return rec.name
