@@ -733,36 +733,6 @@ def get_permission_query_conditions(user=None):
         return ""
     current_emps = frappe.get_all("Employee", filters={"user_id": user}, fields=["name"])
     if not current_emps:
-        return f"`tabCRM Lead`.`lead_owner` = '{user}'"
-    def get_reportees(emp_name, visited=None):
-        if visited is None:
-            visited = set()
-        if emp_name in visited:
-            return []
-        visited.add(emp_name)
-        result = [emp_name]
-        for r in frappe.get_all("Employee", filters={"reports_to": emp_name}, fields=["name"]):
-            result.extend(get_reportees(r.name, visited))
-        return result
-    team_emps = set()
-    for emp in current_emps:
-        team_emps.update(get_reportees(emp.name))
-    team_users = frappe.get_all("Employee", filters={"name": ["in", list(team_emps)], "user_id": ["!=", ""]}, fields=["user_id"])
-    user_ids = list(set([u.user_id for u in team_users if u.user_id]))
-    if not user_ids:
-        return f"`tabCRM Lead`.`lead_owner` = '{user}'"
-    return f"`tabCRM Lead`.`lead_owner` in ('{\'\', \'\'.join(user_ids)}')"
-
-
-def get_permission_query_conditions(user=None):
-    if not user:
-        user = frappe.session.user
-    if user in ["Administrator", "administrator"]:
-        return ""
-    if "System Manager" in frappe.get_roles(user):
-        return ""
-    current_emps = frappe.get_all("Employee", filters={"user_id": user}, fields=["name"])
-    if not current_emps:
         return "`tabCRM Lead`.`lead_owner` = '{}'".format(user)
     def get_reportees(emp_name, visited=None):
         if visited is None:
