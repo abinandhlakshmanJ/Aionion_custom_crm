@@ -28,7 +28,52 @@
   "column_break_us_2",
   "quantity",
   "currency",
-  "subscription_end_date"
+  "subscription_end_date",
+  "sales_rm_section",
+  "email_address",
+  "aionion_client_code",
+  "contact_number",
+  "client_email",
+  "intended_investment",
+  "indian_investments",
+  "country_of_residence",
+  "employment_status",
+  "emp_code",
+  "emp_name",
+  "emp_team",
+  "emp_branch",
+  "service_rm_section",
+  "month",
+  "year",
+  "assigned_to",
+  "eligibility",
+  "us_status",
+  "progress",
+  "detailed_remarks",
+  "reminder_date",
+  "alternative_phone",
+  "current_country",
+  "alternative_email",
+  "emp_phone",
+  "payment_section",
+  "mode_of_payment_new",
+  "payment_month",
+  "subscription_type_new",
+  "client_status_new",
+  "quantity_new",
+  "currency_new",
+  "sub_start_month",
+  "sub_end_month",
+  "sub_start_date",
+  "sub_end_date",
+  "metadata_section",
+  "sales_done_by",
+  "old_rm",
+  "team",
+  "email_sent",
+  "risk_declaration",
+  "payment_status",
+  "us_remarks"
  ],
  "fields": [
   {
@@ -163,13 +208,266 @@
    "fieldname": "subscription_end_date",
    "fieldtype": "Date",
    "label": "Subscription End Date"
+  },
+  {
+   "fieldname": "sales_rm_section",
+   "fieldtype": "Section Break",
+   "label": "Sales RM Details"
+  },
+  {
+   "fieldname": "email_address",
+   "fieldtype": "Data",
+   "label": "Email Address",
+   "options": "Email"
+  },
+  {
+   "fieldname": "aionion_client_code",
+   "fieldtype": "Data",
+   "label": "Aionion Client Code"
+  },
+  {
+   "fieldname": "contact_number",
+   "fieldtype": "Data",
+   "label": "Contact Number"
+  },
+  {
+   "fieldname": "client_email",
+   "fieldtype": "Data",
+   "label": "Client Email ID",
+   "options": "Email"
+  },
+  {
+   "fieldname": "intended_investment",
+   "fieldtype": "Select",
+   "label": "Intended US Investment",
+   "options": "\nUSD 600-800\nUSD 800-1000\nAbove 1000 USD"
+  },
+  {
+   "fieldname": "indian_investments",
+   "fieldtype": "Select",
+   "label": "Client Indian Investments",
+   "options": "\nINR 50 Lakhs and Above\nINR 25 Lakhs to 50 Lakhs\nLess than INR 25 Lakhs"
+  },
+  {
+   "fieldname": "country_of_residence",
+   "fieldtype": "Link",
+   "label": "Country of Residence",
+   "options": "Country"
+  },
+  {
+   "fieldname": "employment_status",
+   "fieldtype": "Select",
+   "label": "Employment Status",
+   "options": "\nEmployed\nSelf Employed"
+  },
+  {
+   "fieldname": "emp_code",
+   "fieldtype": "Data",
+   "label": "EMP Code"
+  },
+  {
+   "fieldname": "emp_name",
+   "fieldtype": "Data",
+   "label": "EMP Name"
+  },
+  {
+   "fieldname": "emp_team",
+   "fieldtype": "Select",
+   "label": "EMP Team",
+   "options": "\nChennai\nDubai\nMadurai"
+  },
+  {
+   "fieldname": "emp_branch",
+   "fieldtype": "Data",
+   "label": "EMP Branch"
+  },
+  {
+   "fieldname": "service_rm_section",
+   "fieldtype": "Section Break",
+   "label": "Service RM Details"
+  },
+  {
+   "fieldname": "month",
+   "fieldtype": "Select",
+   "label": "Month",
+   "options": "\nJanuary 2025\nFebruary 2025\nMarch 2025\nApril 2025\nMay 2025\nJune 2025\nJuly 2025\nAugust 2025\nSeptember 2025\nOctober 2025\nNovember 2025\nDecember 2025\nJanuary 2026\nFebruary 2026\nMarch 2026\nApril 2026\nMay 2026\nJune 2026\nJuly 2026\nAugust 2026\nSeptember 2026\nOctober 2026\nNovember 2026\nDecember 2026\nJanuary 2027"
+  },
+  {
+   "fieldname": "year",
+   "fieldtype": "Select",
+   "label": "Year",
+   "options": "\n2025\n2026\n2027\n2028"
+  },
+  {
+   "fieldname": "assigned_to",
+   "fieldtype": "Link",
+   "label": "Assigned To",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "eligibility",
+   "fieldtype": "Select",
+   "label": "Eligibility",
+   "options": "\nEligible\nNot Eligible\nAlready Subscribed\nRepeated"
+  },
+  {
+   "fieldname": "us_status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "\nDropped\nIn Process\nNot Eligible\nSubscribed\nReminder Month"
+  },
+  {
+   "fieldname": "progress",
+   "fieldtype": "Select",
+   "label": "Progress",
+   "options": "\nAlready Subscribed / Repeated\nDemate Only\nDropped\nExpensive\nGen. Enquiry / Prospect / Will get back\nIBKR link sent / Funding in process\nNo Response\nNot Eligible\nNot interested\nPayment link sent / Risk form sent\nReminder Month\nSubscribed"
+  },
+  {
+   "fieldname": "detailed_remarks",
+   "fieldtype": "Long Text",
+   "label": "Detailed Remarks"
+  },
+  {
+   "fieldname": "reminder_date",
+   "fieldtype": "Date",
+   "label": "Reminder Date / Postponed Month"
+  },
+  {
+   "fieldname": "alternative_phone",
+   "fieldtype": "Data",
+   "label": "Alternative Phone"
+  },
+  {
+   "fieldname": "current_country",
+   "fieldtype": "Link",
+   "label": "Current Country",
+   "options": "Country"
+  },
+  {
+   "fieldname": "alternative_email",
+   "fieldtype": "Data",
+   "label": "Alternative Email",
+   "options": "Email"
+  },
+  {
+   "fieldname": "emp_phone",
+   "fieldtype": "Data",
+   "label": "EMP Phone No"
+  },
+  {
+   "fieldname": "payment_section",
+   "fieldtype": "Section Break",
+   "label": "Payment Details"
+  },
+  {
+   "fieldname": "mode_of_payment_new",
+   "fieldtype": "Select",
+   "label": "Mode of Payment",
+   "options": "\nPayment Gateway\nBank Transfer"
+  },
+  {
+   "fieldname": "payment_month",
+   "fieldtype": "Select",
+   "label": "Payment Month",
+   "options": "\nApril 2026\nMay 2026\nJune 2026\nJuly 2026\nAugust 2026\nSeptember 2026\nOctober 2026\nNovember 2026\nDecember 2026\nJanuary 2027\nFebruary 2027\nMarch 2027"
+  },
+  {
+   "fieldname": "subscription_type_new",
+   "fieldtype": "Select",
+   "label": "Subscription Type",
+   "options": "\nAnnual\nTwo Years\nThree Years"
+  },
+  {
+   "fieldname": "client_status_new",
+   "fieldtype": "Select",
+   "label": "Client Status",
+   "options": "\nNew\nRNL"
+  },
+  {
+   "fieldname": "quantity_new",
+   "fieldtype": "Select",
+   "label": "Quantity",
+   "options": "\n1\n2\n3"
+  },
+  {
+   "fieldname": "currency_new",
+   "fieldtype": "Select",
+   "label": "Currency",
+   "options": "\nUSD\nAED"
+  },
+  {
+   "fieldname": "sub_start_month",
+   "fieldtype": "Select",
+   "label": "Subscription Start (Month-Year)",
+   "options": "\nApril 2026\nMay 2026\nJune 2026\nJuly 2026\nAugust 2026\nSeptember 2026\nOctober 2026\nNovember 2026\nDecember 2026\nJanuary 2027\nFebruary 2027\nMarch 2027\nApril 2028\nApril 2029"
+  },
+  {
+   "fieldname": "sub_end_month",
+   "fieldtype": "Select",
+   "label": "Subscription End (Month-Year)",
+   "options": "\nApril 2026\nMay 2026\nJune 2026\nJuly 2026\nAugust 2026\nSeptember 2026\nOctober 2026\nNovember 2026\nDecember 2026\nJanuary 2027\nFebruary 2027\nMarch 2027\nApril 2028\nApril 2029"
+  },
+  {
+   "fieldname": "sub_start_date",
+   "fieldtype": "Date",
+   "label": "Subscription Start Date"
+  },
+  {
+   "fieldname": "sub_end_date",
+   "fieldtype": "Date",
+   "label": "Subscription End Date"
+  },
+  {
+   "fieldname": "metadata_section",
+   "fieldtype": "Section Break",
+   "label": "Lead Metadata"
+  },
+  {
+   "fieldname": "sales_done_by",
+   "fieldtype": "Link",
+   "label": "Sales Done By",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "old_rm",
+   "fieldtype": "Data",
+   "label": "Old RM"
+  },
+  {
+   "fieldname": "team",
+   "fieldtype": "Select",
+   "label": "Team",
+   "options": "\nChennai\nDubai\nMadurai"
+  },
+  {
+   "fieldname": "email_sent",
+   "fieldtype": "Select",
+   "label": "Email Sent",
+   "options": "\nYes\nNo"
+  },
+  {
+   "fieldname": "risk_declaration",
+   "fieldtype": "Select",
+   "label": "Risk Declaration Received",
+   "options": "\nYes\nNo"
+  },
+  {
+   "fieldname": "payment_status",
+   "fieldtype": "Select",
+   "label": "Payment Status",
+   "options": "\nPending\nApproved\nRejected"
+  },
+  {
+   "fieldname": "us_remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-03-24 10:30:37.491357",
+ "modified": "2026-04-27 21:47:32.149189",
  "modified_by": "Administrator",
  "module": "Aionion Custom",
  "name": "US Subscription Record",
