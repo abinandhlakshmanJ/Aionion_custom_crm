@@ -187,7 +187,13 @@ fixtures = [
         "Insurance MIS",
         "Insurance Sales Manager",
         "Capital RM",
-        "Global RM"
+        "Global RM",
+        "US Subscription RM",
+        "US Subscription MIS"
+    ]]]},
+    # CRM Form Scripts — US Subscription
+    {"dt": "CRM Form Script", "filters": [["name", "in", [
+        "US Subscription List Actions"
     ]]]},
     # Workspace
     {"dt": "Workspace", "filters": [["name", "in", ["Aionion Insurance"]]]},
