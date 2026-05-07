@@ -199,6 +199,9 @@ scheduler_events = {
 			"frappe.email.doctype.email_account.email_account.pull",
 		],
 	},
+	"daily": [
+		"aionion_custom.aionion_custom.controllers.crm_lead.send_us_subscription_expiry_notifications",
+	],
 }
 
 # Testing

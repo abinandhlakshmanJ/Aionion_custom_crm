@@ -2,7 +2,7 @@
  "app": "aionion_custom",
  "charts": [],
  "content": "[]",
- "creation": "2026-04-22 13:29:35.185751",
+ "creation": "2026-04-27 21:50:26.068668",
  "custom_blocks": [],
  "docstatus": 0,
  "doctype": "Workspace",
@@ -85,7 +85,7 @@
    "type": "Link"
   }
  ],
- "modified": "2026-04-22 13:29:35.185751",
+ "modified": "2026-04-27 22:10:20.139452",
  "modified_by": "Administrator",
  "module": "Aionion Custom",
  "name": "Aionion Insurance",
@@ -93,7 +93,17 @@
  "owner": "Administrator",
  "public": 1,
  "quick_lists": [],
- "roles": [],
+ "roles": [
+  {
+   "role": "Insurance Renewals RM"
+  },
+  {
+   "role": "Insurance Sales RM"
+  },
+  {
+   "role": "Insurance Service RM"
+  }
+ ],
  "sequence_id": 0.0,
  "shortcuts": [],
  "title": "Aionion Insurance",

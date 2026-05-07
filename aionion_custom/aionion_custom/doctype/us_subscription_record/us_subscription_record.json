@@ -11,7 +11,6 @@
   "customer",
   "lead",
   "company",
-  "client_name",
   "client_status",
   "column_break_us_1",
   "rm_employee_code",
@@ -31,6 +30,7 @@
   "subscription_end_date",
   "sales_rm_section",
   "email_address",
+  "client_name",
   "aionion_client_code",
   "contact_number",
   "client_email",
@@ -78,11 +78,13 @@
  "fields": [
   {
    "fieldname": "section_break_lhe6",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "hidden": 1
   },
   {
    "fieldname": "task",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Task",
    "options": "Aionion Task",
    "read_only": 1
@@ -90,6 +92,7 @@
   {
    "fieldname": "customer",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Customer",
    "options": "Customer"
   },
@@ -97,45 +100,53 @@
    "fieldname": "lead",
    "fieldtype": "Link",
    "label": "Lead",
-   "options": "CRM Lead"
+   "options": "CRM Lead",
+   "read_only": 1
   },
   {
    "fieldname": "company",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Company",
    "options": "Company"
   },
   {
    "fieldname": "client_name",
    "fieldtype": "Data",
-   "label": "Client Name"
+   "label": "Client Name",
+   "read_only": 1
   },
   {
    "fieldname": "client_status",
    "fieldtype": "Select",
+   "hidden": 1,
    "label": "Client Status",
    "options": "New\nRenewal"
   },
   {
    "fieldname": "column_break_us_1",
-   "fieldtype": "Column Break"
+   "fieldtype": "Column Break",
+   "hidden": 1
   },
   {
    "fieldname": "rm_employee_code",
    "fieldtype": "Link",
    "label": "RM Employee Code",
-   "options": "Employee"
+   "options": "Employee",
+   "read_only": 1
   },
   {
    "fetch_from": "rm_employee_code.employee_name",
    "fieldname": "rm_employee_name",
    "fieldtype": "Data",
-   "label": "RM Employee Name"
+   "label": "RM Employee Name",
+   "read_only": 1
   },
   {
    "fetch_from": "rm_employee_code.branch",
    "fieldname": "branch",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Branch",
    "options": "Branch"
   },
@@ -143,12 +154,14 @@
    "fetch_from": "rm_employee_code.department",
    "fieldname": "department",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Department",
    "options": "Department"
   },
   {
    "fieldname": "amended_from",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Amended From",
    "no_copy": 1,
    "options": "US Subscription Record",
@@ -159,7 +172,7 @@
   {
    "fieldname": "us_subscription_section",
    "fieldtype": "Section Break",
-   "label": "US Subscription Transaction"
+   "label": "Payment Amount"
   },
   {
    "fieldname": "payment_date",
@@ -174,18 +187,21 @@
   {
    "fieldname": "subscription_type",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Subscription Type",
    "options": "Subscription Plan"
   },
   {
    "fieldname": "mode_of_payment",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Mode of Payment",
    "options": "Mode of Payment"
   },
   {
    "fieldname": "chola_client_code",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Chola Client Code"
   },
   {
@@ -195,18 +211,21 @@
   {
    "fieldname": "quantity",
    "fieldtype": "Int",
+   "hidden": 1,
    "label": "Quantity",
    "non_negative": 1
   },
   {
    "fieldname": "currency",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Currency",
    "options": "Currency"
   },
   {
    "fieldname": "subscription_end_date",
    "fieldtype": "Date",
+   "hidden": 1,
    "label": "Subscription End Date"
   },
   {
@@ -252,13 +271,15 @@
    "fieldname": "country_of_residence",
    "fieldtype": "Link",
    "label": "Country of Residence",
-   "options": "Country"
+   "options": "Country",
+   "read_only": 1
   },
   {
    "fieldname": "employment_status",
    "fieldtype": "Select",
    "label": "Employment Status",
-   "options": "\nEmployed\nSelf Employed"
+   "options": "\nEmployed\nSelf Employed",
+   "read_only": 1
   },
   {
    "fieldname": "emp_code",
@@ -467,7 +488,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-04-27 21:47:32.149189",
+ "modified": "2026-04-28 11:47:09.711861",
  "modified_by": "Administrator",
  "module": "Aionion Custom",
  "name": "US Subscription Record",
@@ -491,5 +512,6 @@
  "rows_threshold_for_grid_search": 20,
  "sort_field": "creation",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }

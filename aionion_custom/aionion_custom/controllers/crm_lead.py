@@ -32,10 +32,17 @@ def set_sales_rm_defaults(doc, method):
         if employee:
             doc.custom_sales_rm = employee
 
+    # Auto-fill Sales RM details from Employee record
+    if doc.custom_sales_rm:
+        emp = frappe.db.get_value("Employee", doc.custom_sales_rm,
+            ["name", "employee_name", "branch"],
+            as_dict=True)
+        if emp:
+            doc.custom_sales_rm_code = emp.name
+            if emp.branch:
+                doc.custom_sales_rm_branch = emp.branch
+
     # Service RM must NEVER be auto-set on creation
-    # It must always be assigned manually via Assign Service RM button
-    # NOTE: Sales RM and Service RM CAN be the same person — that is valid
-    # We only prevent AUTO-setting service_rm, not manual assignment
     if doc.is_new():
         doc.custom_service_rm = None
         doc.custom_service_rm_name = None
@@ -349,13 +356,18 @@ def get_suggested_service_rm(lead_name):
             return match
 
     # Priority 2: Round robin
-    # Check if this is a renewal lead — use Renewals RM role
-    # Otherwise use Service RM role
+    # Determine role and entity based on product/entity
     lead_doc = frappe.get_doc("CRM Lead", lead_name)
-    if lead_doc.custom_product == "Insurance Renewals":
+
+    if lead_doc.custom_entity == "US Subscription":
+        rm_role = "US Subscription RM"
+        filter_entity = "US Subscription"
+    elif lead_doc.custom_product == "Insurance Renewals":
         rm_role = "Insurance Renewals RM"
+        filter_entity = "Aionion Insurance"
     else:
         rm_role = "Insurance Service RM"
+        filter_entity = "Aionion Insurance"
 
     service_rm_users = frappe.get_all("Has Role",
         filters={"role": rm_role, "parenttype": "User"},
@@ -372,9 +384,8 @@ def get_suggested_service_rm(lead_name):
             fields=["name", "employee_name", "user_id"])
 
     if not employees:
-        return {"service_rm": None, "reason": "No Insurance Service RMs available"}
+        return {"service_rm": None, "reason": f"No {rm_role} available"}
 
-    # WHY frappe.qb not get_all in loop:
     # Count active leads per RM in ONE query — no N+1 problem
     from frappe.query_builder import DocType
     from frappe.query_builder.functions import Count
@@ -386,7 +397,7 @@ def get_suggested_service_rm(lead_name):
         .select(CRMLead.custom_service_rm, Count("*").as_("lead_count"))
         .where(
             (CRMLead.custom_service_rm.isin(emp_names))
-            & (CRMLead.custom_entity == "Aionion Insurance")
+            & (CRMLead.custom_entity == filter_entity)
             & (CRMLead.docstatus == 0)
         )
         .groupby(CRMLead.custom_service_rm)
@@ -694,16 +705,35 @@ def get_user_ids_for_employees(employee_names):
 
 
 
-def get_permission_query_conditions(user=None):  # v2 - uses get_all
+def get_permission_query_conditions(user=None):  # v3 - role-based entity filter
     if not user:
         user = frappe.session.user
     if user in ["Administrator", "administrator"]:
         return ""
-    if "System Manager" in frappe.get_roles(user):
+
+    user_roles = frappe.get_roles(user)
+
+    if "System Manager" in user_roles:
         return ""
+
+    # US Subscription MIS — sees all US Subscription leads
+    if "US Subscription MIS" in user_roles:
+        return "`tabCRM Lead`.`custom_entity` = 'US Subscription'"
+
+    # US Subscription RM — sees only their own US Subscription leads
+    if "US Subscription RM" in user_roles and "Insurance Sales RM" not in user_roles and "Capital RM" not in user_roles:
+        return ("`tabCRM Lead`.`custom_entity` = 'US Subscription' AND "
+                "`tabCRM Lead`.`lead_owner` = '{}'".format(user))
+
+    # Insurance MIS — sees all Insurance leads
+    if "Insurance MIS" in user_roles:
+        return "`tabCRM Lead`.`custom_entity` = 'Aionion Insurance'"
+
+    # Hierarchy-based visibility for all other roles
     current_emps = frappe.get_all("Employee", filters={"user_id": user}, fields=["name"])
     if not current_emps:
         return "`tabCRM Lead`.`lead_owner` = '{}'".format(user)
+
     def get_reportees(emp_name, visited=None):
         if visited is None:
             visited = set()
@@ -714,13 +744,16 @@ def get_permission_query_conditions(user=None):  # v2 - uses get_all
         for r in frappe.get_all("Employee", filters={"reports_to": emp_name}, fields=["name"]):
             result.extend(get_reportees(r.name, visited))
         return result
+
     team_emps = set()
     for emp in current_emps:
         team_emps.update(get_reportees(emp.name))
+
     team_users = frappe.get_all("Employee",
         filters={"name": ["in", list(team_emps)], "user_id": ["!=", ""]},
         fields=["user_id"])
     user_ids = list(set([u.user_id for u in team_users if u.user_id]))
+
     if not user_ids:
         return "`tabCRM Lead`.`lead_owner` = '{}'".format(user)
     return "`tabCRM Lead`.`lead_owner` in ('{}')".format("', '".join(user_ids))
@@ -813,3 +846,566 @@ def save_product_data(lead_name, product, data):
 
     frappe.db.commit()
     return rec.name
+
+
+@frappe.whitelist()
+def submit_us_lead(lead_name):
+    """Submit US Subscription lead for payment verification"""
+    doc = frappe.get_doc("CRM Lead", lead_name)
+    user_roles = frappe.get_roles(frappe.session.user)
+    
+    allowed_roles = ["US Subscription RM", "Insurance Sales RM", "Capital RM", 
+                     "Global RM", "System Manager"]
+    if not any(r in user_roles for r in allowed_roles):
+        frappe.throw(_("Only Sales RM can submit US Subscription leads."))
+    
+    if doc.docstatus == 1:
+        frappe.throw(_("Lead is already submitted."))
+    
+    doc.docstatus = 1
+    doc.save(ignore_permissions=True)
+    frappe.db.commit()
+    
+    # Notify US Subscription MIS
+    mis_users = frappe.get_all("Has Role",
+        filters={"role": "US Subscription MIS", "parenttype": "User"},
+        fields=["parent"])
+    
+    for mis in mis_users:
+        try:
+            frappe.get_doc({
+                "doctype": "Notification Log",
+                "subject": f"US Lead Submitted: {doc.lead_name} — Verify Payment",
+                "email_content": f"US Subscription lead {lead_name} submitted by {frappe.session.user}. Please verify payment.",
+                "for_user": mis.parent,
+                "type": "Alert",
+                "document_type": "CRM Lead",
+                "document_name": lead_name,
+            }).insert(ignore_permissions=True)
+        except Exception as e:
+            frappe.log_error(str(e), "US Lead Submit Notification Error")
+    
+    frappe.db.commit()
+    return "Submitted"
+
+
+@frappe.whitelist()
+def verify_us_payment(lead_name):
+    """MIS verifies payment — creates Customer + US Subscription Record"""
+    user_roles = frappe.get_roles(frappe.session.user)
+    if "US Subscription MIS" not in user_roles and "System Manager" not in user_roles:
+        frappe.throw(_("Only US Subscription MIS can verify payments."))
+    
+    doc = frappe.get_doc("CRM Lead", lead_name)
+    
+    if doc.docstatus != 1:
+        frappe.throw(_("Lead must be submitted before payment verification."))
+    
+    # Update payment status — only fields that exist in CRM Lead
+    frappe.db.set_value("CRM Lead", lead_name, {
+        "custom_mis_status": "Approved",
+        "custom_mis_verified_by": frappe.session.user,
+        "custom_mis_verified_date": frappe.utils.today(),
+    })
+    frappe.db.commit()
+    
+    # Process in background
+    frappe.enqueue(
+        "aionion_custom.aionion_custom.controllers.crm_lead.process_us_post_approval",
+        lead_name=lead_name,
+        queue="default",
+        timeout=300
+    )
+    return "Approved"
+
+
+@frappe.whitelist()
+def reject_us_payment(lead_name, reason=None):
+    """MIS rejects payment"""
+    user_roles = frappe.get_roles(frappe.session.user)
+    if "US Subscription MIS" not in user_roles and "System Manager" not in user_roles:
+        frappe.throw(_("Only US Subscription MIS can reject payments."))
+    
+    frappe.db.set_value("CRM Lead", lead_name, {
+        "custom_mis_status": "Rejected",
+        "custom_mis_verified_by": frappe.session.user,
+        "custom_mis_verified_date": frappe.utils.today(),
+    })
+    
+    # Unlock lead back to draft
+    frappe.db.set_value("CRM Lead", lead_name, "docstatus", 0)
+    frappe.db.commit()
+    
+    # Notify lead owner
+    lead = frappe.get_doc("CRM Lead", lead_name)
+    try:
+        frappe.get_doc({
+            "doctype": "Notification Log",
+            "subject": f"US Payment Rejected: {lead.lead_name}",
+            "email_content": f"Payment rejected. Reason: {reason or 'Not specified'}. Please update and resubmit.",
+            "for_user": lead.lead_owner,
+            "type": "Alert",
+            "document_type": "CRM Lead",
+            "document_name": lead_name,
+        }).insert(ignore_permissions=True)
+    except Exception as e:
+        frappe.log_error(str(e), "US Payment Reject Notification Error")
+    
+    frappe.db.commit()
+    return "Rejected"
+
+
+def process_us_post_approval(lead_name):
+    """Background job — create Customer + US Subscription Record after payment approval"""
+    try:
+        lead = frappe.get_doc("CRM Lead", lead_name)
+        
+        # Get or create Customer
+        customer = _get_or_create_customer(lead)
+        if not customer.custom_aionion_master_id:
+            _generate_aionion_master_id(customer)
+        
+        # Create US Subscription Record
+        us_record = _create_us_subscription_record(lead, customer)
+        
+        # Link customer to US Subscription Record
+        if us_record and customer:
+            frappe.db.set_value("US Subscription Record", us_record.name, {
+                "customer": customer.name,
+                "payment_status": "Approved"
+            })
+            frappe.db.commit()
+        # Lock lead
+        frappe.db.set_value("CRM Lead", lead_name, "status", "Converted")
+        frappe.db.commit()
+        
+        frappe.logger().info(f"US Post Approval Complete for {lead_name}")
+    except Exception as e:
+        frappe.log_error(f"US Post Approval Error for {lead_name}: {str(e)}", 
+                         "US Post Approval Error")
+
+
+def _create_us_subscription_record(lead, customer):
+    """Create US Subscription Record from approved lead"""
+    import datetime
+    
+    # Check if already exists
+    existing = frappe.db.get_value("US Subscription Record", 
+        {"lead": lead.name}, "name")
+    if existing:
+        return frappe.get_doc("US Subscription Record", existing)
+    
+    yy = str(datetime.datetime.now().year)[2:]
+    random_part = customer.get("custom_random_part") or ""
+    
+    us_rec = frappe.get_doc({
+        "doctype": "US Subscription Record",
+        "customer": customer.name,
+        "lead": lead.name,
+        "client_name": lead.lead_name,
+        "company": frappe.db.get_single_value("Global Defaults", "default_company"),
+        "rm_employee_code": lead.custom_sales_rm,
+        "rm_employee_name": frappe.db.get_value("Employee", lead.custom_sales_rm, "employee_name") if lead.custom_sales_rm else "",
+        "client_status": "New",
+        # Sales RM fields
+        "email_address": lead.email,
+        "contact_number": lead.mobile_no,
+        "payment_status": "Approved",
+    })
+    us_rec.insert(ignore_permissions=True)
+    frappe.db.commit()
+    
+    # Rename with correct format
+    if random_part:
+        new_name = f"US-{yy}-{random_part}-{us_rec.name.split('-')[-1].zfill(6)}"
+        try:
+            frappe.rename_doc("US Subscription Record", us_rec.name, new_name, 
+                            ignore_permissions=True)
+            frappe.db.commit()
+        except Exception:
+            pass
+    
+    return us_rec
+
+
+@frappe.whitelist()
+def get_us_subscription_details(lead_name):
+    """Get US Subscription Details child table row for a lead"""
+    lead = frappe.get_doc("CRM Lead", lead_name)
+    details = lead.get("custom_us_subscription_details")
+    if details and len(details) > 0:
+        return details[0].as_dict()
+    return {}
+
+
+@frappe.whitelist()
+def save_us_subscription_details(lead_name, data):
+    """Save US Subscription Details child table for a lead"""
+    import json
+    if isinstance(data, str):
+        data = json.loads(data)
+
+    lead = frappe.get_doc("CRM Lead", lead_name)
+
+    if lead.custom_us_subscription_details:
+        # Update existing row
+        row = lead.custom_us_subscription_details[0]
+        for key, val in data.items():
+            if hasattr(row, key):
+                row.set(key, val)
+    else:
+        # Add new row
+        lead.append("custom_us_subscription_details", data)
+
+    lead.save(ignore_permissions=True)
+    frappe.db.commit()
+    return "Saved"
+
+
+@frappe.whitelist()
+def get_us_subscription_details(lead_name):
+    """Get US Subscription Details child table row for a lead"""
+    lead = frappe.get_doc("CRM Lead", lead_name)
+    details = lead.get("custom_us_subscription_details")
+    if details and len(details) > 0:
+        return details[0].as_dict()
+    return {}
+
+
+@frappe.whitelist()
+def save_us_subscription_details(lead_name, data):
+    """Save US Subscription Details child table for a lead"""
+    import json
+    if isinstance(data, str):
+        data = json.loads(data)
+
+    lead = frappe.get_doc("CRM Lead", lead_name)
+
+    if lead.custom_us_subscription_details:
+        row = lead.custom_us_subscription_details[0]
+        for key, val in data.items():
+            if hasattr(row, key):
+                row.set(key, val)
+    else:
+        lead.append("custom_us_subscription_details", data)
+
+    lead.save(ignore_permissions=True)
+    frappe.db.commit()
+    return "Saved"
+
+
+@frappe.whitelist()
+def get_us_subscription_details(lead_name):
+    lead = frappe.get_doc("CRM Lead", lead_name)
+    details = lead.get("custom_us_subscription_details")
+    if details and len(details) > 0:
+        return details[0].as_dict()
+    return {}
+
+
+@frappe.whitelist()
+def save_us_subscription_details(lead_name, data):
+    import json
+    if isinstance(data, str):
+        data = json.loads(data)
+    lead = frappe.get_doc("CRM Lead", lead_name)
+    if lead.custom_us_subscription_details:
+        row = lead.custom_us_subscription_details[0]
+        for key, val in data.items():
+            if hasattr(row, key):
+                row.set(key, val)
+    else:
+        lead.append("custom_us_subscription_details", data)
+    lead.save(ignore_permissions=True)
+    frappe.db.commit()
+    return "Saved"
+
+
+@frappe.whitelist()
+def create_us_subscription_from_lead(lead_name):
+    """Create US Subscription Record pre-filled from Lead data"""
+    existing = frappe.db.get_value("US Subscription Record", {"lead": lead_name}, "name")
+    if existing:
+        return existing
+
+    lead = frappe.get_doc("CRM Lead", lead_name)
+
+    rm_name = frappe.db.get_value("Employee", lead.custom_sales_rm, "employee_name") if lead.custom_sales_rm else ""
+
+    rec = frappe.get_doc({
+        "doctype": "US Subscription Record",
+        "lead": lead_name,
+        "client_name": lead.lead_name,
+        "client_email": lead.email,
+        "contact_number": lead.mobile_no,
+        "email_address": lead.email,
+        "country_of_residence": lead.custom_country,
+        "employment_status": lead.custom_employee_status,
+        "indian_investments": lead.custom_client_indian_investments,
+        "intended_investment": lead.custom_client_intended_investment_in_us_market,
+        "aionion_client_code": lead.custom_aionion_client_code,
+        "emp_code": lead.custom_sales_rm_code,
+        "emp_name": rm_name,
+        "emp_branch": lead.custom_sales_rm_branch,
+        "emp_team": lead.custom_sales_rm_team,
+        "rm_employee_code": lead.custom_sales_rm,
+        "rm_employee_name": rm_name,
+        "client_status": "New",
+        "payment_status": "Pending",
+    })
+    rec.insert(ignore_permissions=True)
+    frappe.db.commit()
+    return rec.name
+
+
+@frappe.whitelist()
+def create_us_subscription_from_lead(lead_name):
+    existing = frappe.db.get_value("US Subscription Record", {"lead": lead_name}, "name")
+    if existing:
+        return existing
+    lead = frappe.get_doc("CRM Lead", lead_name)
+    rm_name = frappe.db.get_value("Employee", lead.custom_sales_rm, "employee_name") if lead.custom_sales_rm else ""
+    rec = frappe.get_doc({
+        "doctype": "US Subscription Record",
+        "lead": lead_name,
+        "client_name": lead.lead_name,
+        "client_email": lead.email,
+        "contact_number": lead.mobile_no,
+        "email_address": lead.email,
+        "country_of_residence": lead.custom_country,
+        "employment_status": lead.custom_employee_status,
+        "indian_investments": lead.custom_client_indian_investments,
+        "intended_investment": lead.custom_client_intended_investment_in_us_market,
+        "aionion_client_code": lead.custom_aionion_client_code,
+        "emp_code": lead.custom_sales_rm_code,
+        "emp_branch": lead.custom_sales_rm_branch,
+        "rm_employee_code": lead.custom_sales_rm,
+        "rm_employee_name": rm_name,
+        "client_status": "New",
+        "payment_status": "Pending",
+    })
+    rec.insert(ignore_permissions=True)
+    frappe.db.commit()
+    return rec.name
+
+
+@frappe.whitelist()
+def bulk_approve_us_payments(lead_names):
+    import json
+    if isinstance(lead_names, str):
+        lead_names = json.loads(lead_names)
+
+    user_roles = frappe.get_roles(frappe.session.user)
+    if "US Subscription MIS" not in user_roles and "System Manager" not in user_roles:
+        frappe.throw(_("Only US Subscription MIS can approve payments."))
+
+    results = {"approved": [], "failed": [], "skipped": []}
+
+    for lead_name in lead_names:
+        try:
+            lead = frappe.get_doc("CRM Lead", lead_name)
+
+            # Skip non-US leads
+            if lead.custom_entity != "US Subscription":
+                results["skipped"].append(lead_name)
+                continue
+
+            # Skip non-submitted leads
+            if lead.docstatus != 1:
+                results["skipped"].append(lead_name)
+                continue
+
+            # Skip already approved
+            if lead.custom_mis_status == "Approved":
+                results["skipped"].append(lead_name)
+                continue
+
+            # Approve
+            frappe.db.set_value("CRM Lead", lead_name, {
+                "custom_mis_status": "Approved",
+                "custom_mis_verified_by": frappe.session.user,
+                "custom_mis_verified_date": frappe.utils.today(),
+            })
+
+            # Sync to US Subscription Record
+            us_record = frappe.db.get_value("US Subscription Record",
+                {"lead": lead_name}, "name")
+            if us_record:
+                frappe.db.set_value("US Subscription Record", us_record,
+                    "payment_status", "Approved")
+
+            results["approved"].append(lead_name)
+
+            # Process in background
+            frappe.enqueue(
+                "aionion_custom.aionion_custom.controllers.crm_lead.process_us_post_approval",
+                lead_name=lead_name,
+                queue="default",
+                timeout=300
+            )
+
+        except Exception as e:
+            frappe.log_error(str(e), f"Bulk Approve Error: {lead_name}")
+            results["failed"].append(lead_name)
+
+    frappe.db.commit()
+    return results
+
+
+@frappe.whitelist()
+def bulk_approve_us_payments(lead_names):
+    import json
+    if isinstance(lead_names, str):
+        lead_names = json.loads(lead_names)
+
+    user_roles = frappe.get_roles(frappe.session.user)
+    if "US Subscription MIS" not in user_roles and "System Manager" not in user_roles:
+        frappe.throw("Only US Subscription MIS can approve payments.")
+
+    results = {"approved": [], "failed": [], "skipped": []}
+
+    for lead_name in lead_names:
+        try:
+            lead = frappe.get_doc("CRM Lead", lead_name)
+            if lead.custom_entity != "US Subscription":
+                results["skipped"].append(lead_name)
+                continue
+            if lead.docstatus != 1:
+                results["skipped"].append(lead_name)
+                continue
+            if lead.custom_mis_status == "Approved":
+                results["skipped"].append(lead_name)
+                continue
+
+            frappe.db.set_value("CRM Lead", lead_name, {
+                "custom_mis_status": "Approved",
+                "custom_mis_verified_by": frappe.session.user,
+                "custom_mis_verified_date": frappe.utils.today(),
+            })
+
+            us_record = frappe.db.get_value("US Subscription Record", {"lead": lead_name}, "name")
+            if us_record:
+                frappe.db.set_value("US Subscription Record", us_record, "payment_status", "Approved")
+
+            results["approved"].append(lead_name)
+            frappe.enqueue(
+                "aionion_custom.aionion_custom.controllers.crm_lead.process_us_post_approval",
+                lead_name=lead_name,
+                queue="default",
+                timeout=300
+            )
+        except Exception as e:
+            frappe.log_error(str(e), "Bulk Approve Error")
+            results["failed"].append(lead_name)
+
+    frappe.db.commit()
+    return results
+
+
+@frappe.whitelist()
+def send_us_subscription_expiry_notifications():
+    """
+    Scheduler job — runs daily
+    Checks US Subscription Records expiring in 30 days
+    Creates RNL lead and notifies Sales RM
+    """
+    from frappe.utils import today, add_days, getdate
+
+    thirty_days_later = add_days(today(), 30)
+
+    # Find US Subscription Records expiring in 30 days
+    expiring_records = frappe.get_all("US Subscription Record",
+        filters={
+            "sub_end_date": ["between", [today(), thirty_days_later]],
+            "payment_status": "Approved",
+            "client_status_new": ["!=", "RNL"],
+        },
+        fields=[
+            "name", "lead", "customer", "client_name",
+            "email_address", "contact_number", "sub_end_date",
+            "rm_employee_code", "sales_done_by", "subscription_type_new",
+            "currency_new", "quantity_new"
+        ]
+    )
+
+    for rec in expiring_records:
+        try:
+            # Check if RNL lead already exists for this record
+            existing_rnl = frappe.db.get_value("CRM Lead", {
+                "custom_entity": "US Subscription",
+                "custom_client_category": original_lead.custom_client_category if original_lead else "Reference Client",
+                "mobile_no": rec.contact_number,
+                "status": ["!=", "Converted"]
+            }, "name")
+
+            if existing_rnl:
+                continue
+
+            # Get original lead details
+            original_lead = frappe.get_doc("CRM Lead", rec.lead) if rec.lead else None
+
+            # Get Sales RM and Service RM users
+            sales_rm_user = None
+            service_rm_user = None
+            if rec.rm_employee_code:
+                sales_rm_user = frappe.db.get_value("Employee",
+                    rec.rm_employee_code, "user_id")
+            if original_lead and original_lead.custom_service_rm:
+                service_rm_user = frappe.db.get_value("Employee",
+                    original_lead.custom_service_rm, "user_id")
+
+            # Create RNL Lead
+            name_parts = (rec.client_name or "").split(" ", 1)
+            first_name = name_parts[0]
+            last_name = name_parts[1] if len(name_parts) > 1 else ""
+
+            rnl_lead = frappe.get_doc({
+                "doctype": "CRM Lead",
+                "first_name": first_name,
+                "last_name": last_name,
+                "lead_name": rec.client_name,
+                "email": rec.email_address,
+                "mobile_no": rec.contact_number,
+                "custom_entity": "US Subscription",
+                "custom_product": "US Subscription",
+                "custom_client_category": original_lead.custom_client_category if original_lead else "Reference Client",
+                "custom_sales_rm": rec.rm_employee_code or (original_lead.custom_sales_rm if original_lead else None),
+                "custom_service_rm": original_lead.custom_service_rm if original_lead else None,
+                "custom_service_rm_name": original_lead.custom_service_rm_name if original_lead else None,
+                "custom_country": original_lead.custom_country if original_lead else None,
+                "custom_employee_status": original_lead.custom_employee_status if original_lead else None,
+                "custom_client_indian_investments": original_lead.custom_client_indian_investments if original_lead else None,
+                "custom_client_intended_investment_in_us_market": original_lead.custom_client_intended_investment_in_us_market if original_lead else None,
+                "custom_aionion_client_code": original_lead.custom_aionion_client_code if original_lead else None,
+                "custom_residency": original_lead.custom_residency if original_lead else "Indian",
+                "custom_residency": original_lead.custom_residency if original_lead else "Indian",
+                "lead_owner": service_rm_user or sales_rm_user or frappe.session.user,
+                "status": "New",
+            })
+            rnl_lead.insert(ignore_permissions=True)
+            frappe.db.commit()
+
+            # Notify both Sales RM and Service RM
+            notify_users = list(set(filter(None, [sales_rm_user, service_rm_user])))
+            for notify_user in notify_users:
+                try:
+                    frappe.get_doc({
+                        "doctype": "Notification Log",
+                        "subject": f"US Subscription Expiring: {rec.client_name} — {rec.sub_end_date}",
+                        "email_content": f"US Subscription for {rec.client_name} expires on {rec.sub_end_date}. RNL lead created: {rnl_lead.name}. Please follow up.",
+                        "for_user": notify_user,
+                        "type": "Alert",
+                        "document_type": "CRM Lead",
+                        "document_name": rnl_lead.name,
+                    }).insert(ignore_permissions=True)
+                    frappe.db.commit()
+                except Exception:
+                    pass
+
+            frappe.logger().info(f"RNL Lead created for {rec.name}: {rnl_lead.name}")
+
+        except Exception as e:
+            frappe.log_error(
+                f"Expiry Notification Error for {rec.name}: {str(e)}",
+                "US Subscription Expiry Error"
+            )
