@@ -909,13 +909,17 @@ def verify_us_payment(lead_name):
     })
     frappe.db.commit()
     
-    # Process in background
-    frappe.enqueue(
-        "aionion_custom.aionion_custom.controllers.crm_lead.process_us_post_approval",
-        lead_name=lead_name,
-        queue="default",
-        timeout=300
-    )
+    # Process inline first then enqueue as backup
+    try:
+        process_us_post_approval(lead_name)
+    except Exception as e:
+        frappe.log_error(str(e), "US Post Approval Inline Error")
+        frappe.enqueue(
+            "aionion_custom.aionion_custom.controllers.crm_lead.process_us_post_approval",
+            lead_name=lead_name,
+            queue="default",
+            timeout=300
+        )
     return "Approved"
 
 
