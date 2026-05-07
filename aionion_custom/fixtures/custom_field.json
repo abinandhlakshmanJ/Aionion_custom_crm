@@ -1043,7 +1043,7 @@
   "name": "CRM Lead-custom_client_indian_investments",
   "no_copy": 0,
   "non_negative": 0,
-  "options": "\nINR 50 Lakhs and Above\nINR 25 Lakhs to 50 Lakhs\nLess than INR 25 Lakhs",
+  "options": "\nINR 50 Lakhs and Above\nINR 25 Lakhs to 50 lakhs\nLess than INR 25 Lakhs",
   "permlevel": 0,
   "placeholder": null,
   "precision": "",
