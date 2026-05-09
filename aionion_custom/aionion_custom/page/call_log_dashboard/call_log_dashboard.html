@@ -1,0 +1,35 @@
+<div class="cld-wrap">
+  <div class="cld-kpi-row">
+    <div class="cld-card"><div class="cld-label">Total Calls</div><div class="cld-val" id="val-total">-</div></div>
+    <div class="cld-card cld-in"><div class="cld-label">Incoming</div><div class="cld-val" id="val-incoming">-</div></div>
+    <div class="cld-card cld-out"><div class="cld-label">Outgoing</div><div class="cld-val" id="val-outgoing">-</div></div>
+    <div class="cld-card cld-miss"><div class="cld-label">Missed</div><div class="cld-val" id="val-missed">-</div></div>
+    <div class="cld-card"><div class="cld-label">Avg Duration</div><div class="cld-val" id="val-avg">-</div></div>
+  </div>
+  <div class="cld-section-title">Team Call Leaderboard</div>
+  <div style="overflow-x:auto;">
+    <table class="cld-table">
+      <thead><tr>
+        <th style="width:40px">#</th>
+        <th>Employee</th>
+        <th>Designation</th>
+        <th>Reports To</th>
+        <th style="text-align:center">Incoming</th>
+        <th style="text-align:center">Outgoing</th>
+        <th style="text-align:center">Missed</th>
+        <th style="text-align:center">Total</th>
+        <th style="width:80px"></th>
+      </tr></thead>
+      <tbody id="leaderboard-body">
+        <tr><td colspan="9" class="cld-empty">Loading...</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div id="emp-detail-panel" class="cld-detail-panel" style="display:none;">
+    <div class="cld-detail-header">
+      <span id="detail-emp-name" style="font-weight:600;"></span>
+      <button id="close-detail" class="btn btn-xs btn-default">Close</button>
+    </div>
+    <div id="detail-body"></div>
+  </div>
+</div>

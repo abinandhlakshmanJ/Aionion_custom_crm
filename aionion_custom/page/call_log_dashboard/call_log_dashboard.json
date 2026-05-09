@@ -1,0 +1,9 @@
+{
+ "module": "Aionion Custom",
+ "name": "call-log-dashboard",
+ "page_name": "call-log-dashboard",
+ "roles": [],
+ "standard": "Yes",
+ "system_page": 0,
+ "title": "Call Log Dashboard"
+}
