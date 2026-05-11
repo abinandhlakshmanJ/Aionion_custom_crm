@@ -1156,6 +1156,10 @@ def create_us_subscription_from_lead(lead_name):
         "rm_employee_name": rm_name,
         "client_status": "New",
         "payment_status": "Pending",
+        "lead_source": lead.lead_source,
+        "service_rm": lead.custom_service_rm,
+        "new_email_id": lead.email,
+        "lead_entry_date": lead.creation,
     })
     rec.insert(ignore_permissions=True)
     frappe.db.commit()
@@ -1187,6 +1191,10 @@ def create_us_subscription_from_lead(lead_name):
         "rm_employee_name": rm_name,
         "client_status": "New",
         "payment_status": "Pending",
+        "lead_source": lead.lead_source,
+        "service_rm": lead.custom_service_rm,
+        "new_email_id": lead.email,
+        "lead_entry_date": lead.creation,
     })
     rec.insert(ignore_permissions=True)
     frappe.db.commit()
