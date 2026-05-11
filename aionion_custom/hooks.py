@@ -189,7 +189,8 @@ fixtures = [
         "Capital RM",
         "Global RM",
         "US Subscription RM",
-        "US Subscription MIS"
+        "US Subscription MIS",
+        "US Subscription Admin"
     ]]]},
     # CRM Form Scripts — US Subscription
     {"dt": "CRM Form Script", "filters": [["name", "in", [

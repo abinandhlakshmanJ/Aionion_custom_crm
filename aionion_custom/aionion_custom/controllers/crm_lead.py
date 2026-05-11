@@ -1421,3 +1421,61 @@ def send_us_subscription_expiry_notifications():
                 f"Expiry Notification Error for {rec.name}: {str(e)}",
                 "US Subscription Expiry Error"
             )
+
+
+@frappe.whitelist()
+def approve_us_subscription_payment(us_record_name):
+    user_roles = frappe.get_roles(frappe.session.user)
+    if "US Subscription Admin" not in user_roles and "System Manager" not in user_roles:
+        frappe.throw("Only US Subscription Admin can approve payments.")
+
+    rec = frappe.get_doc("US Subscription Record", us_record_name)
+    rec.payment_status = "Approved"
+    rec.save(ignore_permissions=True)
+
+    # Notify lead owner
+    if rec.lead:
+        lead = frappe.get_doc("CRM Lead", rec.lead)
+        frappe.db.set_value("CRM Lead", rec.lead, "custom_mis_status", "Approved")
+        if lead.lead_owner:
+            frappe.get_doc({
+                "doctype": "Notification Log",
+                "subject": f"Payment Approved: {rec.client_name}",
+                "email_content": f"Payment for {rec.client_name} has been approved by {frappe.session.user}.",
+                "for_user": lead.lead_owner,
+                "type": "Alert",
+                "document_type": "US Subscription Record",
+                "document_name": us_record_name,
+            }).insert(ignore_permissions=True)
+
+    frappe.db.commit()
+    return "Approved"
+
+
+@frappe.whitelist()
+def reject_us_subscription_payment(us_record_name, reason=None):
+    user_roles = frappe.get_roles(frappe.session.user)
+    if "US Subscription Admin" not in user_roles and "System Manager" not in user_roles:
+        frappe.throw("Only US Subscription Admin can reject payments.")
+
+    rec = frappe.get_doc("US Subscription Record", us_record_name)
+    rec.payment_status = "Rejected"
+    rec.save(ignore_permissions=True)
+
+    # Notify lead owner
+    if rec.lead:
+        lead = frappe.get_doc("CRM Lead", rec.lead)
+        frappe.db.set_value("CRM Lead", rec.lead, "custom_mis_status", "Rejected")
+        if lead.lead_owner:
+            frappe.get_doc({
+                "doctype": "Notification Log",
+                "subject": f"Payment Rejected: {rec.client_name}",
+                "email_content": f"Payment for {rec.client_name} has been rejected. Reason: {reason or 'Not specified'}",
+                "for_user": lead.lead_owner,
+                "type": "Alert",
+                "document_type": "US Subscription Record",
+                "document_name": us_record_name,
+            }).insert(ignore_permissions=True)
+
+    frappe.db.commit()
+    return "Rejected"
