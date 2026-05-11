@@ -12,6 +12,7 @@
   "lead",
   "company",
   "client_status",
+  "lead_entry_date",
   "column_break_us_1",
   "rm_employee_code",
   "rm_employee_name",
@@ -28,6 +29,7 @@
   "quantity",
   "currency",
   "subscription_end_date",
+  "old_subscription_month",
   "sales_rm_section",
   "email_address",
   "client_name",
@@ -45,7 +47,7 @@
   "service_rm_section",
   "month",
   "year",
-  "assigned_to",
+  "assigned_by",
   "eligibility",
   "us_status",
   "progress",
@@ -73,7 +75,9 @@
   "email_sent",
   "risk_declaration",
   "payment_status",
-  "us_remarks"
+  "us_remarks",
+  "alternate_email_id",
+  "data_entry_date"
  ],
  "fields": [
   {
@@ -320,12 +324,6 @@
    "options": "\n2025\n2026\n2027\n2028"
   },
   {
-   "fieldname": "assigned_to",
-   "fieldtype": "Link",
-   "label": "Assigned To",
-   "options": "Employee"
-  },
-  {
    "fieldname": "eligibility",
    "fieldtype": "Select",
    "label": "Eligibility",
@@ -482,13 +480,39 @@
    "fieldname": "us_remarks",
    "fieldtype": "Small Text",
    "label": "Remarks"
+  },
+  {
+   "fieldname": "alternate_email_id",
+   "fieldtype": "Data",
+   "label": "Alternate Email ID"
+  },
+  {
+   "fieldname": "assigned_by",
+   "fieldtype": "Link",
+   "label": "Assigned by",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "lead_entry_date",
+   "fieldtype": "Datetime",
+   "label": "Lead Entry Date"
+  },
+  {
+   "fieldname": "old_subscription_month",
+   "fieldtype": "Select",
+   "label": "Old Subscription Month"
+  },
+  {
+   "fieldname": "data_entry_date",
+   "fieldtype": "Datetime",
+   "label": "Data Entry Date"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-04-28 11:47:09.711861",
+ "modified": "2026-05-11 14:53:14.992465",
  "modified_by": "Administrator",
  "module": "Aionion Custom",
  "name": "US Subscription Record",
@@ -519,7 +543,6 @@
    "write": 1
   },
   {
-   "create": 0,
    "email": 1,
    "export": 1,
    "print": 1,
@@ -528,6 +551,13 @@
    "role": "US Subscription MIS",
    "share": 1,
    "write": 1
+  },
+  {
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Global RM"
   }
  ],
  "row_format": "Dynamic",
