@@ -1479,3 +1479,96 @@ def reject_us_subscription_payment(us_record_name, reason=None):
 
     frappe.db.commit()
     return "Rejected"
+
+
+@frappe.whitelist()
+def get_or_create_renewal_record(lead_name):
+    """Get existing or create new Insurance Renewal Record for a renewal lead"""
+    lead = frappe.get_cached_doc("CRM Lead", lead_name)
+
+    existing = frappe.db.get_value("Insurance Renewal Record",
+        {"source_lead": lead_name}, "name")
+    if existing:
+        return existing
+
+    ins_record = None
+    if lead.custom_parent_policy:
+        ins_record = frappe.get_cached_doc("Insurance Record", lead.custom_parent_policy)
+
+    doc = frappe.new_doc("Insurance Renewal Record")
+    doc.source_lead       = lead_name
+    doc.customer          = lead.custom_customer or None
+    doc.client_name       = lead.lead_name
+    doc.mobile_no         = lead.mobile_no
+    doc.email             = lead.email
+    doc.renewals_rm       = lead.custom_service_rm
+    doc.aionion_master_id = lead.custom_aionion_client_code or None
+
+    if ins_record:
+        doc.source_insurance_record = ins_record.name
+        doc.insurance_type          = ins_record.insurance_type or lead.custom_insurance_type
+        doc.insurance_company       = ins_record.insurance_company
+        doc.existing_policy_number  = ins_record.policy_number
+        doc.policy_expiry_date      = ins_record.policy_expiry_date
+    else:
+        doc.insurance_type         = lead.custom_insurance_type
+        doc.insurance_company      = lead.custom_renewal_company
+        doc.existing_policy_number = None
+        doc.policy_expiry_date     = lead.custom_parent_expiry_date
+
+    doc.renewal_due_date = lead.custom_renewal_due_date or lead.custom_parent_expiry_date
+    doc.insert(ignore_permissions=True)
+    frappe.db.commit()
+    return doc.name
+
+
+@frappe.whitelist()
+def approve_renewal_mis(record_name):
+    """MIS approves Insurance Renewal Record — updates Insurance Record with new policy"""
+    _check_mis_role()
+    rec = frappe.get_doc("Insurance Renewal Record", record_name)
+
+    if rec.mis_status == "Approved":
+        frappe.throw("Already approved.")
+
+    rec.mis_status        = "Approved"
+    rec.mis_verified_by   = frappe.session.user
+    rec.mis_verified_date = frappe.utils.nowdate()
+    rec.save(ignore_permissions=True)
+
+    # Update source Insurance Record with new policy details
+    if rec.source_insurance_record and rec.new_policy_number:
+        ins = frappe.get_doc("Insurance Record", rec.source_insurance_record)
+        if rec.new_policy_number:     ins.policy_number       = rec.new_policy_number
+        if rec.new_insurance_company: ins.insurance_company   = rec.new_insurance_company
+        if rec.new_expiry_date:       ins.policy_expiry_date  = rec.new_expiry_date
+        if rec.new_premium:           ins.gross_premium_value = rec.new_premium
+        if rec.new_sum_assured:       ins.sum_insured         = rec.new_sum_assured
+        ins.save(ignore_permissions=True)
+
+    # Update source CRM Lead renewal status
+    if rec.source_lead:
+        frappe.db.set_value("CRM Lead", rec.source_lead, "custom_renewal_status", "Renewed")
+
+    frappe.db.commit()
+    return {"status": "approved"}
+
+
+@frappe.whitelist()
+def reject_renewal_mis(record_name, reason=None):
+    """MIS rejects Insurance Renewal Record"""
+    _check_mis_role()
+    rec = frappe.get_doc("Insurance Renewal Record", record_name)
+
+    rec.mis_status        = "Rejected"
+    rec.mis_verified_by   = frappe.session.user
+    rec.mis_verified_date = frappe.utils.nowdate()
+    if reason:
+        rec.renewal_remarks = (rec.renewal_remarks or "") + f"\nRejected: {reason}"
+    rec.save(ignore_permissions=True)
+
+    if rec.source_lead:
+        frappe.db.set_value("CRM Lead", rec.source_lead, "custom_renewal_status", "Pending")
+
+    frappe.db.commit()
+    return {"status": "rejected"}

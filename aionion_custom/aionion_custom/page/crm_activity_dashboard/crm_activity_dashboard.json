@@ -1,0 +1,11 @@
+{
+ "creation": "2026-05-11 00:00:00.000000",
+ "doctype": "Page",
+ "modified": "2026-05-11 00:00:00.000000",
+ "module": "Aionion Custom",
+ "name": "crm-activity-dashboard",
+ "page_name": "crm-activity-dashboard",
+ "roles": [],
+ "standard": "Yes",
+ "title": "CRM Activity Dashboard"
+}
