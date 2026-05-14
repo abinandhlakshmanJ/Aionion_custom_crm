@@ -129,8 +129,20 @@ def process_post_mis_approval(lead_name):
         if not customer.custom_aionion_master_id:
             _generate_aionion_master_id(customer)
         ins_record = _create_insurance_record(lead, customer)
+        # Create Insurance Renewal Record (for renewals team detailed work)
         renewal_record = _create_renewal_record(lead, customer, ins_record)
-        _notify_renewals_manager(renewal_record, lead)
+        # Create new CRM Lead with product=Insurance Renewals (for renewals queue)
+        renewal_lead = _create_renewal_lead(lead, customer, ins_record)
+        # Share renewal lead with Dilip (renewals manager)
+        dilip_user = frappe.db.get_value("Has Role",
+            {"role": "Insurance Renewals Manager", "parenttype": "User"}, "parent")
+        if dilip_user:
+            frappe.share.add(
+                doctype="CRM Lead", name=renewal_lead.name,
+                user=dilip_user, read=1, write=1,
+                flags={"ignore_share_permission": True}
+            )
+        _notify_renewals_manager(renewal_lead, lead)
         frappe.db.commit()
         frappe.logger().info("Phase4 Complete for lead " + lead_name)
     except Exception as e:
@@ -236,22 +248,72 @@ def _create_renewal_lead(lead, customer, ins_record):
 
     renewal = frappe.get_doc({
         "doctype": "CRM Lead",
+        # ── Basic client info ──
         "first_name": first_name,
         "last_name": last_name,
         "lead_name": lead.lead_name,
         "mobile_no": lead.mobile_no,
         "email": lead.email,
+        "custom_dob": lead.custom_dob,
+        "custom_pan_number": lead.custom_pan_number,
+        "custom_aionion_client_code": customer.custom_aionion_master_id,
+        # ── Entity & Product ──
         "custom_entity": "Aionion Insurance",
         "custom_product": "Insurance Renewals",
         "custom_business_type": "Renewal",
         "custom_client_category": lead.custom_client_category,
         "custom_residency": lead.custom_residency,
         "custom_insurance_type": lead.custom_insurance_type,
+        # ── Customer link ──
         "custom_customer": customer.name,
+        "custom_is_existing_customer": 1,
+        # ── Parent policy (existing policy details) ──
         "custom_parent_policy": ins_record.name,
         "custom_parent_expiry_date": lead.custom_expiry_date,
         "custom_source_lead": lead.name,
         "custom_renewal_company": lead.custom_insurance_company,
+        # ── Policy details from sales lead ──
+        "custom_insurance_company": lead.custom_insurance_company,
+        "custom_policy_number": lead.custom_policy_number,
+        "custom_policy_status": lead.custom_policy_status,
+        "custom_sum_assured": lead.custom_sum_assured,
+        "custom_gross_premium": lead.custom_gross_premium,
+        "custom_net_premium": lead.custom_net_premium,
+        "custom_expiry_date": lead.custom_expiry_date,
+        "custom_tenure": lead.custom_tenure,
+        "custom_fresh_port": lead.custom_fresh_port,
+        "custom_proposal_number": lead.custom_proposal_number,
+        # ── Health sub-fields ──
+        "custom_health_type": lead.custom_health_type,
+        "custom_ped": lead.custom_ped,
+        "custom_ped_description": lead.custom_ped_description,
+        "custom_health_members": lead.custom_health_members,
+        "custom_health_company": lead.custom_health_company,
+        # ── Term sub-fields ──
+        "custom_term_age": lead.custom_term_age,
+        "custom_term_dob": lead.custom_term_dob,
+        "custom_term_occupation": lead.custom_term_occupation,
+        "custom_term_itr": lead.custom_term_itr,
+        "custom_term_income": lead.custom_term_income,
+        "custom_term_education": lead.custom_term_education,
+        "custom_term_smoker": lead.custom_term_smoker,
+        "custom_term_height": lead.custom_term_height,
+        "custom_term_weight": lead.custom_term_weight,
+        "custom_term_company": lead.custom_term_company,
+        "custom_term_payment_mode": lead.custom_term_payment_mode,
+        # ── Motor sub-fields ──
+        "custom_motor_vehicle_year": lead.custom_motor_vehicle_year,
+        "custom_motor_vehicle_type": lead.custom_motor_vehicle_type,
+        "custom_motor_company": lead.custom_motor_company,
+        "custom_motor_vehicle_number": lead.custom_motor_vehicle_number,
+        "custom_motor_vehicle_make_model": lead.custom_motor_vehicle_make_model,
+        # ── Travel sub-fields ──
+        "custom_travel_country": lead.custom_travel_country,
+        "custom_travel_duration": lead.custom_travel_duration,
+        "custom_travel_members": lead.custom_travel_members,
+        "custom_travel_coverage": lead.custom_travel_coverage,
+        "custom_travel_company": lead.custom_travel_company,
+        # ── RM details ──
         "custom_sales_rm": lead.custom_service_rm or lead.custom_sales_rm,
         "lead_owner": dilip_user,
         "status": "New",
@@ -1572,3 +1634,156 @@ def reject_renewal_mis(record_name, reason=None):
 
     frappe.db.commit()
     return {"status": "rejected"}
+
+
+@frappe.whitelist()
+def assign_renewals_rm(record_name, renewals_rm):
+    """Assign Renewals RM to Insurance Renewal Record"""
+    doc = frappe.get_doc("Insurance Renewal Record", record_name)
+    rm_name = frappe.db.get_value("Employee", renewals_rm, "employee_name")
+    rm_user = frappe.db.get_value("Employee", renewals_rm, "user_id")
+
+    doc.renewals_rm      = renewals_rm
+    doc.renewals_rm_name = rm_name
+    doc.assigned_by      = frappe.session.user
+    doc.assigned_date    = frappe.utils.today()
+    doc.renewal_status   = "In Progress"
+    doc.save(ignore_permissions=True)
+
+    # Share with Renewals RM user
+    if rm_user:
+        existing = frappe.db.get_value("DocShare", {
+            "share_doctype": "Insurance Renewal Record",
+            "share_name": record_name,
+            "user": rm_user
+        }, "name")
+        if not existing:
+            frappe.share.add(
+                doctype="Insurance Renewal Record",
+                name=record_name,
+                user=rm_user,
+                read=1, write=1,
+                flags={"ignore_share_permission": True}
+            )
+
+    # Notify the RM
+    if rm_user:
+        frappe.sendmail(
+            recipients=[rm_user],
+            subject=f"Renewal Assigned: {doc.client_name}",
+            message=f"""
+            <p>Dear {rm_name},</p>
+            <p>A renewal record has been assigned to you:</p>
+            <ul>
+                <li>Client: {doc.client_name}</li>
+                <li>Insurance Type: {doc.insurance_type}</li>
+                <li>Policy Expiry: {doc.policy_expiry_date}</li>
+            </ul>
+            <p>Please follow up with the client for renewal.</p>
+            """,
+            now=True
+        )
+
+    frappe.db.commit()
+    return {"status": "assigned", "rm_name": rm_name}
+
+
+@frappe.whitelist()
+def get_renewals_rm_list_for_assign():
+    """Get list of Renewals RM employees for assignment dropdown"""
+    users = frappe.get_all("Has Role",
+        filters={"role": "Insurance Renewals RM", "parenttype": "User"},
+        fields=["parent"])
+
+    result = []
+    for u in users:
+        emp = frappe.db.get_value("Employee",
+            {"user_id": u.parent},
+            ["name", "employee_name"], as_dict=True)
+        if emp:
+            result.append({
+                "employee": emp.name,
+                "name": emp.employee_name,
+                "email": u.parent
+            })
+    return result
+
+
+@frappe.whitelist()
+def get_renewals_rm_list_for_assign():
+    """Get list of Renewals RM team members only (exclude managers/admins)"""
+    # Get users with Renewals Manager role to exclude them
+    managers = set(frappe.get_all("Has Role",
+        filters={"role": "Insurance Renewals Manager", "parenttype": "User"},
+        pluck="parent"))
+
+    users = frappe.get_all("Has Role",
+        filters={"role": "Insurance Renewals RM", "parenttype": "User"},
+        fields=["parent"])
+
+    result = []
+    for u in users:
+        # Skip managers and Administrator
+        if u.parent in managers or u.parent == "Administrator":
+            continue
+        emp = frappe.db.get_value("Employee",
+            {"user_id": u.parent},
+            ["name", "employee_name"], as_dict=True)
+        if emp:
+            result.append({
+                "employee": emp.name,
+                "name": emp.employee_name,
+                "email": u.parent
+            })
+    return result
+
+
+@frappe.whitelist()
+def assign_renewal_rm_to_lead(lead_name, renewals_rm):
+    """Assign Renewals RM to CRM Lead (Insurance Renewals) and linked Renewal Record"""
+    lead = frappe.get_doc("CRM Lead", lead_name)
+    rm_name = frappe.db.get_value("Employee", renewals_rm, "employee_name")
+    rm_user = frappe.db.get_value("Employee", renewals_rm, "user_id")
+
+    # Set service RM on the lead
+    lead.custom_service_rm = renewals_rm
+    lead.custom_service_rm_name = rm_name
+    lead.save(ignore_permissions=True)
+
+    # Also update linked Insurance Renewal Record if exists
+    renewal_record = frappe.db.get_value("Insurance Renewal Record",
+        {"source_lead": lead_name}, "name")
+    if renewal_record:
+        frappe.db.set_value("Insurance Renewal Record", renewal_record, {
+            "renewals_rm": renewals_rm,
+            "renewals_rm_name": rm_name,
+            "renewal_status": "In Progress"
+        })
+        # Share with RM
+        if rm_user:
+            existing = frappe.db.get_value("DocShare", {
+                "share_doctype": "Insurance Renewal Record",
+                "share_name": renewal_record,
+                "user": rm_user
+            }, "name")
+            if not existing:
+                frappe.share.add(
+                    doctype="Insurance Renewal Record",
+                    name=renewal_record,
+                    user=rm_user,
+                    read=1, write=1,
+                    flags={"ignore_share_permission": True}
+                )
+
+    # Share CRM Lead with RM
+    if rm_user:
+        frappe.share.add(
+            doctype="CRM Lead",
+            name=lead_name,
+            user=rm_user,
+            read=1, write=1,
+            flags={"ignore_share_permission": True}
+        )
+
+    frappe.db.commit()
+    return {"status": "assigned", "rm_name": rm_name}
