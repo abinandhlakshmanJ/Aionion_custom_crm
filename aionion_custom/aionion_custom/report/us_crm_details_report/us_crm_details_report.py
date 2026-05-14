@@ -9,7 +9,7 @@ def get_columns():
     return [
         {"label": "Record", "fieldname": "name", "fieldtype": "Link", "options": "US Subscription Record", "width": 120},
         {"label": "Client Name", "fieldname": "client_name", "fieldtype": "Data", "width": 160},
-        {"label": "New Email ID", "fieldname": "new_email_id", "fieldtype": "Data", "width": 180},
+        {"label": "New Email ID", "fieldname": "email_address", "fieldtype": "Data", "width": 180},
         {"label": "Old Email ID", "fieldname": "old_email_id", "fieldtype": "Data", "width": 180},
         {"label": "Country Code", "fieldname": "country_code", "fieldtype": "Data", "width": 100},
         {"label": "Contact Number", "fieldname": "contact_number", "fieldtype": "Data", "width": 130},
@@ -45,7 +45,7 @@ def get_data(filters):
     query = (
         frappe.qb.from_(USRec)
         .select(
-            USRec.name, USRec.client_name, USRec.new_email_id, USRec.old_email_id,
+            USRec.name, USRec.client_name, USRec.email_address, USRec.old_email_id,
             USRec.country_code, USRec.contact_number, USRec.alternative_phone,
             USRec.country_of_residence, USRec.mode_of_payment_new, USRec.payment_date,
             USRec.payment_month, USRec.subscription_type_new, USRec.client_status_new,

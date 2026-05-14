@@ -1221,7 +1221,7 @@ def create_us_subscription_from_lead(lead_name):
         "lead_source": getattr(lead, "source", None) or getattr(lead, "lead_source", None),
         "sales_done_by": lead.custom_sales_rm or frappe.db.get_value("Employee", {"user_id": frappe.session.user}, "name"),
         "service_rm": lead.custom_service_rm,
-        "new_email_id": lead.email,
+        "email_address": lead.email,
         "lead_entry_date": lead.creation,
     })
     rec.insert(ignore_permissions=True)
@@ -1257,7 +1257,7 @@ def create_us_subscription_from_lead(lead_name):
         "lead_source": getattr(lead, "source", None) or getattr(lead, "lead_source", None),
         "sales_done_by": lead.custom_sales_rm or frappe.db.get_value("Employee", {"user_id": frappe.session.user}, "name"),
         "service_rm": lead.custom_service_rm,
-        "new_email_id": lead.email,
+        "email_address": lead.email,
         "lead_entry_date": lead.creation,
     })
     rec.insert(ignore_permissions=True)

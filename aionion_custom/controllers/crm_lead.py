@@ -1158,7 +1158,7 @@ def create_us_subscription_from_lead(lead_name):
         "payment_status": "Pending",
         "lead_source": lead.lead_source,
         "service_rm": lead.custom_service_rm,
-        "new_email_id": lead.email,
+        "email_address": lead.email,
         "lead_entry_date": lead.creation,
     })
     rec.insert(ignore_permissions=True)
@@ -1193,7 +1193,7 @@ def create_us_subscription_from_lead(lead_name):
         "payment_status": "Pending",
         "lead_source": lead.lead_source,
         "service_rm": lead.custom_service_rm,
-        "new_email_id": lead.email,
+        "email_address": lead.email,
         "lead_entry_date": lead.creation,
     })
     rec.insert(ignore_permissions=True)
