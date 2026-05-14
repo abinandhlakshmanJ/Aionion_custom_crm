@@ -168,7 +168,8 @@ fixtures = [
         "Customer Actions",
         "Customer Call Button",
         "Navigate to Customers and Aionion Tasks",
-        "Lead Hierarchy Filter"
+        "Lead Hierarchy Filter",
+        "US Subscription List Actions"
     ]]]},
     # Client Scripts
     {"dt": "Client Script", "filters": [["name", "in", [
@@ -193,9 +194,7 @@ fixtures = [
         "US Subscription Admin"
     ]]]},
     # CRM Form Scripts — US Subscription
-    {"dt": "CRM Form Script", "filters": [["name", "in", [
-        "US Subscription List Actions"
-    ]]]},
+ 
     # Workspace
     {"dt": "Workspace", "filters": [["name", "in", ["Aionion Insurance"]]]},
 ]
