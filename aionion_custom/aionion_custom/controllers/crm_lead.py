@@ -1789,3 +1789,175 @@ def assign_renewal_rm_to_lead(lead_name, renewals_rm):
 
     frappe.db.commit()
     return {"status": "assigned", "rm_name": rm_name}
+
+
+# ── AIONION CAPITAL — BONDS / MUTUAL FUNDS / ACCOUNT OPENING ─────────────────
+
+def _get_capital_record_info(lead):
+    """Get DocType name and existing record for capital product"""
+    product_map = {
+        "Bonds": "Bonds Purchase Record",
+        "Mutual Funds": "Mutual Funds Record",
+        "Account Opening": "Equity Record",
+    }
+    dt = product_map.get(lead.custom_product)
+    if not dt:
+        frappe.throw(f"Unknown capital product: {lead.custom_product}")
+    existing = frappe.db.get_value(dt, {"lead": lead.name}, "name")
+    return dt, existing
+
+
+def _build_capital_record(dt, lead):
+    """Create a new capital record pre-filled from lead"""
+    rm = lead.custom_service_rm or lead.custom_sales_rm
+    rm_name = frappe.db.get_value("Employee", rm, "employee_name") if rm else ""
+    branch, department = None, None
+    if rm:
+        emp = frappe.db.get_value("Employee", rm, ["branch", "department"], as_dict=True)
+        if emp:
+            branch = emp.branch
+            department = emp.department
+
+    doc = frappe.new_doc(dt)
+    doc.lead           = lead.name
+    doc.customer       = lead.custom_customer or None
+    doc.client_name    = lead.lead_name
+    doc.pan            = lead.custom_pan_number
+    doc.rm_employee_code = rm
+    doc.rm_employee_name = rm_name
+    doc.branch         = branch
+    doc.department     = department
+    if hasattr(doc, "sales_done_by"):
+        doc.sales_done_by = rm
+    doc.insert(ignore_permissions=True)
+    frappe.db.commit()
+    return doc.name
+
+
+@frappe.whitelist()
+def get_or_create_capital_record(lead_name):
+    """Get or create Bonds/MF/Equity record for a capital lead"""
+    lead = frappe.get_cached_doc("CRM Lead", lead_name)
+    dt, existing = _get_capital_record_info(lead)
+    if existing:
+        return {"name": existing, "doctype": dt}
+    name = _build_capital_record(dt, lead)
+    return {"name": name, "doctype": dt}
+
+
+@frappe.whitelist()
+def submit_capital_lead(lead_name):
+    """Submit a Capital lead for MIS verification"""
+    lead = frappe.get_doc("CRM Lead", lead_name)
+    if lead.docstatus == 1:
+        frappe.throw("Lead already submitted.")
+    lead.submit()
+
+    # Share with MIS team
+    mis_users = frappe.get_all("Has Role",
+        filters={"role": "Insurance MIS", "parenttype": "User"},
+        pluck="parent")
+    for user in mis_users:
+        if user != "Administrator":
+            frappe.share.add("CRM Lead", lead_name, user,
+                read=1, write=1, flags={"ignore_share_permission": True})
+    frappe.db.commit()
+    return {"status": "submitted"}
+
+
+@frappe.whitelist()
+def approve_capital_mis(lead_name):
+    """MIS approves a Capital lead — creates/syncs customer"""
+    _check_mis_role()
+    lead = frappe.get_doc("CRM Lead", lead_name)
+    if lead.custom_mis_status == "Approved":
+        frappe.throw("Already approved.")
+    lead.custom_mis_status      = "Approved"
+    lead.custom_mis_verified_by = frappe.session.user
+    lead.custom_mis_verified_date = frappe.utils.nowdate()
+    lead.save(ignore_permissions=True)
+    frappe.enqueue(
+        "aionion_custom.aionion_custom.controllers.crm_lead.process_post_capital_mis_approval",
+        lead_name=lead_name, queue="default"
+    )
+    frappe.db.commit()
+    return {"status": "approved"}
+
+
+@frappe.whitelist()
+def reject_capital_mis(lead_name, reason=None):
+    """MIS rejects a Capital lead"""
+    _check_mis_role()
+    lead = frappe.get_doc("CRM Lead", lead_name)
+    lead.custom_mis_status      = "Rejected"
+    lead.custom_mis_verified_by = frappe.session.user
+    lead.custom_mis_verified_date = frappe.utils.nowdate()
+    lead.save(ignore_permissions=True)
+    # Unlock lead
+    frappe.db.set_value("CRM Lead", lead_name, "docstatus", 0)
+    frappe.db.commit()
+    return {"status": "rejected"}
+
+
+def process_post_capital_mis_approval(lead_name):
+    """Post MIS approval — create/sync customer and update capital record"""
+    try:
+        lead = frappe.get_doc("CRM Lead", lead_name)
+        customer = _get_or_create_customer(lead)
+        if not customer.custom_aionion_master_id:
+            _generate_aionion_master_id(customer)
+
+        # Update capital record with customer
+        dt, existing = _get_capital_record_info(lead)
+        if existing:
+            frappe.db.set_value(dt, existing, {
+                "customer": customer.name,
+                "client_code": customer.custom_aionion_master_id,
+            })
+
+        # Update lead with customer
+        frappe.db.set_value("CRM Lead", lead_name, "custom_customer", customer.name)
+        frappe.db.commit()
+        frappe.logger().info(f"Capital MIS approved for {lead_name}")
+    except Exception as e:
+        frappe.log_error(str(e), "Post Capital MIS Approval Error")
+
+
+@frappe.whitelist()
+def autoname_us_subscription_record(doc, method=None):
+    """Generate US-YY-XXXX-NNNNNN format ID"""
+    import datetime, random, string
+
+    yy = str(datetime.datetime.now().year)[2:]
+
+    # Get random part from Customer
+    random_part = ""
+    if doc.customer:
+        random_part = frappe.db.get_value(
+            "Customer", doc.customer, "custom_random_part") or ""
+
+    if not random_part:
+        chars = [c for c in (string.ascii_uppercase + string.digits)
+                 if c not in "0O1IL"]
+        random_part = "".join(random.choices(chars, k=4))
+        if doc.customer:
+            frappe.db.set_value("Customer", doc.customer,
+                "custom_random_part", random_part)
+
+    if not random_part:
+        random_part = "XXXX"
+
+    # Get next sequence
+    last = frappe.db.sql(
+        "SELECT name FROM `tabUS Subscription Record` WHERE name LIKE %s ORDER BY name DESC LIMIT 1",
+        [f"US-{yy}-{random_part}-%"]
+    )
+    if last:
+        try:
+            seq = int(last[0][0].split("-")[-1]) + 1
+        except:
+            seq = 1
+    else:
+        seq = 1
+
+    doc.name = f"US-{yy}-{random_part}-{seq:06d}"
