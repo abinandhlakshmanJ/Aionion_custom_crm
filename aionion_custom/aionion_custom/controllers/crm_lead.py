@@ -1961,3 +1961,25 @@ def autoname_us_subscription_record(doc, method=None):
         seq = 1
 
     doc.name = f"US-{yy}-{random_part}-{seq:06d}"
+
+
+@frappe.whitelist()
+def autoname_insurance_renewal_record(doc, method=None):
+    """Generate RNW-YY-XXXX-NNNNNN format ID"""
+    yy = frappe.utils.now_datetime().strftime("%y")
+    random_part = ""
+    if doc.customer:
+        random_part = frappe.db.get_value("Customer", doc.customer, "custom_random_part") or ""
+    if not random_part:
+        import random, string
+        chars = [c for c in (string.ascii_uppercase + string.digits) if c not in "0O1IL"]
+        random_part = "".join(random.choices(chars, k=4))
+        if doc.customer:
+            frappe.db.set_value("Customer", doc.customer, "custom_random_part", random_part)
+    if not random_part:
+        random_part = "XXXX"
+    last = frappe.db.sql(
+        "SELECT name FROM `tabInsurance Renewal Record` WHERE name LIKE %s ORDER BY name DESC LIMIT 1",
+        [f"RNW-{yy}-{random_part}-%"])
+    seq = (int(last[0][0].split("-")[-1]) + 1) if last else 1
+    doc.name = f"RNW-{yy}-{random_part}-{seq:06d}"
