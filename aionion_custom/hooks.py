@@ -8,7 +8,7 @@ app_license = "mit"
 # Includes in <head>
 # ------------------
 # app_include_css = "/assets/aionion_custom/css/aionion_custom.css"
-# app_include_js = "/assets/aionion_custom/js/aionion_custom.js"
+# app_include_js = ["/assets/aionion_custom/js/crm_mail_inbox_btn.js"]
 # web_include_css = "/assets/aionion_custom/css/aionion_custom.css"
 # web_include_js = "/assets/aionion_custom/js/aionion_custom.js"
 
