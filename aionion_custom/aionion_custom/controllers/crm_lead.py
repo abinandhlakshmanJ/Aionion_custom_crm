@@ -1835,6 +1835,7 @@ def _build_capital_record(dt, lead):
 
 
 @frappe.whitelist()
+@frappe.whitelist()
 def get_or_create_capital_record(lead_name):
     """Get or create Bonds/MF/Equity record for a capital lead"""
     lead = frappe.get_cached_doc("CRM Lead", lead_name)
@@ -1845,6 +1846,7 @@ def get_or_create_capital_record(lead_name):
     return {"name": name, "doctype": dt}
 
 
+@frappe.whitelist()
 @frappe.whitelist()
 def submit_capital_lead(lead_name):
     """Submit a Capital lead for MIS verification"""
@@ -1866,6 +1868,7 @@ def submit_capital_lead(lead_name):
 
 
 @frappe.whitelist()
+@frappe.whitelist()
 def approve_capital_mis(lead_name):
     """MIS approves a Capital lead — creates/syncs customer"""
     _check_mis_role()
@@ -1884,6 +1887,7 @@ def approve_capital_mis(lead_name):
     return {"status": "approved"}
 
 
+@frappe.whitelist()
 @frappe.whitelist()
 def reject_capital_mis(lead_name, reason=None):
     """MIS rejects a Capital lead"""
