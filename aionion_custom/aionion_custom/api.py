@@ -8,29 +8,48 @@ def get_call_log_summary(from_date=None, to_date=None):
     CRMCallLog = DocType("CRM Call Log")
     current_user = frappe.session.user
 
-    def apply_filters(q):
+    def base_query():
+        q = (
+            frappe.qb.from_(CRMCallLog)
+            .where(CRMCallLog.reference_doctype == "CRM Lead")
+        )
         if from_date:
             q = q.where(CRMCallLog.creation >= from_date)
         if to_date:
-            q = q.where(CRMCallLog.creation <= to_date)
+            q = q.where(CRMCallLog.creation <= to_date + " 23:59:59")
         return q
 
-    my_calls = apply_filters(
-        frappe.qb.from_(CRMCallLog)
+    my_calls = (
+        base_query()
         .select(CRMCallLog.status, Count("*").as_("count"))
-        .where(CRMCallLog.owner == current_user)
+        .where(
+            (CRMCallLog.caller == current_user) | (CRMCallLog.receiver == current_user)
+        )
         .groupby(CRMCallLog.status)
     ).run(as_dict=True)
 
-    team_calls = apply_filters(
-        frappe.qb.from_(CRMCallLog)
-        .select(CRMCallLog.owner, Count("*").as_("total_calls"))
-        .groupby(CRMCallLog.owner)
-        .orderby(Count("*"), order=frappe.qb.desc)
+    caller_rows = (
+        base_query()
+        .select(CRMCallLog.caller.as_("agent"), Count("*").as_("total_calls"))
+        .where(CRMCallLog.caller.isnotnull())
+        .groupby(CRMCallLog.caller)
     ).run(as_dict=True)
 
-    owners = [r["owner"] for r in team_calls]
-    if not owners:
+    receiver_rows = (
+        base_query()
+        .select(CRMCallLog.receiver.as_("agent"), Count("*").as_("total_calls"))
+        .where(CRMCallLog.receiver.isnotnull())
+        .groupby(CRMCallLog.receiver)
+    ).run(as_dict=True)
+
+    agent_totals = {}
+    for r in caller_rows + receiver_rows:
+        agent = r.get("agent")
+        if agent:
+            agent_totals[agent] = agent_totals.get(agent, 0) + r["total_calls"]
+
+    agents = list(agent_totals.keys())
+    if not agents:
         return {
             "my_summary": {"user": current_user, "total": 0, "by_status": []},
             "team_summary": [], "managers": [], "team_leads": []
@@ -38,7 +57,7 @@ def get_call_log_summary(from_date=None, to_date=None):
 
     user_map = {
         u["name"]: u for u in frappe.get_all(
-            "User", filters={"name": ["in", owners]}, fields=["name", "full_name"]
+            "User", filters={"name": ["in", agents]}, fields=["name", "full_name"]
         )
     }
 
@@ -48,23 +67,23 @@ def get_call_log_summary(from_date=None, to_date=None):
         frappe.qb.from_(HasRole)
         .select(HasRole.parent, HasRole.role)
         .where(
-            (HasRole.parent.isin(owners)) &
+            (HasRole.parent.isin(agents)) &
             (HasRole.role.isin(["CRM Manager", "CRM TL", "Sales Team Lead", "Sales Manager"]))
         )
         .run(as_dict=True)
     ):
         role_map.setdefault(r["parent"], []).append(r["role"])
 
-    enriched_team = [
+    enriched_team = sorted([
         {
-            "user": row["owner"],
-            "full_name": user_map.get(row["owner"], {}).get("full_name", row["owner"]),
-            "total_calls": row["total_calls"],
-            "roles": role_map.get(row["owner"], ["Agent"]),
-            "is_me": row["owner"] == current_user
+            "user": agent,
+            "full_name": user_map.get(agent, {}).get("full_name", agent),
+            "total_calls": agent_totals[agent],
+            "roles": role_map.get(agent, ["Agent"]),
+            "is_me": agent == current_user
         }
-        for row in team_calls
-    ]
+        for agent in agents
+    ], key=lambda x: x["total_calls"], reverse=True)
 
     return {
         "my_summary": {

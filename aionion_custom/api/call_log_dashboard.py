@@ -1,142 +1,182 @@
 import frappe
 from frappe.query_builder import DocType
-from frappe.query_builder.functions import Count, Sum
+from frappe.query_builder.functions import Count, Sum, Coalesce  # ← added Coalesce
 
 
 @frappe.whitelist()
 def get_call_log_summary(from_date=None, to_date=None):
-	"""
-	Returns total, incoming, outgoing, missed call counts
-	and average duration for the given date range.
-	"""
-	CRMCallLog = DocType("CRM Call Log")
+    CRMCallLog = DocType("CRM Call Log")
+    current_user = frappe.session.user
 
-	query = (
-		frappe.qb.from_(CRMCallLog)
-		.select(
-			CRMCallLog.type,
-			CRMCallLog.status,
-			Count("*").as_("count"),
-		)
-	)
+    def base_query():
+        q = (
+            frappe.qb.from_(CRMCallLog)
+            .where(CRMCallLog.reference_doctype == "CRM Lead")
+        )
+        if from_date:
+            q = q.where(CRMCallLog.creation >= from_date)
+        if to_date:
+            q = q.where(CRMCallLog.creation <= to_date + " 23:59:59")
+        return q
 
-	if from_date:
-		query = query.where(CRMCallLog.start_time >= from_date)
-	if to_date:
-		query = query.where(CRMCallLog.start_time <= to_date + " 23:59:59")
+    # My Calls: I am the caller OR receiver
+    my_calls = (
+        base_query()
+        .select(CRMCallLog.status, Count("*").as_("count"))
+        .where(
+            (CRMCallLog.caller == current_user) | (CRMCallLog.receiver == current_user)
+        )
+        .groupby(CRMCallLog.status)
+    ).run(as_dict=True)
 
-	rows = query.groupby(CRMCallLog.type, CRMCallLog.status).run(as_dict=True)
+    # Team Calls: group by caller first, then receiver, merge in Python
+    caller_rows = (
+        base_query()
+        .select(CRMCallLog.caller.as_("agent"), Count("*").as_("total_calls"))
+        .where(CRMCallLog.caller.isnotnull())
+        .groupby(CRMCallLog.caller)
+    ).run(as_dict=True)
 
-	summary = {
-		"total": 0,
-		"incoming": 0,
-		"outgoing": 0,
-		"missed": 0,
-		"completed": 0,
-	}
+    receiver_rows = (
+        base_query()
+        .select(CRMCallLog.receiver.as_("agent"), Count("*").as_("total_calls"))
+        .where(CRMCallLog.receiver.isnotnull())
+        .groupby(CRMCallLog.receiver)
+    ).run(as_dict=True)
 
-	for row in rows:
-		call_type = (row.type or "").lower()
-		call_status = (row.status or "").lower()
-		count = row.count or 0
+    # Merge counts per agent
+    agent_totals = {}
+    for r in caller_rows + receiver_rows:
+        agent = r.get("agent")
+        if agent:
+            agent_totals[agent] = agent_totals.get(agent, 0) + r["total_calls"]
 
-		summary["total"] += count
+    agents = list(agent_totals.keys())
+    if not agents:
+        return {
+            "my_summary": {"user": current_user, "total": 0, "by_status": []},
+            "team_summary": [], "managers": [], "team_leads": []
+        }
 
-		if call_type == "incoming":
-			summary["incoming"] += count
-		elif call_type == "outgoing":
-			summary["outgoing"] += count
+    user_map = {
+        u["name"]: u for u in frappe.get_all(
+            "User", filters={"name": ["in", agents]}, fields=["name", "full_name"]
+        )
+    }
 
-		if call_status in ("missed", "no answer"):
-			summary["missed"] += count
-		elif call_status in ("completed", "answered"):
-			summary["completed"] += count
+    HasRole = DocType("Has Role")
+    role_map = {}
+    for r in (
+        frappe.qb.from_(HasRole)
+        .select(HasRole.parent, HasRole.role)
+        .where(
+            (HasRole.parent.isin(agents)) &
+            (HasRole.role.isin(["CRM Manager", "CRM TL", "Sales Team Lead", "Sales Manager"]))
+        )
+        .run(as_dict=True)
+    ):
+        role_map.setdefault(r["parent"], []).append(r["role"])
 
-	return summary
+    enriched_team = sorted([
+        {
+            "user": agent,
+            "full_name": user_map.get(agent, {}).get("full_name", agent),
+            "total_calls": agent_totals[agent],
+            "roles": role_map.get(agent, ["Agent"]),
+            "is_me": agent == current_user
+        }
+        for agent in agents
+    ], key=lambda x: x["total_calls"], reverse=True)
 
-
+    return {
+        "my_summary": {
+            "user": current_user,
+            "total": sum(r["count"] for r in my_calls),
+            "by_status": my_calls
+        },
+        "team_summary": enriched_team,
+        "managers": [r for r in enriched_team if any("Manager" in x for x in r["roles"])],
+        "team_leads": [r for r in enriched_team if any("TL" in x or "Lead" in x for x in r["roles"])]
+    }
 @frappe.whitelist()
 def get_calls_per_employee(from_date=None, to_date=None):
-	"""
-	Returns per-employee call counts (incoming + outgoing)
-	joined with HRMS Employee for hierarchy data.
-	"""
-	CRMCallLog = DocType("CRM Call Log")
-	Employee = DocType("Employee")
+    """
+    Returns per-employee call counts using COALESCE(caller, receiver)
+    so both incoming (receiver) and outgoing (caller) calls are captured.
+    """
+    CRMCallLog = DocType("CRM Call Log")
+    Employee = DocType("Employee")
 
-	query = (
-		frappe.qb.from_(CRMCallLog)
-		.inner_join(Employee)
-		.on(Employee.user_id == CRMCallLog.caller)
-		.select(
-			CRMCallLog.caller.as_("user_id"),
-			Employee.name.as_("employee"),
-			Employee.employee_name,
-			Employee.designation,
-			Employee.reports_to,
-			Employee.image,
-			CRMCallLog.type,
-			Count("*").as_("count"),
-		)
-	)
+    agent_field = Coalesce(CRMCallLog.caller, CRMCallLog.receiver)
 
-	if from_date:
-		query = query.where(CRMCallLog.start_time >= from_date)
-	if to_date:
-		query = query.where(CRMCallLog.start_time <= to_date + " 23:59:59")
+    query = (
+        frappe.qb.from_(CRMCallLog)
+        .inner_join(Employee)
+        .on(Employee.user_id == agent_field)
+        .select(
+            agent_field.as_("user_id"),
+            Employee.name.as_("employee"),
+            Employee.employee_name,
+            Employee.designation,
+            Employee.reports_to,
+            Employee.image,
+            CRMCallLog.type,
+            Count("*").as_("count"),
+        )
+    )
 
-	rows = query.groupby(CRMCallLog.caller, CRMCallLog.type).run(as_dict=True)
+    if from_date:
+        query = query.where(CRMCallLog.start_time >= from_date)
+    if to_date:
+        query = query.where(CRMCallLog.start_time <= to_date + " 23:59:59")
 
-	# Aggregate into per-employee dict
-	employees = {}
-	for row in rows:
-		uid = row.user_id
-		if uid not in employees:
-			employees[uid] = {
-				"user_id": uid,
-				"employee": row.employee,
-				"employee_name": row.employee_name,
-				"designation": row.designation,
-				"reports_to": row.reports_to,
-				"image": row.image,
-				"incoming": 0,
-				"outgoing": 0,
-				"total": 0,
-			}
+    rows = query.groupby(agent_field, CRMCallLog.type).run(as_dict=True)
 
-		count = row.count or 0
-		call_type = (row.type or "").lower()
+    employees = {}
+    for row in rows:
+        uid = row.user_id
+        if uid not in employees:
+            employees[uid] = {
+                "user_id": uid,
+                "employee": row.employee,
+                "employee_name": row.employee_name,
+                "designation": row.designation,
+                "reports_to": row.reports_to,
+                "image": row.image,
+                "incoming": 0,
+                "outgoing": 0,
+                "total": 0,
+            }
+        count = row.count or 0
+        if (row.type or "").lower() == "incoming":
+            employees[uid]["incoming"] += count
+        elif (row.type or "").lower() == "outgoing":
+            employees[uid]["outgoing"] += count
+        employees[uid]["total"] += count
 
-		if call_type == "incoming":
-			employees[uid]["incoming"] += count
-		elif call_type == "outgoing":
-			employees[uid]["outgoing"] += count
-
-		employees[uid]["total"] += count
-
-	return list(employees.values())
+    return list(employees.values())
 
 
 @frappe.whitelist()
 def get_hrms_hierarchy():
-	"""
-	Returns active employee list with reports_to for building org tree.
-	"""
-	Employee = DocType("Employee")
+    """
+    Returns active employee list with reports_to for building org tree.
+    """
+    Employee = DocType("Employee")
 
-	employees = (
-		frappe.qb.from_(Employee)
-		.select(
-			Employee.name,
-			Employee.employee_name,
-			Employee.reports_to,
-			Employee.designation,
-			Employee.department,
-			Employee.user_id,
-			Employee.image,
-		)
-		.where(Employee.status == "Active")
-		.run(as_dict=True)
-	)
+    employees = (
+        frappe.qb.from_(Employee)
+        .select(
+            Employee.name,
+            Employee.employee_name,
+            Employee.reports_to,
+            Employee.designation,
+            Employee.department,
+            Employee.user_id,
+            Employee.image,
+        )
+        .where(Employee.status == "Active")
+        .run(as_dict=True)
+    )
 
-	return employees
+    return employees
