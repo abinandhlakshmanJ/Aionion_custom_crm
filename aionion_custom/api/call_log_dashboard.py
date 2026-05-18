@@ -8,6 +8,11 @@ def get_call_log_summary(from_date=None, to_date=None):
     CRMCallLog = DocType("CRM Call Log")
     current_user = frappe.session.user
 
+    # Roles that can see ALL calls
+    manager_roles = {"Administrator", "Sales Manager", "CRM Manager", "System Manager"}
+    user_roles = set(frappe.get_roles(current_user))
+    is_manager = bool(user_roles & manager_roles) or current_user == "Administrator"
+
     def base_query():
         q = (
             frappe.qb.from_(CRMCallLog)
@@ -17,9 +22,14 @@ def get_call_log_summary(from_date=None, to_date=None):
             q = q.where(CRMCallLog.creation >= from_date)
         if to_date:
             q = q.where(CRMCallLog.creation <= to_date + " 23:59:59")
+
+        # Agents only see their own calls
+        if not is_manager:
+            q = q.where(
+                (CRMCallLog.caller == current_user) | (CRMCallLog.receiver == current_user)
+            )
         return q
 
-    # My Calls: I am the caller OR receiver
     my_calls = (
         base_query()
         .select(CRMCallLog.status, Count("*").as_("count"))
@@ -29,7 +39,6 @@ def get_call_log_summary(from_date=None, to_date=None):
         .groupby(CRMCallLog.status)
     ).run(as_dict=True)
 
-    # Team Calls: group by caller first, then receiver, merge in Python
     caller_rows = (
         base_query()
         .select(CRMCallLog.caller.as_("agent"), Count("*").as_("total_calls"))
@@ -44,7 +53,6 @@ def get_call_log_summary(from_date=None, to_date=None):
         .groupby(CRMCallLog.receiver)
     ).run(as_dict=True)
 
-    # Merge counts per agent
     agent_totals = {}
     for r in caller_rows + receiver_rows:
         agent = r.get("agent")
@@ -97,8 +105,7 @@ def get_call_log_summary(from_date=None, to_date=None):
         "team_summary": enriched_team,
         "managers": [r for r in enriched_team if any("Manager" in x for x in r["roles"])],
         "team_leads": [r for r in enriched_team if any("TL" in x or "Lead" in x for x in r["roles"])]
-    }
-@frappe.whitelist()
+    }@frappe.whitelist()
 def get_calls_per_employee(from_date=None, to_date=None):
     """
     Returns per-employee call counts using COALESCE(caller, receiver)
