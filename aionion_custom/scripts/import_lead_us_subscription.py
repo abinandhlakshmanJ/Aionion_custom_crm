@@ -101,8 +101,8 @@ def import_records(file_path):
 
         for row_num, row in enumerate(reader, start=2):
             try:
-                _upsert_crm_lead(row)
-                _upsert_us_subscription(row)
+                lead_name = _upsert_crm_lead(row)
+                _upsert_us_subscription(row, lead_name)
                 frappe.db.commit()
                 results["success"] += 1
 
@@ -178,10 +178,8 @@ _LEAD_FIELDS_TO_IMPORT = [
 
 def _upsert_crm_lead(row):
     lead_doc_name = cstr(row.get("lead__name")).strip()
-    if not lead_doc_name:
-        return  # nothing to do
 
-    exists = frappe.db.exists("CRM Lead", lead_doc_name)
+    exists = frappe.db.exists("CRM Lead", lead_doc_name) if lead_doc_name else False
 
     if exists:
         doc = frappe.get_doc("CRM Lead", lead_doc_name)
@@ -199,7 +197,9 @@ def _upsert_crm_lead(row):
     else:
         doc.flags.ignore_mandatory = True
         doc.flags.ignore_links = True
-        doc.insert(ignore_permissions=True)
+        doc.db_insert()
+
+    return doc.name
 
 
 # ──────────────────────────────────────────────
@@ -227,9 +227,10 @@ _US_FIELDS_TO_IMPORT = [
 ]
 
 
-def _upsert_us_subscription(row):
+def _upsert_us_subscription(row, lead_name=None):
     us_doc_name = cstr(row.get("us__name")).strip()
-    lead_name   = cstr(row.get("us__lead")).strip()
+    # Use passed lead_name (from newly created lead) or fall back to us__lead column
+    lead_name = lead_name or cstr(row.get("us__lead")).strip()
 
     # If there is no US Subscription data at all for this row, skip
     if not us_doc_name and not lead_name:
@@ -253,12 +254,16 @@ def _upsert_us_subscription(row):
         raw = row.get(f"us__{fieldname}")
         doc.set(fieldname, _cast_us(fieldname, raw))
 
+    # Always override lead with the passed lead_name to ensure correct linking
+    if lead_name:
+        doc.lead = lead_name
+
     doc.flags.ignore_mandatory = True
     doc.flags.ignore_links = True
     doc.flags.ignore_validate = True
 
     if doc.is_new():
-        doc.insert(ignore_permissions=True)
+        doc.db_insert()
     else:
         # db_update → direct SQL UPDATE, bypasses all Python validation
         doc.db_update()
