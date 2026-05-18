@@ -3,15 +3,57 @@ from frappe.query_builder import DocType
 from frappe.query_builder.functions import Count
 
 
+def get_team_user_ids(current_user):
+    """
+    BFS down the reports_to tree from current_user's employee record.
+    Returns list of all user_ids the current_user can see (self + all subordinates).
+    """
+    my_employees = frappe.get_all(
+        "Employee",
+        filters={"user_id": current_user, "status": "Active"},
+        fields=["name"]
+    )
+    if not my_employees:
+        return [current_user]
+
+    visited_emp_ids = set(e.name for e in my_employees)
+    queue = list(visited_emp_ids)
+
+    while queue:
+        batch  = queue[:50]
+        queue  = queue[50:]
+        subordinates = frappe.get_all(
+            "Employee",
+            filters={"reports_to": ["in", batch], "status": "Active"},
+            fields=["name"]
+        )
+        for sub in subordinates:
+            if sub.name not in visited_emp_ids:
+                visited_emp_ids.add(sub.name)
+                queue.append(sub.name)
+
+    # Resolve employee IDs → user_ids
+    emp_users = frappe.get_all(
+        "Employee",
+        filters={"name": ["in", list(visited_emp_ids)]},
+        fields=["user_id"]
+    )
+    user_ids = list({e.user_id for e in emp_users if e.user_id})
+
+    if current_user not in user_ids:
+        user_ids.append(current_user)
+
+    return user_ids
+
+
 @frappe.whitelist()
 def get_call_log_summary(from_date=None, to_date=None):
-    CRMCallLog = DocType("CRM Call Log")
+    CRMCallLog   = DocType("CRM Call Log")
     current_user = frappe.session.user
+    is_admin     = current_user == "Administrator"
 
-    # Roles that can see ALL calls
-    manager_roles = {"Administrator", "Sales Manager", "CRM Manager", "System Manager"}
-    user_roles = set(frappe.get_roles(current_user))
-    is_manager = bool(user_roles & manager_roles) or current_user == "Administrator"
+    # Get the users this person can see based on hierarchy
+    team_users = None if is_admin else get_team_user_ids(current_user)
 
     def base_query():
         q = (
@@ -23,13 +65,15 @@ def get_call_log_summary(from_date=None, to_date=None):
         if to_date:
             q = q.where(CRMCallLog.creation <= to_date + " 23:59:59")
 
-        # Agents only see their own calls
-        if not is_manager:
+        # Scope to hierarchy — skip filter for Administrator
+        if not is_admin and team_users:
             q = q.where(
-                (CRMCallLog.caller == current_user) | (CRMCallLog.receiver == current_user)
+                (CRMCallLog.caller.isin(team_users)) |
+                (CRMCallLog.receiver.isin(team_users))
             )
         return q
 
+    # My Calls — always just current user
     my_calls = (
         base_query()
         .select(CRMCallLog.status, Count("*").as_("count"))
@@ -39,6 +83,7 @@ def get_call_log_summary(from_date=None, to_date=None):
         .groupby(CRMCallLog.status)
     ).run(as_dict=True)
 
+    # Team breakdown — scoped by hierarchy
     caller_rows = (
         base_query()
         .select(CRMCallLog.caller.as_("agent"), Count("*").as_("total_calls"))
@@ -106,6 +151,7 @@ def get_call_log_summary(from_date=None, to_date=None):
         "managers": [r for r in enriched_team if any("Manager" in x for x in r["roles"])],
         "team_leads": [r for r in enriched_team if any("TL" in x or "Lead" in x for x in r["roles"])]
     }
+
 
 @frappe.whitelist()
 def get_email_summary(from_date=None, to_date=None):
