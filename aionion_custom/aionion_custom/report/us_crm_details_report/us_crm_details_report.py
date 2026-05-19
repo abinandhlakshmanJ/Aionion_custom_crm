@@ -8,6 +8,7 @@ def execute(filters=None):
 def get_columns():
     return [
         {"label": "Record", "fieldname": "name", "fieldtype": "Link", "options": "US Subscription Record", "width": 120},
+        {"label": "Data Entry Date", "fieldname": "data_entry_date", "fieldtype": "Datetime", "width": 160},
         {"label": "Client Name", "fieldname": "client_name", "fieldtype": "Data", "width": 160},
         {"label": "Email Address", "fieldname": "email_address", "fieldtype": "Data", "width": 180},
         {"label": "Alternate Email", "fieldname": "alternate_email_id", "fieldtype": "Data", "width": 180},
@@ -28,6 +29,9 @@ def get_columns():
         {"label": "Sub End Date", "fieldname": "sub_end_date", "fieldtype": "Date", "width": 110},
         {"label": "Old Sub Month", "fieldname": "old_subscription_month", "fieldtype": "Data", "width": 130},
         {"label": "Sales Done By", "fieldname": "sales_done_by", "fieldtype": "Link", "options": "Employee", "width": 130},
+        {"label": "Service RM", "fieldname": "service_rm", "fieldtype": "Data", "width": 130},
+        {"label": "Lead Source", "fieldname": "lead_source", "fieldtype": "Data", "width": 120},
+        {"label": "Team", "fieldname": "team", "fieldtype": "Data", "width": 100},
         {"label": "Old RM", "fieldname": "old_rm", "fieldtype": "Data", "width": 120},
         {"label": "Email Sent", "fieldname": "email_sent", "fieldtype": "Data", "width": 100},
         {"label": "Payment Status", "fieldname": "payment_status", "fieldtype": "Data", "width": 120},
@@ -37,19 +41,27 @@ def get_columns():
 
 def get_data(filters):
     USRec = DocType("US Subscription Record")
+    CRMLead = DocType("CRM Lead")
+
     query = (
         frappe.qb.from_(USRec)
+        .left_join(CRMLead).on(USRec.lead == CRMLead.name)
         .select(
-            USRec.name, USRec.client_name, USRec.email_address, USRec.alternate_email_id,
-            USRec.contact_number, USRec.alternative_phone, USRec.country_of_residence,
-            USRec.mode_of_payment_new, USRec.payment_date, USRec.payment_month,
+            USRec.name, USRec.data_entry_date, USRec.client_name,
+            USRec.email_address, USRec.alternate_email_id,
+            USRec.contact_number, USRec.alternative_phone,
+            USRec.country_of_residence, USRec.mode_of_payment_new,
+            USRec.payment_date, USRec.payment_month,
             USRec.subscription_type_new, USRec.client_status_new,
             USRec.quantity_new, USRec.currency_new, USRec.amount_paid_us_subs,
             USRec.sub_start_month, USRec.sub_end_month,
             USRec.sub_start_date, USRec.sub_end_date,
             USRec.old_subscription_month, USRec.sales_done_by,
-            USRec.old_rm, USRec.email_sent, USRec.payment_status,
-            USRec.aionion_client_code, USRec.employment_status,
+            USRec.team, USRec.old_rm, USRec.email_sent,
+            USRec.payment_status, USRec.aionion_client_code,
+            USRec.employment_status,
+            CRMLead.custom_service_rm_name.as_("service_rm"),
+            CRMLead.source.as_("lead_source"),
         )
         .where(USRec.docstatus < 2)
     )
@@ -65,4 +77,6 @@ def get_data(filters):
         query = query.where(USRec.payment_date <= filters["to_date"])
     if filters.get("sales_done_by"):
         query = query.where(USRec.sales_done_by == filters["sales_done_by"])
+    if filters.get("team"):
+        query = query.where(USRec.team == filters["team"])
     return query.run(as_dict=True)

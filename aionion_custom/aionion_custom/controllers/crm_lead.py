@@ -1993,3 +1993,33 @@ def autoname_insurance_renewal_record(doc, method=None):
         [f"RNW-{yy}-{random_part}-%"])
     seq = (int(last[0][0].split("-")[-1]) + 1) if last else 1
     doc.name = f"RNW-{yy}-{random_part}-{seq:06d}"
+
+
+@frappe.whitelist()
+def auto_extend_month_options():
+    """Yearly scheduler — runs Jan 1st to add next year month options to Select fields"""
+    from calendar import month_name as cal_month_name
+
+    current_year = frappe.utils.now_datetime().year
+    start_year = current_year - 2
+    end_year = current_year + 3
+
+    options = []
+    for year in range(start_year, end_year + 1):
+        for month in range(1, 13):
+            options.append(f"{cal_month_name[month]} {year}")
+    options_str = "\n".join(options)
+
+    month_fields = [
+        "old_subscription_month", "sub_start_month",
+        "sub_end_month", "payment_month", "month",
+    ]
+    for fieldname in month_fields:
+        exists = frappe.db.get_value("DocField",
+            {"parent": "US Subscription Record", "fieldname": fieldname}, "name")
+        if exists:
+            frappe.db.set_value("DocField",
+                {"parent": "US Subscription Record", "fieldname": fieldname},
+                "options", options_str)
+    frappe.db.commit()
+    frappe.logger().info(f"Month options extended to {end_year}")

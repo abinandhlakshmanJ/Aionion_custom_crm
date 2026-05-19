@@ -7,7 +7,7 @@ def execute(filters=None):
 
 def get_columns():
     return [
-        {"label": "Data Entry Date", "fieldname": "data_entry_date", "fieldtype": "Date", "width": 120},
+        {"label": "Data Entry Date", "fieldname": "data_entry_date", "fieldtype": "Datetime", "width": 160},
         {"label": "Email Address", "fieldname": "email_address", "fieldtype": "Data", "width": 180},
         {"label": "EMP Code", "fieldname": "emp_code", "fieldtype": "Data", "width": 100},
         {"label": "EMP Name", "fieldname": "emp_name", "fieldtype": "Data", "width": 140},
@@ -23,7 +23,7 @@ def get_columns():
         {"label": "Employment Status", "fieldname": "employment_status", "fieldtype": "Data", "width": 130},
         {"label": "Month", "fieldname": "month", "fieldtype": "Data", "width": 120},
         {"label": "Year", "fieldname": "year", "fieldtype": "Data", "width": 80},
-        {"label": "Assigned By", "fieldname": "assigned_by", "fieldtype": "Link", "options": "Employee", "width": 130},
+        {"label": "Assigned To", "fieldname": "assigned_by", "fieldtype": "Link", "options": "Employee", "width": 130},
         {"label": "Eligibility", "fieldname": "eligibility", "fieldtype": "Data", "width": 120},
         {"label": "Status", "fieldname": "us_status", "fieldtype": "Data", "width": 120},
         {"label": "Progress", "fieldname": "progress", "fieldtype": "Data", "width": 150},
@@ -55,14 +55,26 @@ def get_data(filters):
     )
     if filters.get("emp_team"):
         query = query.where(USRec.emp_team == filters["emp_team"])
+    if filters.get("emp_name"):
+        query = query.where(USRec.emp_name.like("%" + filters["emp_name"] + "%"))
+    if filters.get("emp_code"):
+        query = query.where(USRec.emp_code == filters["emp_code"])
     if filters.get("eligibility"):
         query = query.where(USRec.eligibility == filters["eligibility"])
     if filters.get("us_status"):
         query = query.where(USRec.us_status == filters["us_status"])
+    if filters.get("employment_status"):
+        query = query.where(USRec.employment_status == filters["employment_status"])
+    if filters.get("country_of_residence"):
+        query = query.where(USRec.country_of_residence == filters["country_of_residence"])
+    if filters.get("assigned_by"):
+        query = query.where(USRec.assigned_by == filters["assigned_by"])
+    if filters.get("month"):
+        query = query.where(USRec.month == filters["month"])
+    if filters.get("year"):
+        query = query.where(USRec.year == filters["year"])
     if filters.get("from_date"):
         query = query.where(USRec.data_entry_date >= filters["from_date"])
     if filters.get("to_date"):
         query = query.where(USRec.data_entry_date <= filters["to_date"])
-    if filters.get("month"):
-        query = query.where(USRec.month == filters["month"])
     return query.run(as_dict=True)
