@@ -424,8 +424,14 @@ def get_suggested_service_rm(lead_name):
     if lead_doc.custom_entity == "US Subscription":
         rm_role = "US Subscription RM"
         filter_entity = "US Subscription"
+    elif lead_doc.custom_entity == "Aionion Capital":
+        rm_role = "Capital RM"
+        filter_entity = "Aionion Capital"
     elif lead_doc.custom_product == "Insurance Renewals":
         rm_role = "Insurance Renewals RM"
+        filter_entity = "Aionion Insurance"
+    elif lead_doc.custom_product == "Insurance Sales":
+        rm_role = "Insurance Service RM"
         filter_entity = "Aionion Insurance"
     else:
         rm_role = "Insurance Service RM"
