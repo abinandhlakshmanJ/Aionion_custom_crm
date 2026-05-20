@@ -46,6 +46,7 @@ doc_events = {
 # --------
 fixtures = [
     "Insurance Company",
+    {"dt": "Custom Field", "filters": [["name", "in", ["CRM Lead-custom_product"]]]},
     "CRM Lead Source",
     {
         "dt": "CRM Form Script",
@@ -66,8 +67,14 @@ fixtures = [
             "Create Lead from Customer",
             "Go to CRM Leads from Customer",
             "Call Button for Customer",
-            "Insurance Renewal Record — MIS Actions"
+            "Insurance Renewal Record — MIS Actions",
+            "US subscription Auto Fetch",
+            "US Subscription Record Payment Actions"
         ]]]
+    },
+    {
+        "dt": "Custom Field",
+        "filters": [["dt", "=", "US Subscription Record"]]
     },
     {
         "dt": "Role",
