@@ -46,7 +46,7 @@ doc_events = {
 # --------
 fixtures = [
     "Insurance Company",
-    {"dt": "Custom Field", "filters": [["name", "in", ["CRM Lead-custom_product"]]]},
+    {"dt": "Custom Field", "filters": [["dt", "in", ["CRM Lead", "Customer", "US Subscription Record"]]]},
     "CRM Lead Source",
     {
         "dt": "CRM Form Script",
@@ -71,10 +71,6 @@ fixtures = [
             "US subscription Auto Fetch",
             "US Subscription Record Payment Actions"
         ]]]
-    },
-    {
-        "dt": "Custom Field",
-        "filters": [["dt", "=", "US Subscription Record"]]
     },
     {
         "dt": "Role",
