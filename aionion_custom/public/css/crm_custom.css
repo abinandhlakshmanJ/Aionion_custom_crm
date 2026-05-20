@@ -1,0 +1,6 @@
+
+/* Hide Assign To avatars by default for non-managers */
+/* Managers: form script adds 'aion-manager' class to body to re-show */
+body:not(.aion-manager) div.relative.inline-block.shrink-0.w-6.h-6.rounded-full {
+    display: none !important;
+}

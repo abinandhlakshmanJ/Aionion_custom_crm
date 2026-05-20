@@ -522,7 +522,10 @@ def assign_service_rm(lead_name, service_rm):
         doc.lead_owner = service_rm_user
 
     doc.flags.ignore_permissions = True
+    doc.flags.allow_lead_owner_change = True
+    frappe.flags.allow_crm_lead_assignment = True
     doc.save(ignore_permissions=True)
+    frappe.flags.allow_crm_lead_assignment = False
 
     # Share lead with original owner (Sales RM or Renewals Manager)
     # so they retain visibility after lead_owner changes to Service/Renewals RM
@@ -2023,3 +2026,146 @@ def auto_extend_month_options():
                 "options", options_str)
     frappe.db.commit()
     frappe.logger().info(f"Month options extended to {end_year}")
+
+
+@frappe.whitelist()
+def get_rm_list_for_manager(lead_name):
+    """Returns full list of RMs for manager to choose from + checks if user is manager"""
+    lead = frappe.get_cached_doc("CRM Lead", lead_name)
+    user_roles = frappe.get_roles(frappe.session.user)
+
+    # Determine if current user is a manager for this entity/product
+    is_manager = False
+    rm_role = None
+
+    if lead.custom_entity == "US Subscription":
+        is_manager = "US Subscription Admin" in user_roles or "System Manager" in user_roles
+        rm_role = "US Subscription RM"
+    elif lead.custom_product == "Insurance Renewals":
+        is_manager = "Insurance Renewals Manager" in user_roles or "System Manager" in user_roles
+        rm_role = "Insurance Renewals RM"
+    elif lead.custom_entity == "Aionion Insurance":
+        is_manager = "Insurance Sales Manager" in user_roles or "System Manager" in user_roles
+        rm_role = "Insurance Service RM"
+
+    if not is_manager:
+        frappe.throw("Only managers can assign Service RM.")
+
+    # Get all RMs with this role
+    rm_users = frappe.get_all("Has Role",
+        filters={"role": rm_role, "parenttype": "User"},
+        pluck="parent")
+
+    employees = frappe.get_all("Employee",
+        filters={"status": "Active", "user_id": ["in", rm_users]},
+        fields=["name", "employee_name", "user_id"])
+
+    # Get lead count per RM
+    from frappe.query_builder import DocType
+    from frappe.query_builder.functions import Count
+    CRMLead = DocType("CRM Lead")
+    emp_names = [e.name for e in employees]
+
+    counts = {}
+    if emp_names:
+        rows = (
+            frappe.qb.from_(CRMLead)
+            .select(CRMLead.custom_service_rm, Count("*").as_("cnt"))
+            .where(CRMLead.custom_service_rm.isin(emp_names))
+            .where(CRMLead.docstatus == 0)
+            .groupby(CRMLead.custom_service_rm)
+        ).run(as_dict=True)
+        counts = {r.custom_service_rm: r.cnt for r in rows}
+
+    rm_list = []
+    for emp in employees:
+        rm_list.append({
+            "employee": emp.name,
+            "employee_name": emp.employee_name,
+            "lead_count": counts.get(emp.name, 0)
+        })
+
+    rm_list.sort(key=lambda x: x["lead_count"])
+    return {"is_manager": True, "rm_list": rm_list}
+
+
+@frappe.whitelist()
+def get_suggested_rm_for_lead(lead_name):
+    """Returns suggested RM for normal RM (round robin) — not manager"""
+    result = get_suggested_service_rm(lead_name)
+    return result
+
+
+@frappe.whitelist()
+def get_suggested_rm_for_lead(lead_name):
+    """Returns suggested RM for normal RM (round robin) — not manager"""
+    result = get_suggested_service_rm(lead_name)
+    return result
+
+
+def validate_lead_owner_change(doc, method):
+    """Block lead_owner changes from non-managers — only assign_service_rm() can change it"""
+    if doc.is_new():
+        return
+
+    # Get previous lead_owner
+    old_owner = frappe.db.get_value("CRM Lead", doc.name, "lead_owner")
+    if not old_owner or old_owner == doc.lead_owner:
+        return
+
+    # lead_owner changed — check if user is authorized
+    user_roles = frappe.get_roles(frappe.session.user)
+    manager_roles = [
+        "Insurance Sales Manager", "Insurance Renewals Manager",
+        "US Subscription Admin", "Capital Manager", "Global RM Manager",
+        "System Manager"
+    ]
+    is_manager = any(r in user_roles for r in manager_roles)
+
+    # Allow if triggered by our assign_service_rm function (flagged)
+    if doc.flags.get("allow_lead_owner_change"):
+        return
+
+    if not is_manager:
+        frappe.throw(
+            "You cannot change the Assigned To field directly. "
+            "Please use the Assign Service RM button.",
+            frappe.PermissionError
+        )
+
+
+def validate_crm_lead_assignment(doc, method):
+    """Block ToDo reassignment to CRM Lead by non-managers"""
+    frappe.log_error(f"ToDo hook fired: ref={doc.reference_type}, user={frappe.session.user}, allocated_to={doc.allocated_to}, flag={frappe.flags.get('allow_crm_lead_assignment')}", "ToDo Assignment Debug")
+    if doc.reference_type != "CRM Lead":
+        return
+
+    # Allow if triggered by our internal assign_service_rm function
+    if frappe.flags.get("allow_crm_lead_assignment"):
+        return
+
+    # Allow self-assignment
+    if doc.allocated_to == frappe.session.user:
+        return
+
+    # Allow initial assignment — lead has no owner yet
+    existing_owner = frappe.db.get_value("CRM Lead", doc.reference_name, "lead_owner")
+    if not existing_owner:
+        return
+
+    # Check manager role
+    user_roles = frappe.get_roles(frappe.session.user)
+    manager_roles = [
+        "Insurance Sales Manager", "Insurance Renewals Manager",
+        "US Subscription Admin", "Capital Manager", "Global RM Manager",
+        "System Manager", "Administrator"
+    ]
+
+    if any(r in user_roles for r in manager_roles):
+        return
+
+    frappe.throw(
+        "Only Managers can reassign leads. "
+        "Please contact your manager to change the assignment.",
+        frappe.PermissionError
+    )

@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_import": 1,
  "allow_rename": 1,
  "autoname": "US-.###",
  "creation": "2026-03-14 08:21:57.858066",
@@ -12,42 +13,53 @@
   "lead",
   "company",
   "client_status",
+  "amended_from",
   "lead_entry_date",
   "column_break_us_1",
   "rm_employee_code",
   "rm_employee_name",
   "branch",
-  "department",
-  "amended_from",
+  "data_entry_date",
   "us_subscription_section",
   "payment_date",
   "amount_paid_us_subs",
+  "mode_of_payment_new",
+  "payment_month",
+  "subscription_type_new",
+  "client_status_new",
+  "quantity_new",
   "subscription_type",
   "mode_of_payment",
   "chola_client_code",
   "column_break_us_2",
+  "old_subscription_month",
+  "currency_new",
+  "sub_start_month",
+  "sub_end_month",
+  "sub_start_date",
+  "sub_end_date",
   "quantity",
   "currency",
   "subscription_end_date",
-  "old_subscription_month",
   "sales_rm_section",
-  "email_address",
   "client_name",
+  "country_of_residence",
   "aionion_client_code",
+  "employment_status",
   "contact_number",
   "client_email",
-  "intended_investment",
-  "indian_investments",
-  "country_of_residence",
-  "employment_status",
-  "emp_code",
+  "column_break_cfmq",
   "emp_name",
+  "emp_code",
   "emp_team",
+  "department",
   "emp_branch",
+  "email_address",
+  "emp_phone",
+  "column_break_gltc",
+  "indian_investments",
+  "intended_investment",
   "service_rm_section",
-  "month",
-  "year",
-  "assigned_by",
   "eligibility",
   "us_status",
   "progress",
@@ -55,35 +67,29 @@
   "reminder_date",
   "alternative_phone",
   "current_country",
+  "column_break_lrqg",
+  "year",
+  "month",
+  "assigned_by",
   "alternative_email",
-  "emp_phone",
-  "payment_section",
-  "mode_of_payment_new",
-  "payment_month",
-  "subscription_type_new",
-  "client_status_new",
-  "quantity_new",
-  "currency_new",
-  "sub_start_month",
-  "sub_end_month",
-  "sub_start_date",
-  "sub_end_date",
+  "column_break_mxxn",
+  "column_break_vjlk",
   "metadata_section",
   "sales_done_by",
   "old_rm",
   "team",
+  "us_remarks",
+  "column_break_zdlm",
   "email_sent",
   "risk_declaration",
-  "payment_status",
-  "us_remarks",
-  "alternate_email_id",
-  "data_entry_date"
+  "alternate_email_id"
  ],
  "fields": [
   {
    "fieldname": "section_break_lhe6",
    "fieldtype": "Section Break",
-   "hidden": 1
+   "hidden": 1,
+   "label": "Data Entered By RM"
   },
   {
    "fieldname": "task",
@@ -176,7 +182,7 @@
   {
    "fieldname": "us_subscription_section",
    "fieldtype": "Section Break",
-   "label": "Payment Amount"
+   "label": "Payment Details"
   },
   {
    "fieldname": "payment_date",
@@ -315,7 +321,7 @@
    "fieldname": "month",
    "fieldtype": "Select",
    "label": "Month",
-   "options": "\nJanuary 2025\nFebruary 2025\nMarch 2025\nApril 2025\nMay 2025\nJune 2025\nJuly 2025\nAugust 2025\nSeptember 2025\nOctober 2025\nNovember 2025\nDecember 2025\nJanuary 2026\nFebruary 2026\nMarch 2026\nApril 2026\nMay 2026\nJune 2026\nJuly 2026\nAugust 2026\nSeptember 2026\nOctober 2026\nNovember 2026\nDecember 2026\nJanuary 2027"
+   "options": "January 2024\nFebruary 2024\nMarch 2024\nApril 2024\nMay 2024\nJune 2024\nJuly 2024\nAugust 2024\nSeptember 2024\nOctober 2024\nNovember 2024\nDecember 2024\nJanuary 2025\nFebruary 2025\nMarch 2025\nApril 2025\nMay 2025\nJune 2025\nJuly 2025\nAugust 2025\nSeptember 2025\nOctober 2025\nNovember 2025\nDecember 2025\nJanuary 2026\nFebruary 2026\nMarch 2026\nApril 2026\nMay 2026\nJune 2026\nJuly 2026\nAugust 2026\nSeptember 2026\nOctober 2026\nNovember 2026\nDecember 2026\nJanuary 2027\nFebruary 2027\nMarch 2027\nApril 2027\nMay 2027\nJune 2027\nJuly 2027\nAugust 2027\nSeptember 2027\nOctober 2027\nNovember 2027\nDecember 2027\nJanuary 2028\nFebruary 2028\nMarch 2028\nApril 2028\nMay 2028\nJune 2028\nJuly 2028\nAugust 2028\nSeptember 2028\nOctober 2028\nNovember 2028\nDecember 2028\nJanuary 2029\nFebruary 2029\nMarch 2029\nApril 2029\nMay 2029\nJune 2029\nJuly 2029\nAugust 2029\nSeptember 2029\nOctober 2029\nNovember 2029\nDecember 2029"
   },
   {
    "fieldname": "year",
@@ -365,6 +371,7 @@
   {
    "fieldname": "alternative_email",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Alternative Email",
    "options": "Email"
   },
@@ -372,11 +379,6 @@
    "fieldname": "emp_phone",
    "fieldtype": "Data",
    "label": "EMP Phone No"
-  },
-  {
-   "fieldname": "payment_section",
-   "fieldtype": "Section Break",
-   "label": "Payment Details"
   },
   {
    "fieldname": "mode_of_payment_new",
@@ -388,7 +390,7 @@
    "fieldname": "payment_month",
    "fieldtype": "Select",
    "label": "Payment Month",
-   "options": "\nApril 2026\nMay 2026\nJune 2026\nJuly 2026\nAugust 2026\nSeptember 2026\nOctober 2026\nNovember 2026\nDecember 2026\nJanuary 2027\nFebruary 2027\nMarch 2027"
+   "options": "January 2024\nFebruary 2024\nMarch 2024\nApril 2024\nMay 2024\nJune 2024\nJuly 2024\nAugust 2024\nSeptember 2024\nOctober 2024\nNovember 2024\nDecember 2024\nJanuary 2025\nFebruary 2025\nMarch 2025\nApril 2025\nMay 2025\nJune 2025\nJuly 2025\nAugust 2025\nSeptember 2025\nOctober 2025\nNovember 2025\nDecember 2025\nJanuary 2026\nFebruary 2026\nMarch 2026\nApril 2026\nMay 2026\nJune 2026\nJuly 2026\nAugust 2026\nSeptember 2026\nOctober 2026\nNovember 2026\nDecember 2026\nJanuary 2027\nFebruary 2027\nMarch 2027\nApril 2027\nMay 2027\nJune 2027\nJuly 2027\nAugust 2027\nSeptember 2027\nOctober 2027\nNovember 2027\nDecember 2027\nJanuary 2028\nFebruary 2028\nMarch 2028\nApril 2028\nMay 2028\nJune 2028\nJuly 2028\nAugust 2028\nSeptember 2028\nOctober 2028\nNovember 2028\nDecember 2028\nJanuary 2029\nFebruary 2029\nMarch 2029\nApril 2029\nMay 2029\nJune 2029\nJuly 2029\nAugust 2029\nSeptember 2029\nOctober 2029\nNovember 2029\nDecember 2029"
   },
   {
    "fieldname": "subscription_type_new",
@@ -418,13 +420,13 @@
    "fieldname": "sub_start_month",
    "fieldtype": "Select",
    "label": "Subscription Start (Month-Year)",
-   "options": "\nApril 2026\nMay 2026\nJune 2026\nJuly 2026\nAugust 2026\nSeptember 2026\nOctober 2026\nNovember 2026\nDecember 2026\nJanuary 2027\nFebruary 2027\nMarch 2027\nApril 2028\nApril 2029"
+   "options": "January 2024\nFebruary 2024\nMarch 2024\nApril 2024\nMay 2024\nJune 2024\nJuly 2024\nAugust 2024\nSeptember 2024\nOctober 2024\nNovember 2024\nDecember 2024\nJanuary 2025\nFebruary 2025\nMarch 2025\nApril 2025\nMay 2025\nJune 2025\nJuly 2025\nAugust 2025\nSeptember 2025\nOctober 2025\nNovember 2025\nDecember 2025\nJanuary 2026\nFebruary 2026\nMarch 2026\nApril 2026\nMay 2026\nJune 2026\nJuly 2026\nAugust 2026\nSeptember 2026\nOctober 2026\nNovember 2026\nDecember 2026\nJanuary 2027\nFebruary 2027\nMarch 2027\nApril 2027\nMay 2027\nJune 2027\nJuly 2027\nAugust 2027\nSeptember 2027\nOctober 2027\nNovember 2027\nDecember 2027\nJanuary 2028\nFebruary 2028\nMarch 2028\nApril 2028\nMay 2028\nJune 2028\nJuly 2028\nAugust 2028\nSeptember 2028\nOctober 2028\nNovember 2028\nDecember 2028\nJanuary 2029\nFebruary 2029\nMarch 2029\nApril 2029\nMay 2029\nJune 2029\nJuly 2029\nAugust 2029\nSeptember 2029\nOctober 2029\nNovember 2029\nDecember 2029"
   },
   {
    "fieldname": "sub_end_month",
    "fieldtype": "Select",
    "label": "Subscription End (Month-Year)",
-   "options": "\nApril 2026\nMay 2026\nJune 2026\nJuly 2026\nAugust 2026\nSeptember 2026\nOctober 2026\nNovember 2026\nDecember 2026\nJanuary 2027\nFebruary 2027\nMarch 2027\nApril 2028\nApril 2029"
+   "options": "January 2024\nFebruary 2024\nMarch 2024\nApril 2024\nMay 2024\nJune 2024\nJuly 2024\nAugust 2024\nSeptember 2024\nOctober 2024\nNovember 2024\nDecember 2024\nJanuary 2025\nFebruary 2025\nMarch 2025\nApril 2025\nMay 2025\nJune 2025\nJuly 2025\nAugust 2025\nSeptember 2025\nOctober 2025\nNovember 2025\nDecember 2025\nJanuary 2026\nFebruary 2026\nMarch 2026\nApril 2026\nMay 2026\nJune 2026\nJuly 2026\nAugust 2026\nSeptember 2026\nOctober 2026\nNovember 2026\nDecember 2026\nJanuary 2027\nFebruary 2027\nMarch 2027\nApril 2027\nMay 2027\nJune 2027\nJuly 2027\nAugust 2027\nSeptember 2027\nOctober 2027\nNovember 2027\nDecember 2027\nJanuary 2028\nFebruary 2028\nMarch 2028\nApril 2028\nMay 2028\nJune 2028\nJuly 2028\nAugust 2028\nSeptember 2028\nOctober 2028\nNovember 2028\nDecember 2028\nJanuary 2029\nFebruary 2029\nMarch 2029\nApril 2029\nMay 2029\nJune 2029\nJuly 2029\nAugust 2029\nSeptember 2029\nOctober 2029\nNovember 2029\nDecember 2029"
   },
   {
    "fieldname": "sub_start_date",
@@ -459,9 +461,10 @@
    "options": "\nChennai\nDubai\nMadurai"
   },
   {
+   "default": "No",
    "fieldname": "email_sent",
    "fieldtype": "Select",
-   "label": "Email Sent",
+   "label": "Acknowledgment Sent",
    "options": "\nYes\nNo"
   },
   {
@@ -469,12 +472,6 @@
    "fieldtype": "Select",
    "label": "Risk Declaration Received",
    "options": "\nYes\nNo"
-  },
-  {
-   "fieldname": "payment_status",
-   "fieldtype": "Select",
-   "label": "Payment Status",
-   "options": "\nPending\nApproved\nRejected"
   },
   {
    "fieldname": "us_remarks",
@@ -489,7 +486,7 @@
   {
    "fieldname": "assigned_by",
    "fieldtype": "Link",
-   "label": "Assigned by",
+   "label": "Assigned To",
    "options": "Employee"
   },
   {
@@ -500,19 +497,45 @@
   {
    "fieldname": "old_subscription_month",
    "fieldtype": "Select",
-   "label": "Old Subscription Month"
+   "label": "Old Subscription Month",
+   "options": "January 2024\nFebruary 2024\nMarch 2024\nApril 2024\nMay 2024\nJune 2024\nJuly 2024\nAugust 2024\nSeptember 2024\nOctober 2024\nNovember 2024\nDecember 2024\nJanuary 2025\nFebruary 2025\nMarch 2025\nApril 2025\nMay 2025\nJune 2025\nJuly 2025\nAugust 2025\nSeptember 2025\nOctober 2025\nNovember 2025\nDecember 2025\nJanuary 2026\nFebruary 2026\nMarch 2026\nApril 2026\nMay 2026\nJune 2026\nJuly 2026\nAugust 2026\nSeptember 2026\nOctober 2026\nNovember 2026\nDecember 2026\nJanuary 2027\nFebruary 2027\nMarch 2027\nApril 2027\nMay 2027\nJune 2027\nJuly 2027\nAugust 2027\nSeptember 2027\nOctober 2027\nNovember 2027\nDecember 2027\nJanuary 2028\nFebruary 2028\nMarch 2028\nApril 2028\nMay 2028\nJune 2028\nJuly 2028\nAugust 2028\nSeptember 2028\nOctober 2028\nNovember 2028\nDecember 2028\nJanuary 2029\nFebruary 2029\nMarch 2029\nApril 2029\nMay 2029\nJune 2029\nJuly 2029\nAugust 2029\nSeptember 2029\nOctober 2029\nNovember 2029\nDecember 2029"
   },
   {
+   "default": "Today",
    "fieldname": "data_entry_date",
    "fieldtype": "Datetime",
    "label": "Data Entry Date"
+  },
+  {
+   "fieldname": "column_break_cfmq",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_gltc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_mxxn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_lrqg",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_vjlk",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_zdlm",
+   "fieldtype": "Column Break"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-05-11 14:53:14.992465",
+ "modified": "2026-05-20 11:27:03.230680",
  "modified_by": "Administrator",
  "module": "Aionion Custom",
  "name": "US Subscription Record",
@@ -565,6 +588,5 @@
  "sort_field": "creation",
  "sort_order": "DESC",
  "states": [],
- "track_changes": 1,
- "allow_import": 1
+ "track_changes": 1
 }

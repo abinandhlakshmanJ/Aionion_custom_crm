@@ -9,6 +9,7 @@ app_license = "mit"
 # ------------------
 # app_include_css = "/assets/aionion_custom/css/aionion_custom.css"
 # app_include_js = ["/assets/aionion_custom/js/crm_mail_inbox_btn.js"]
+app_include_css = ["/assets/aionion_custom/css/crm_custom.css"]
 # web_include_css = "/assets/aionion_custom/css/aionion_custom.css"
 # web_include_js = "/assets/aionion_custom/js/aionion_custom.js"
 
@@ -29,6 +30,14 @@ doc_events = {
         ],
         "on_submit": [
             "aionion_custom.aionion_custom.controllers.crm_lead.share_lead_with_mis_team",
+        ],
+        "validate": [
+            "aionion_custom.aionion_custom.controllers.crm_lead.validate_lead_owner_change",
+        ],
+    },
+    "ToDo": {
+        "before_insert": [
+            "aionion_custom.aionion_custom.controllers.crm_lead.validate_crm_lead_assignment",
         ],
     },
 }
@@ -70,7 +79,9 @@ fixtures = [
             "Insurance MIS",
             "Insurance Sales Manager",
             "Capital RM",
+            "Capital Manager",
             "Global RM",
+            "Global RM Manager",
             "US Subscription RM",
             "US Subscription MIS",
             "US Subscription Admin"
