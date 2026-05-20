@@ -87,6 +87,10 @@ fixtures = [
             "US Subscription Admin"
         ]]]
     },
+    {
+        "dt": "Property Setter",
+        "filters": [["doc_type", "=", "US Subscription Record"]]
+    },
 ]
 
 # Scheduled Tasks
