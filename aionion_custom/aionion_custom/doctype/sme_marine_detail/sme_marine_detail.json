@@ -1,0 +1,58 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-05-20 14:41:28.154564",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "transit_type",
+  "cargo_type",
+  "col_break_1",
+  "mode",
+  "sum_insured"
+ ],
+ "fields": [
+  {
+   "fieldname": "transit_type",
+   "fieldtype": "Select",
+   "label": "Transit Type",
+   "options": "\nSingle Transit\nOpen Policy\nAnnual Policy"
+  },
+  {
+   "fieldname": "cargo_type",
+   "fieldtype": "Data",
+   "label": "Cargo Type"
+  },
+  {
+   "fieldname": "col_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "mode",
+   "fieldtype": "Select",
+   "label": "Mode",
+   "options": "\nSea\nAir\nRoad\nMultimodal"
+  },
+  {
+   "fieldname": "sum_insured",
+   "fieldtype": "Currency",
+   "label": "Sum Insured"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-05-20 14:41:28.154564",
+ "modified_by": "Administrator",
+ "module": "Aionion Custom",
+ "name": "SME Marine Detail",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

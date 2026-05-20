@@ -1,0 +1,333 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:policy_number",
+ "creation": "2026-05-20 14:34:18.963195",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "basic_section",
+  "lead",
+  "customer",
+  "company",
+  "client_name",
+  "col_break_1",
+  "product_type",
+  "insurer_name",
+  "policy_number",
+  "col_break_2",
+  "policy_start_date",
+  "policy_end_date",
+  "policy_status",
+  "premium_section",
+  "sum_insured",
+  "gross_premium",
+  "discount",
+  "col_break_3",
+  "net_premium",
+  "gst",
+  "total_premium",
+  "sales_section",
+  "sales_owner",
+  "lead_source",
+  "deal_status",
+  "col_break_4",
+  "renewal_date",
+  "renewal_reminder",
+  "sme_remarks",
+  "gmc_section",
+  "gmc_details",
+  "gti_section",
+  "gti_details",
+  "gpa_section",
+  "gpa_details",
+  "travel_section",
+  "travel_details",
+  "car_ear_section",
+  "car_ear_details",
+  "marine_section",
+  "marine_details",
+  "doctor_indemnity_section",
+  "doctor_indemnity_details",
+  "home_insurance_section",
+  "home_insurance_details",
+  "fire_insurance_section",
+  "fire_insurance_details"
+ ],
+ "fields": [
+  {
+   "fieldname": "basic_section",
+   "fieldtype": "Section Break",
+   "label": "Basic Info"
+  },
+  {
+   "fieldname": "lead",
+   "fieldtype": "Link",
+   "label": "Lead",
+   "options": "CRM Lead"
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "client_name",
+   "fieldtype": "Data",
+   "label": "Client Name"
+  },
+  {
+   "fieldname": "col_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "product_type",
+   "fieldtype": "Select",
+   "label": "Product Type",
+   "options": "\nGMC\nGTI\nGPA\nTravel\nCAR\nEAR\nMarine\nDoctor Indemnity\nHome / Property Insurance\nFire Insurance"
+  },
+  {
+   "fieldname": "insurer_name",
+   "fieldtype": "Data",
+   "label": "Insurer Name"
+  },
+  {
+   "fieldname": "policy_number",
+   "fieldtype": "Data",
+   "label": "Policy Number",
+   "unique": 1
+  },
+  {
+   "fieldname": "col_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "policy_start_date",
+   "fieldtype": "Date",
+   "label": "Policy Start Date"
+  },
+  {
+   "fieldname": "policy_end_date",
+   "fieldtype": "Date",
+   "label": "Policy End Date"
+  },
+  {
+   "fieldname": "policy_status",
+   "fieldtype": "Select",
+   "label": "Policy Status",
+   "options": "\nActive\nExpired\nRenewal Due"
+  },
+  {
+   "fieldname": "premium_section",
+   "fieldtype": "Section Break",
+   "label": "Premium Details"
+  },
+  {
+   "fieldname": "sum_insured",
+   "fieldtype": "Currency",
+   "label": "Sum Insured"
+  },
+  {
+   "fieldname": "gross_premium",
+   "fieldtype": "Currency",
+   "label": "Gross Premium"
+  },
+  {
+   "fieldname": "discount",
+   "fieldtype": "Currency",
+   "label": "Discount"
+  },
+  {
+   "fieldname": "col_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "net_premium",
+   "fieldtype": "Currency",
+   "label": "Net Premium"
+  },
+  {
+   "fieldname": "gst",
+   "fieldtype": "Currency",
+   "label": "GST"
+  },
+  {
+   "fieldname": "total_premium",
+   "fieldtype": "Currency",
+   "label": "Total Premium"
+  },
+  {
+   "fieldname": "sales_section",
+   "fieldtype": "Section Break",
+   "label": "Sales Tracking"
+  },
+  {
+   "fieldname": "sales_owner",
+   "fieldtype": "Link",
+   "label": "Sales Owner",
+   "options": "User"
+  },
+  {
+   "fieldname": "lead_source",
+   "fieldtype": "Data",
+   "label": "Lead Source"
+  },
+  {
+   "fieldname": "deal_status",
+   "fieldtype": "Select",
+   "label": "Deal Status",
+   "options": "\nOpen\nWon\nLost"
+  },
+  {
+   "fieldname": "col_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "renewal_date",
+   "fieldtype": "Date",
+   "label": "Renewal Date"
+  },
+  {
+   "default": "0",
+   "fieldname": "renewal_reminder",
+   "fieldtype": "Check",
+   "label": "Renewal Reminder"
+  },
+  {
+   "fieldname": "sme_remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  },
+  {
+   "depends_on": "eval:doc.product_type==\"GMC\"",
+   "fieldname": "gmc_section",
+   "fieldtype": "Section Break",
+   "label": "GMC - Group Medical Insurance"
+  },
+  {
+   "fieldname": "gmc_details",
+   "fieldtype": "Table",
+   "label": "GMC Details",
+   "options": "SME GMC Detail"
+  },
+  {
+   "depends_on": "eval:doc.product_type==\"GTI\"",
+   "fieldname": "gti_section",
+   "fieldtype": "Section Break",
+   "label": "GTI - Group Term Insurance"
+  },
+  {
+   "fieldname": "gti_details",
+   "fieldtype": "Table",
+   "label": "GTI Details",
+   "options": "SME GTI Detail"
+  },
+  {
+   "depends_on": "eval:doc.product_type==\"GPA\"",
+   "fieldname": "gpa_section",
+   "fieldtype": "Section Break",
+   "label": "GPA - Group Personal Accident"
+  },
+  {
+   "fieldname": "gpa_details",
+   "fieldtype": "Table",
+   "label": "GPA Details",
+   "options": "SME GPA Detail"
+  },
+  {
+   "depends_on": "eval:doc.product_type==\"Travel\"",
+   "fieldname": "travel_section",
+   "fieldtype": "Section Break",
+   "label": "Travel Insurance"
+  },
+  {
+   "fieldname": "travel_details",
+   "fieldtype": "Table",
+   "label": "Travel Details",
+   "options": "SME Travel Detail"
+  },
+  {
+   "depends_on": "eval:doc.product_type==\"CAR\" || doc.product_type==\"EAR\"",
+   "fieldname": "car_ear_section",
+   "fieldtype": "Section Break",
+   "label": "CAR / EAR - Contractor & Erection All Risk"
+  },
+  {
+   "fieldname": "car_ear_details",
+   "fieldtype": "Table",
+   "label": "CAR / EAR Details",
+   "options": "SME CAR EAR Detail"
+  },
+  {
+   "depends_on": "eval:doc.product_type==\"Marine\"",
+   "fieldname": "marine_section",
+   "fieldtype": "Section Break",
+   "label": "Marine Insurance"
+  },
+  {
+   "fieldname": "marine_details",
+   "fieldtype": "Table",
+   "label": "Marine Details",
+   "options": "SME Marine Detail"
+  },
+  {
+   "depends_on": "eval:doc.product_type==\"Doctor Indemnity\"",
+   "fieldname": "doctor_indemnity_section",
+   "fieldtype": "Section Break",
+   "label": "Doctor Indemnity"
+  },
+  {
+   "fieldname": "doctor_indemnity_details",
+   "fieldtype": "Table",
+   "label": "Doctor Indemnity Details",
+   "options": "SME Doctor Indemnity Detail"
+  },
+  {
+   "depends_on": "eval:doc.product_type==\"Home / Property Insurance\"",
+   "fieldname": "home_insurance_section",
+   "fieldtype": "Section Break",
+   "label": "Home / Property Insurance"
+  },
+  {
+   "fieldname": "home_insurance_details",
+   "fieldtype": "Table",
+   "label": "Home Insurance Details",
+   "options": "SME Home Insurance Detail"
+  },
+  {
+   "depends_on": "eval:doc.product_type==\"Fire Insurance\"",
+   "fieldname": "fire_insurance_section",
+   "fieldtype": "Section Break",
+   "label": "Fire Insurance"
+  },
+  {
+   "fieldname": "fire_insurance_details",
+   "fieldtype": "Table",
+   "label": "Fire Insurance Details",
+   "options": "SME Fire Insurance Detail"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-05-20 14:45:08.270780",
+ "modified_by": "Administrator",
+ "module": "Aionion Custom",
+ "name": "SME Insurance Record",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

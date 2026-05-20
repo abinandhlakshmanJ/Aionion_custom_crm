@@ -2169,3 +2169,83 @@ def validate_crm_lead_assignment(doc, method):
         "Please contact your manager to change the assignment.",
         frappe.PermissionError
     )
+    
+
+@frappe.whitelist()
+def get_or_create_sme_record(lead_name):
+    """Open existing SME Insurance Record for this lead, or create a new one."""
+    existing = frappe.db.get_value(
+        "SME Insurance Record",
+        {"lead": lead_name},
+        "name"
+    )
+    if existing:
+        return {"name": existing}
+
+    lead = frappe.get_cached_doc("CRM Lead", lead_name)
+    rec = frappe.new_doc("SME Insurance Record")
+    rec.lead = lead_name
+    rec.client_name = lead.lead_name
+    rec.customer = lead.get("custom_customer") or ""
+    rec.company = lead.get("custom_company") or ""
+    rec.insert(ignore_permissions=True)
+    frappe.db.commit()
+    return {"name": rec.name}
+
+
+@frappe.whitelist()
+def submit_sme_lead(lead_name):
+    """Submit SME lead — locks it for MIS verification."""
+    lead = frappe.get_doc("CRM Lead", lead_name)
+    if lead.docstatus == 1:
+        frappe.throw("Lead is already submitted.")
+    lead.docstatus = 1
+    lead.save(ignore_permissions=True)
+    frappe.db.commit()
+    return "submitted"
+
+
+@frappe.whitelist()
+def approve_sme_mis(lead_name):
+    """MIS approves SME lead — creates Customer if not already created."""
+    lead = frappe.get_cached_doc("CRM Lead", lead_name)
+    if lead.docstatus != 1:
+        frappe.throw("Lead must be submitted before MIS approval.")
+
+    frappe.db.set_value("CRM Lead", lead_name, "custom_mis_status", "Approved")
+
+    # Create Customer if not already linked
+    if not lead.get("custom_customer"):
+        customer = frappe.new_doc("Customer")
+        customer.customer_name = lead.lead_name
+        customer.customer_type = "Individual"
+        customer.customer_group = "SME"
+        customer.territory = "India"
+        customer.insert(ignore_permissions=True)
+
+        frappe.db.set_value("CRM Lead", lead_name, "custom_customer", customer.name)
+
+        # Link customer back to SME Insurance Record
+        sme_rec = frappe.db.get_value(
+            "SME Insurance Record", {"lead": lead_name}, "name"
+        )
+        if sme_rec:
+            frappe.db.set_value(
+                "SME Insurance Record", sme_rec, "customer", customer.name
+            )
+
+    frappe.db.commit()
+    return "approved"
+
+
+@frappe.whitelist()
+def reject_sme_mis(lead_name):
+    """MIS rejects SME lead — unlocks it for editing."""
+    lead = frappe.get_doc("CRM Lead", lead_name)
+    if lead.docstatus != 1:
+        frappe.throw("Lead is not submitted.")
+    lead.docstatus = 0
+    lead.save(ignore_permissions=True)
+    frappe.db.set_value("CRM Lead", lead_name, "custom_mis_status", "Rejected")
+    frappe.db.commit()
+    return "rejected"
