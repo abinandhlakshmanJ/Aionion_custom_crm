@@ -427,6 +427,9 @@ def get_suggested_service_rm(lead_name):
     elif lead_doc.custom_entity == "Aionion Capital":
         rm_role = "Capital RM"
         filter_entity = "Aionion Capital"
+    elif lead_doc.custom_product == "SME Insurance":
+        rm_role = "SME Insurance RM"
+        filter_entity = "Aionion Insurance"
     elif lead_doc.custom_product == "Insurance Renewals":
         rm_role = "Insurance Renewals RM"
         filter_entity = "Aionion Insurance"
@@ -2044,6 +2047,9 @@ def get_rm_list_for_manager(lead_name):
     elif lead.custom_product == "Insurance Renewals":
         is_manager = "Insurance Renewals Manager" in user_roles or "System Manager" in user_roles
         rm_role = "Insurance Renewals RM"
+    elif lead.custom_entity == "Aionion Insurance" and lead.custom_product == "SME Insurance":
+        is_manager = "SME Insurance Manager" in user_roles or "System Manager" in user_roles
+        rm_role = "SME Insurance RM"
     elif lead.custom_entity == "Aionion Insurance":
         is_manager = "Insurance Sales Manager" in user_roles or "System Manager" in user_roles
         rm_role = "Insurance Service RM"

@@ -104,7 +104,9 @@ fixtures = [
             "Global RM Manager",
             "US Subscription RM",
             "US Subscription MIS",
-            "US Subscription Admin"
+            "US Subscription Admin",
+            "SME Insurance RM",
+            "SME Insurance Manager"
         ]]]
     },
     {
