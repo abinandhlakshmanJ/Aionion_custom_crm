@@ -2255,3 +2255,16 @@ def reject_sme_mis(lead_name):
     frappe.db.set_value("CRM Lead", lead_name, "custom_mis_status", "Rejected")
     frappe.db.commit()
     return "rejected"
+
+@frappe.whitelist()
+def clear_service_rm_on_product_change(doc, method):
+    """Clear service RM when product changes so it can be reassigned for the new product."""
+    if not doc.is_new() and doc.has_value_changed("custom_product"):
+        if doc.custom_service_rm:
+            doc.custom_service_rm = None
+            doc.custom_service_rm_name = None
+            frappe.msgprint(
+                "Service RM cleared because product changed. Please reassign via Assign Service RM button.",
+                alert=True,
+                indicator="orange"
+            )
