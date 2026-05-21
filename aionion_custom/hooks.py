@@ -23,8 +23,10 @@ permission_query_conditions = {
 # ---------------
 doc_events = {
     "CRM Lead": {
+        "before_validate": [
+            "aionion_custom.aionion_custom.controllers.crm_lead.set_sales_rm_defaults"
+        ],
         "before_save": [
-            "aionion_custom.aionion_custom.controllers.crm_lead.set_sales_rm_defaults",
             "aionion_custom.aionion_custom.controllers.crm_lead.clear_service_rm_on_product_change",
             "aionion_custom.aionion_custom.controllers.crm_lead.set_business_type",
             "aionion_custom.aionion_custom.controllers.crm_lead.sync_lead_owner",
