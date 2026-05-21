@@ -2,6 +2,83 @@
  {
   "docstatus": 0,
   "doctype": "CRM Form Script",
+  "dt": "CRM Lead",
+  "enabled": 1,
+  "is_standard": 1,
+  "modified": "2026-04-14 17:15:02.534675",
+  "name": "Product Details Script for CRM Lead",
+  "script": "class CRMLead {\n  update_total() {\n    let total = 0\n    let total_qty = 0\n    let net_total = 0\n    let discount_applied = false\n\n    this.doc.products.forEach((d) => {\n      total += d.amount\n      net_total += d.net_amount\n      if (d.discount_percentage > 0) {\n        discount_applied = true\n      }\n    })\n\n    this.doc.total = total\n    this.doc.net_total = net_total || total\n\n    if (!net_total && discount_applied) {\n      this.doc.net_total = net_total\n    }\n  }\n}\n\nclass CRMProducts {\n  products_add() {\n    let row = this.doc.getRow('products')\n    row.trigger('qty')\n    this.doc.trigger('update_total')\n  }\n\n  products_remove() {\n    this.doc.trigger('update_total')\n  }\n\n  async product_code(idx) {\n    let row = this.doc.getRow('products', idx)\n\n    let a = await call(\"frappe.client.get_value\", {\n        doctype: \"CRM Product\",\n        filters: { name: row.product_code },\n        fieldname: [\"product_name\", \"standard_rate\"],\n    })\n\n    row.product_name = a.product_name\n    if (a.standard_rate && !row.rate) {\n        row.rate = a.standard_rate\n        row.trigger(\"rate\")\n    }\n  }\n\n  qty(idx) {\n    let row = this.doc.getRow('products', idx)\n    row.amount = row.qty * row.rate\n    row.trigger('discount_percentage', idx)\n  }\n\n  rate() {\n    let row = this.doc.getRow('products')\n    row.amount = row.qty * row.rate\n    row.trigger('discount_percentage')\n  }\n\n  discount_percentage(idx) {\n    let row = this.doc.getRow('products', idx)\n    if (!row.discount_percentage) {\n      row.net_amount = row.amount\n      row.discount_amount = 0\n    }\n    if (row.discount_percentage && row.amount) {\n      row.discount_amount = (row.discount_percentage / 100) * row.amount\n      row.net_amount = row.amount - row.discount_amount\n    }\n    this.doc.trigger('update_total')\n  }\n}",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "CRM Form Script",
+  "dt": "CRM Deal",
+  "enabled": 1,
+  "is_standard": 1,
+  "modified": "2026-04-14 17:15:02.539006",
+  "name": "Product Details Script for CRM Deal",
+  "script": "class CRMDeal {\n  update_total() {\n    let total = 0\n    let total_qty = 0\n    let net_total = 0\n    let discount_applied = false\n\n    this.doc.products.forEach((d) => {\n      total += d.amount\n      net_total += d.net_amount\n      if (d.discount_percentage > 0) {\n        discount_applied = true\n      }\n    })\n\n    this.doc.total = total\n    this.doc.net_total = net_total || total\n\n    if (!net_total && discount_applied) {\n      this.doc.net_total = net_total\n    }\n  }\n}\n\nclass CRMProducts {\n  products_add() {\n    let row = this.doc.getRow('products')\n    row.trigger('qty')\n    this.doc.trigger('update_total')\n  }\n\n  products_remove() {\n    this.doc.trigger('update_total')\n  }\n\n  async product_code(idx) {\n    let row = this.doc.getRow('products', idx)\n\n    let a = await call(\"frappe.client.get_value\", {\n        doctype: \"CRM Product\",\n        filters: { name: row.product_code },\n        fieldname: [\"product_name\", \"standard_rate\"],\n    })\n\n    row.product_name = a.product_name\n    if (a.standard_rate && !row.rate) {\n        row.rate = a.standard_rate\n        row.trigger(\"rate\")\n    }\n  }\n\n  qty(idx) {\n    let row = this.doc.getRow('products', idx)\n    row.amount = row.qty * row.rate\n    row.trigger('discount_percentage', idx)\n  }\n\n  rate() {\n    let row = this.doc.getRow('products')\n    row.amount = row.qty * row.rate\n    row.trigger('discount_percentage')\n  }\n\n  discount_percentage(idx) {\n    let row = this.doc.getRow('products', idx)\n    if (!row.discount_percentage) {\n      row.net_amount = row.amount\n      row.discount_amount = 0\n    }\n    if (row.discount_percentage && row.amount) {\n      row.discount_amount = (row.discount_percentage / 100) * row.amount\n      row.net_amount = row.amount - row.discount_amount\n    }\n    this.doc.trigger('update_total')\n  }\n}",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "CRM Form Script",
+  "dt": "CRM Deal",
+  "enabled": 1,
+  "is_standard": 1,
+  "modified": "2026-04-14 17:15:02.543195",
+  "name": "Forecasting Script",
+  "script": "class CRMDeal {\n    async status() {\n        await this.doc.trigger('updateProbability')\n    }\n    async updateProbability() {\n        let status = await call(\"frappe.client.get_value\", {\n            doctype: \"CRM Deal Status\",\n            fieldname: \"probability\",\n            filters: { name: this.doc.status },\n        })\n\n        this.doc.probability = status.probability\n    }\n}",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "CRM Form Script",
+  "dt": "CRM Lead",
+  "enabled": 0,
+  "is_standard": 0,
+  "modified": "2026-04-16 16:16:48.884380",
+  "name": "Create Task against Lead",
+  "script": "class CRMLead {\n  onLoad() {\n    let doc = this.doc;\n    this.actions = [\n      {\n        label: \"Create Task\",\n        onClick: () => {\n          let selectedProduct = \"\";\n          createDialog({\n            title: \"Create Aionion Task\",\n            html: '<div style=\"margin-top:8px\"><label class=\"text-sm text-ink-gray-5\" style=\"display:block;margin-bottom:4px\">Product</label><select id=\"aionion-product-select\" class=\"form-input\" style=\"width:100%;padding:8px 10px;height:38px;border:1px solid var(--gray-300);border-radius:8px;font-size:14px;background:white\"><option value=\"\">Loading...</option></select></div>',\n            actions: [\n              {\n                label: \"Create\",\n                variant: \"solid\",\n                onClick: (close) => {\n                  if (!selectedProduct) {\n                    toast.error(\"Please select a product\");\n                    return;\n                  }\n                  call(\"create_aionion_task\", {\n                    lead: doc.name,\n                    aionion_product: selectedProduct,\n                  }).then((taskName) => {\n                    close();\n                    window.location.href = \"/app/aionion-task/\" + taskName;\n                  });\n                },\n              },\n            ],\n          });\n          call(\"frappe.desk.search.search_link\", {\n            doctype: \"Aionion Product\",\n            txt: \"\",\n          }).then((results) => {\n            let select = document.getElementById(\"aionion-product-select\");\n            select.innerHTML = '<option value=\"\">Select a product...</option>' +\n              (results || []).map((r) => '<option value=\"' + r.value + '\">' + r.value + '</option>').join(\"\");\n            select.addEventListener(\"change\", () => {\n              selectedProduct = select.value;\n            });\n          });\n        },\n      },\n    ];\n  }\n}",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "CRM Form Script",
+  "dt": "CRM Lead",
+  "enabled": 0,
+  "is_standard": 0,
+  "modified": "2026-04-16 16:17:19.062274",
+  "name": "Go to Customer from CRM Leads",
+  "script": "class CRMLead {\n  onLoad() {\n    let doc = this.doc;\n    this.actions = [\n    ];\n  }\n}\n\nfrappe.listview_settings['CRM Lead'] = {\n  onload: function(listview) {\n    let btn = listview.page.add_button(__('Go to Customers'), function() {\n      window.open('/app/customer', '_blank');\n    });\n\n    btn.css({\n      'padding': '4px 12px',\n      'text-align': 'center',\n      'min-width': 'unset',\n      'width': 'auto'\n    });\n  }\n};",
+  "view": "List"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "CRM Form Script",
+  "dt": "CRM Lead",
+  "enabled": 1,
+  "is_standard": 0,
+  "modified": "2026-05-05 17:33:56.752277",
+  "name": "Renewals Manager View",
+  "script": "function setupList({ call, columns, filters, setFilters }) {\n    // Auto-filter to show only Insurance Renewals leads for Renewals Manager\n    call(\"aionion_custom.aionion_custom.controllers.crm_lead.get_current_user_roles\", {})\n    .then((roles) => {\n        if (roles && roles.includes(\"Insurance Renewals Manager\")) {\n            setFilters([\n                { fieldname: \"custom_product\", operator: \"=\", value: \"Insurance Renewals\" }\n            ])\n        }\n        if (roles && roles.includes(\"Insurance Renewals RM\") && !roles.includes(\"Insurance Renewals Manager\")) {\n            setFilters([\n                { fieldname: \"custom_product\", operator: \"=\", value: \"Insurance Renewals\" }\n            ])\n        }\n    })\n}",
+  "view": "List"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "CRM Form Script",
+  "dt": "CRM Lead",
+  "enabled": 0,
+  "is_standard": 0,
+  "modified": "2026-05-04 15:20:22.280899",
+  "name": "US Subscription Actions",
+  "script": "\nfunction setupForm({ doc, call, toast, $dialog }) {\n\n    if (doc.custom_entity !== \"US Subscription\") return\n\n    const actions = []\n\n    // Submit US Lead\n    if (!doc.docstatus || doc.docstatus === 0) {\n        actions.push({\n            label: \"Submit US Lead\",\n            onClick: () => {\n                const mandatory = {\n                    \"lead_name\": \"Client Name\",\n                    \"mobile_no\": \"Contact Number\",\n                    \"email\": \"Email\",\n                    \"custom_country\": \"Country of Residence\",\n                    \"custom_employee_status\": \"Employment Status\",\n                    \"custom_client_indian_investments\": \"Indian Investments\",\n                    \"custom_client_intended_investment_in_us_market\": \"Intended Investment\",\n                    \"custom_aionion_client_code\": \"Aionion Client Code\",\n                    \"custom_sales_rm_code\": \"EMP Code\",\n                    \"custom_sales_rm_branch\": \"EMP Branch\",\n                }\n                const missing = Object.entries(mandatory)\n                    .filter(([field]) => !doc[field])\n                    .map(([, label]) => label)\n\n                if (missing.length) {\n                    toast.error(\"Missing: \" + missing.join(\", \"))\n                    return\n                }\n\n                $dialog({\n                    title: \"Submit US Lead\",\n                    message: \"Submit this lead for payment verification by MIS?\",\n                    actions: [{\n                        label: \"Submit\",\n                        variant: \"solid\",\n                        onClick: (close) => {\n                            call(\n                                \"aionion_custom.aionion_custom.controllers.crm_lead.submit_us_lead\",\n                                { lead_name: doc.name }\n                            ).then(() => {\n                                close()\n                                toast.success(\"US Lead submitted! MIS team will verify payment.\")\n                                setTimeout(() => window.location.href = window.location.href, 1500)\n                            }).catch((e) => {\n                                close()\n                                toast.error(e.message || \"Something went wrong\")\n                            })\n                        }\n                    }]\n                })\n            }\n        })\n    }\n\n    // MIS Actions\n    if (doc.docstatus === 1) {\n        actions.push({\n            label: \"✅ Verify Payment\",\n            onClick: () => {\n                $dialog({\n                    title: \"Verify Payment\",\n                    message: \"Confirm payment received for \" + doc.lead_name + \"?\",\n                    actions: [{\n                        label: \"Verify\",\n                        variant: \"solid\",\n                        onClick: (close) => {\n                            call(\n                                \"aionion_custom.aionion_custom.controllers.crm_lead.verify_us_payment\",\n                                { lead_name: doc.name }\n                            ).then(() => {\n                                close()\n                                toast.success(\"Payment verified! Customer and US Subscription Record created.\")\n                                setTimeout(() => window.location.href = window.location.href, 1500)\n                            }).catch((e) => {\n                                close()\n                                toast.error(e.message || \"Error verifying payment\")\n                            })\n                        }\n                    }]\n                })\n            }\n        })\n\n        actions.push({\n            label: \"❌ Reject Payment\",\n            onClick: () => {\n                $dialog({\n                    title: \"Reject Payment\",\n                    message: \"Reason for rejection?\",\n                    actions: [{\n                        label: \"Reject\",\n                        variant: \"solid\",\n                        onClick: (close) => {\n                            call(\n                                \"aionion_custom.aionion_custom.controllers.crm_lead.reject_us_payment\",\n                                { lead_name: doc.name }\n                            ).then(() => {\n                                close()\n                                toast.error(\"Payment rejected. Lead owner notified.\")\n                                setTimeout(() => window.location.href = window.location.href, 1500)\n                            }).catch((e) => {\n                                close()\n                                toast.error(e.message || \"Error rejecting payment\")\n                            })\n                        }\n                    }]\n                })\n            }\n        })\n    }\n\n    // View US Subscription Record — opens in same tab\n    actions.push({\n        label: \"📋 US Subscription Record\",\n        onClick: () => {\n            call(\n                \"aionion_custom.aionion_custom.controllers.crm_lead.get_product_data\",\n                { lead_name: doc.name, product: \"US Subscription\" }\n            ).then((record) => {\n                if (record && record.name) {\n                    window.location.href = \"/app/us-subscription-record/\" + record.name\n                } else {\n                    toast.error(\"No US Subscription Record found. Please submit the lead first.\")\n                }\n            })\n        }\n    })\n\n    return { actions }\n}\n",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "CRM Form Script",
   "dt": "Customer",
   "enabled": 0,
   "is_standard": 0,

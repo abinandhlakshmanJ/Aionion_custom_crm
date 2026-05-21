@@ -57,7 +57,14 @@ fixtures = [
             "Customer Call Button",
             "Navigate to Customers and Aionion Tasks",
             "Lead Hierarchy Filter",
-            "US Subscription List Actions"
+            "US Subscription List Actions",
+            "Forecasting Script",
+            "US Subscription Actions",
+            "Renewals Manager View",
+            "Go to Customer from CRM Leads",
+            "Product Details Script for CRM Deal",
+            "Product Details Script for CRM Lead",
+            "Create Task against Lead"
         ]]]
     },
     {
@@ -68,6 +75,16 @@ fixtures = [
             "Go to CRM Leads from Customer",
             "Call Button for Customer",
             "Insurance Renewal Record — MIS Actions",
+            "CRM Lead Import Export",
+            "call_log_dashboard",
+            "Lead condition",
+            "Show only current user in Sales RM",
+            "Customer Cross Sell",
+            "Button to generate tasks against Leads",
+            "Button to start Demat Verification",
+            "Create Task for Customer",
+            "Display Task Status options as per Product",
+            "Aionion Task - Navigate to CRM Leads",
             "US subscription Auto Fetch",
             "US Subscription Record Payment Actions"
         ]]]
