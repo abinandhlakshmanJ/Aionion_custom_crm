@@ -748,7 +748,7 @@
   "name": "CRM Lead-custom_product",
   "no_copy": 0,
   "non_negative": 0,
-  "options": "Account Opening\nBonds\nMutual Funds\nInsurance Sales\nInsurance Renewals\nUS Subscription\nSME Insurance",
+  "options": "\nAccount Opening\nBonds\nMutual Funds\nInsurance Sales\nInsurance Renewals\nUS Subscription",
   "permlevel": 0,
   "placeholder": null,
   "precision": null,
