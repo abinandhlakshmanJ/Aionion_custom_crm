@@ -108,6 +108,7 @@ fixtures = [
             "US Subscription RM",
             "US Subscription MIS",
             "US Subscription Admin",
+            "US Subscription TL",
             "SME Insurance RM",
             "SME Insurance Manager"
         ]]]

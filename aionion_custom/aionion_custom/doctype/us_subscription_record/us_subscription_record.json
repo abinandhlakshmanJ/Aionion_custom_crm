@@ -78,7 +78,8 @@
   "column_break_zdlm",
   "email_sent",
   "risk_declaration",
-  "alternate_email_id"
+  "alternate_email_id",
+  "data_entry_date"
  ],
  "fields": [
   {
@@ -500,14 +501,20 @@
   {
    "fieldname": "column_break_zdlm",
    "fieldtype": "Column Break"
+  },
+  {
+   "default": "Now",
+   "fieldname": "data_entry_date",
+   "fieldtype": "Datetime",
+   "label": "Data Entry Date"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-05-21 17:21:19.945830",
- "modified_by": "rajagopalan.s@aionioncapital.com",
+ "modified": "2026-05-22 14:45:54.439532",
+ "modified_by": "Administrator",
  "module": "Aionion Custom",
  "name": "US Subscription Record",
  "naming_rule": "Expression",
