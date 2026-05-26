@@ -34,6 +34,9 @@ doc_events = {
         "on_submit": [
             "aionion_custom.aionion_custom.controllers.crm_lead.share_lead_with_mis_team",
         ],
+        "on_update": [
+            "aionion_custom.aionion_custom.controllers.crm_lead.sync_us_subscription_from_lead"
+        ],
         "validate": [
             "aionion_custom.aionion_custom.controllers.crm_lead.validate_lead_owner_change",
         ],

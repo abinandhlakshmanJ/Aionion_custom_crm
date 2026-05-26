@@ -2268,3 +2268,86 @@ def clear_service_rm_on_product_change(doc, method):
                 alert=True,
                 indicator="orange"
             )
+
+
+@frappe.whitelist()
+def sync_us_subscription_from_lead(doc, method=None):
+    """Sync CRM Lead changes to linked US Subscription Record."""
+    us_records = frappe.get_all("US Subscription Record",
+        filters={"lead": doc.name},
+        fields=["name"]
+    )
+    if not us_records:
+        return
+
+    # Get employee details for Sales RM
+    emp_name = ""
+    emp_branch = ""
+    emp_team = ""
+    emp_phone = ""
+    email_address = ""
+
+    if doc.custom_sales_rm:
+        emp = frappe.db.get_value("Employee", doc.custom_sales_rm,
+            ["employee_name", "branch", "department", "user_id"],
+            as_dict=True
+        )
+        if emp:
+            emp_name = emp.employee_name or ""
+            emp_branch = emp.branch or ""
+            emp_team = emp.department or ""
+            email_address = emp.user_id or ""
+            if emp.user_id:
+                emp_phone = frappe.db.get_value("User", emp.user_id, "mobile_no") or ""
+
+    # Value mapping for employment_status
+    employment_status = (doc.custom_employee_status or "").replace("Self-Employed", "Self Employed")
+
+    # Value mapping for indian_investments
+    indian_investments_map = {"INR 25 Lakhs to 50 lakhs": "INR 25 Lakhs to 50 Lakhs"}
+    indian_investments = indian_investments_map.get(
+        doc.custom_client_indian_investments,
+        doc.custom_client_indian_investments
+    )
+
+    # Lead source
+    lead_source = getattr(doc, "source", None) or getattr(doc, "lead_source", None)
+
+    for rec in us_records:
+        us_doc = frappe.get_doc("US Subscription Record", rec.name)
+
+        # Client details from Lead
+        us_doc.client_name = doc.lead_name
+        us_doc.client_email = doc.email
+        us_doc.contact_number = doc.mobile_no
+        us_doc.country_of_residence = doc.custom_country
+        us_doc.employment_status = employment_status
+        us_doc.indian_investments = indian_investments
+        us_doc.intended_investment = doc.custom_client_intended_investment_in_us_market
+        us_doc.aionion_client_code = doc.custom_aionion_client_code
+        us_doc.lead_source = lead_source
+
+        # Sales RM details
+        if doc.custom_sales_rm:
+            us_doc.assigned_by = doc.custom_sales_rm
+            us_doc.sales_done_by = doc.custom_sales_rm
+            us_doc.rm_employee_code = doc.custom_sales_rm
+            us_doc.emp_code = doc.custom_sales_rm_code
+            us_doc.emp_branch = emp_branch or doc.custom_sales_rm_branch
+            us_doc.emp_name = emp_name
+            us_doc.emp_team = emp_team
+            us_doc.email_address = email_address
+            us_doc.emp_phone = emp_phone
+
+        # Service RM
+        if doc.custom_service_rm:
+            us_doc.service_rm = doc.custom_service_rm
+
+        us_doc.save(ignore_permissions=True)
+
+    frappe.db.commit()
+    frappe.msgprint(
+        "US Subscription Record updated with latest Lead data.",
+        alert=True,
+        indicator="green"
+    )
