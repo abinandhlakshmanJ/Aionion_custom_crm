@@ -152,18 +152,33 @@ def process_post_mis_approval(lead_name):
 def _get_or_create_customer(lead):
     existing_customer = None
 
-    # Rule: Only match on PAN — PAN is unique per individual in India
-    # Mobile alone is NOT enough — family members share phones
-    # Example: Father's insurance + Son's demat → same mobile, different PAN → different customers
+    # Tier 1: PAN match (strongest — unique per individual in India)
     if lead.custom_pan_number:
-        existing_customer = frappe.db.get_value("Customer", {"pan": lead.custom_pan_number}, "name")
+        existing_customer = frappe.db.get_value(
+            "Customer", {"custom_pan": lead.custom_pan_number}, "name"
+        )
         if existing_customer:
-            frappe.db.set_value("CRM Lead", lead.name, "custom_customer", existing_customer, update_modified=False)
+            frappe.db.set_value("CRM Lead", lead.name, "custom_customer",
+                                existing_customer, update_modified=False)
+            frappe.logger().info(f"Customer matched by PAN for lead {lead.name}: {existing_customer}")
             return frappe.get_doc("Customer", existing_customer)
 
-    # No PAN match → always create new customer
-    # Even if mobile matches — could be family member
-    company = frappe.db.get_single_value("Global Defaults", "default_company")
+    # Tier 2: Email + Mobile together (high confidence)
+    # Mobile alone is NOT enough — family members share phones
+    # Email alone is NOT enough — shared/corporate emails exist
+    if lead.mobile_no and lead.email:
+        existing_customer = frappe.db.get_value(
+            "Customer",
+            {"custom_mobile": lead.mobile_no, "custom_email": lead.email},
+            "name"
+        )
+        if existing_customer:
+            frappe.db.set_value("CRM Lead", lead.name, "custom_customer",
+                                existing_customer, update_modified=False)
+            frappe.logger().info(f"Customer matched by Email+Mobile for lead {lead.name}: {existing_customer}")
+            return frappe.get_doc("Customer", existing_customer)
+
+    # Tier 3: No match → create new customer
     customer = frappe.get_doc({
         "doctype": "Customer",
         "customer_name": lead.lead_name,
@@ -174,14 +189,16 @@ def _get_or_create_customer(lead):
         "custom_email": lead.email,
         "custom_dob": lead.custom_dob,
         "custom_residency": lead.custom_residency,
-        "pan": lead.custom_pan_number,
+        "custom_pan": lead.custom_pan_number,
         "custom_relationship_manager": lead.custom_sales_rm,
         "custom_service_rm": lead.custom_service_rm,
         "custom_account_category": "NRI" if lead.custom_residency == "NRI" else "Individual",
     })
     customer.insert(ignore_permissions=True)
     frappe.db.commit()
-    frappe.db.set_value("CRM Lead", lead.name, "custom_customer", customer.name, update_modified=False)
+    frappe.db.set_value("CRM Lead", lead.name, "custom_customer",
+                        customer.name, update_modified=False)
+    frappe.logger().info(f"New Customer created for lead {lead.name}: {customer.name}")
     return customer
 
 
@@ -2220,16 +2237,12 @@ def approve_sme_mis(lead_name):
 
     frappe.db.set_value("CRM Lead", lead_name, "custom_mis_status", "Approved")
 
-    # Create Customer if not already linked
+    # Create or find Customer using standard matching logic (PAN → Email+Mobile → New)
     if not lead.get("custom_customer"):
-        customer = frappe.new_doc("Customer")
-        customer.customer_name = lead.lead_name
-        customer.customer_type = "Individual"
-        customer.customer_group = "SME"
-        customer.territory = "India"
-        customer.insert(ignore_permissions=True)
-
-        frappe.db.set_value("CRM Lead", lead_name, "custom_customer", customer.name)
+        lead_doc = frappe.get_doc("CRM Lead", lead_name)
+        customer = _get_or_create_customer(lead_doc)
+        if not customer.custom_aionion_master_id:
+            _generate_aionion_master_id(customer)
 
         # Link customer back to SME Insurance Record
         sme_rec = frappe.db.get_value(
