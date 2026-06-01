@@ -214,7 +214,6 @@ frappe.pages["crm-activity-dashboard"].on_page_load = function (wrapper) {
 
                 <!-- Panel: Login -->
                 <div id="panel-login" style="display:none;">
-                    <!-- Login Summary Cards -->
                     <div class="row mb-3">
                         <div class="col-sm-4 mb-2">
                             <div class="aion-login-card aion-lc-strength">
@@ -254,7 +253,7 @@ frappe.pages["crm-activity-dashboard"].on_page_load = function (wrapper) {
         </div>
     `).appendTo(page.main);
 
-    // ── Tab switching ────────────────────────────────────────────────────────
+    // ── Tab switching ─────────────────────────────────────────────────────────
     $("#tab-activity").on("click", function () {
         $("#panel-activity").show(); $("#panel-login").hide();
         $("#tab-activity").addClass("active"); $("#tab-login").removeClass("active");
@@ -264,7 +263,7 @@ frappe.pages["crm-activity-dashboard"].on_page_load = function (wrapper) {
         $("#tab-login").addClass("active"); $("#tab-activity").removeClass("active");
     });
 
-    // ── Existing function — untouched logic ──────────────────────────────────
+    // ── Team Activity Breakdown ───────────────────────────────────────────────
     function load_dashboard() {
         const args = { from_date: from_date.get_value(), to_date: to_date.get_value() };
 
@@ -334,81 +333,111 @@ frappe.pages["crm-activity-dashboard"].on_page_load = function (wrapper) {
         });
     }
 
-    // ── New function ─────────────────────────────────────────────────────────
+    // ── Team Login Activity (hierarchy-scoped) ────────────────────────────────
     function load_login_activity() {
-        frappe.call({
-            method: "frappe.desk.query_report.run",
-            args: {
-                report_name: "Team Login Activity",
-                filters: { from_date: from_date.get_value(), to_date: to_date.get_value() }
-            },
-            async: true
-        }).then(res => {
-            const rows = (res.message && res.message.result) || [];
+        const is_admin = frappe.user_roles.includes("System Manager")
+                      || frappe.session.user === "Administrator";
 
-            if (!rows.length) {
-                $("#login-activity-table").html(`<p class="text-muted text-center py-4">No login data for this period.</p>`);
-                return;
+        // Step 1: get current user's Employee code (skip fetch for admin)
+        const get_emp = is_admin
+            ? Promise.resolve(null)
+            : frappe.call({
+                method: "frappe.client.get_value",
+                args: {
+                    doctype:   "Employee",
+                    filters:   { user_id: frappe.session.user, status: "Active" },
+                    fieldname: "name"
+                }
+              });
+
+        get_emp.then(emp_res => {
+            const emp_code = emp_res && emp_res.message && emp_res.message.name;
+
+            // Step 2: scope non-admins to their own subtree via top_level_manager
+            const report_filters = {
+                from_date: from_date.get_value(),
+                to_date:   to_date.get_value()
+            };
+            if (!is_admin && emp_code) {
+                report_filters.top_level_manager = emp_code;
             }
 
-            // ── Summary cards
-            const total     = rows.length;
-            const loggedIn  = rows.filter(r => (r.login_status||"").includes("Logged In") && !(r.login_status||"").includes("Not")).length;
-            const notLogged = total - loggedIn;
-            const loginPct  = total ? Math.round((loggedIn / total) * 100) : 0;
-            const notPct    = total ? Math.round((notLogged / total) * 100) : 0;
+            // Step 3: run the report with scoped filters
+            frappe.call({
+                method: "frappe.desk.query_report.run",
+                args: { report_name: "Team Login Activity", filters: report_filters },
+                async: true
+            }).then(res => {
+                const rows = (res.message && res.message.result) || [];
 
-            $("#login-total-strength").text(total);
-            $("#login-logged-in").text(`${loggedIn} / ${total}`);
-            $("#login-not-logged-in").text(`${notLogged} / ${total}`);
-            $("#login-logged-pct").text(`${loginPct}% of team today`);
-            $("#login-notlogged-pct").text(`${notPct}% of team today`);
-            $("#prog-login").css("width", loginPct + "%");
-            $("#prog-notlogin").css("width", notPct + "%");
+                if (!rows.length) {
+                    $("#login-activity-table").html(`<p class="text-muted text-center py-4">No login data for this period.</p>`);
+                    $("#login-total-strength").text(0);
+                    $("#login-logged-in").text("0 / 0");
+                    $("#login-not-logged-in").text("0 / 0");
+                    return;
+                }
 
-            // ── Table
-            $("#login-activity-table").html(`
-                <table class="aion-table">
-                    <thead>
-                        <tr>
-                            <th>Employee</th>
-                            <th>Designation</th>
-                            <th>Reports To</th>
-                            <th class="text-center">Team Strength</th>
-                            <th class="text-center">Logged In</th>
-                            <th class="text-center">Not Logged In</th>
-                            <th class="text-center">Status</th>
-                            <th>First Login</th>
-                            <th>Last Logout</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${rows.map(r => {
-                            const isIn  = (r.login_status||"").includes("Logged In") && !(r.login_status||"").includes("Not");
-                            const badge = isIn
-                                ? `<span class="aion-badge badge-green">✅ Logged In</span>`
-                                : `<span class="aion-badge badge-red">❌ Not Logged In</span>`;
-                            return `
-                            <tr class="${isIn ? 'row-loggedin' : 'row-notloggedin'}">
-                                <td style="padding-left:${((r.indent||0)*20)+8}px;font-weight:500;">${r.employee_name||""}</td>
-                                <td style="color:#64748b;">${r.designation||"—"}</td>
-                                <td style="color:#64748b;">${r.reports_to_name||"—"}</td>
-                                <td class="text-center">${r.team_strength||"—"}</td>
-                                <td class="text-center">${r.logged_in_count||"—"}</td>
-                                <td class="text-center">${r.not_logged_in_count||"—"}</td>
-                                <td class="text-center">${badge}</td>
-                                <td style="font-size:12px;color:#64748b;">${r.first_login||"—"}</td>
-                                <td style="font-size:12px;color:#64748b;">${r.last_logout||"—"}</td>
-                            </tr>`;
-                        }).join("")}
-                    </tbody>
-                </table>
-            `);
-        }).catch(() => {
-            $("#login-activity-table").html(`<p class="text-muted text-center py-4">Could not load login activity.</p>`);
+                // Summary cards
+                const total     = rows.length;
+                const loggedIn  = rows.filter(r => (r.login_status||"").includes("Logged In") && !(r.login_status||"").includes("Not")).length;
+                const notLogged = total - loggedIn;
+                const loginPct  = total ? Math.round((loggedIn  / total) * 100) : 0;
+                const notPct    = total ? Math.round((notLogged / total) * 100) : 0;
+
+                $("#login-total-strength").text(total);
+                $("#login-logged-in").text(`${loggedIn} / ${total}`);
+                $("#login-not-logged-in").text(`${notLogged} / ${total}`);
+                $("#login-logged-pct").text(`${loginPct}% of team today`);
+                $("#login-notlogged-pct").text(`${notPct}% of team today`);
+                $("#prog-login").css("width", loginPct + "%");
+                $("#prog-notlogin").css("width", notPct + "%");
+
+                // Table
+                $("#login-activity-table").html(`
+                    <table class="aion-table">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Designation</th>
+                                <th>Reports To</th>
+                                <th class="text-center">Team Strength</th>
+                                <th class="text-center">Logged In</th>
+                                <th class="text-center">Not Logged In</th>
+                                <th class="text-center">Status</th>
+                                <th>First Login</th>
+                                <th>Last Logout</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rows.map(r => {
+                                const isIn  = (r.login_status||"").includes("Logged In") && !(r.login_status||"").includes("Not");
+                                const badge = isIn
+                                    ? `<span class="aion-badge badge-green">✅ Logged In</span>`
+                                    : `<span class="aion-badge badge-red">❌ Not Logged In</span>`;
+                                return `
+                                <tr class="${isIn ? 'row-loggedin' : 'row-notloggedin'}">
+                                    <td style="padding-left:${((r.indent||0)*20)+8}px;font-weight:500;">${r.employee_name||""}</td>
+                                    <td style="color:#64748b;">${r.designation||"—"}</td>
+                                    <td style="color:#64748b;">${r.reports_to_name||"—"}</td>
+                                    <td class="text-center">${r.team_strength||"—"}</td>
+                                    <td class="text-center">${r.logged_in_count||"—"}</td>
+                                    <td class="text-center">${r.not_logged_in_count||"—"}</td>
+                                    <td class="text-center">${badge}</td>
+                                    <td style="font-size:12px;color:#64748b;">${r.first_login||"—"}</td>
+                                    <td style="font-size:12px;color:#64748b;">${r.last_logout||"—"}</td>
+                                </tr>`;
+                            }).join("")}
+                        </tbody>
+                    </table>
+                `);
+            }).catch(() => {
+                $("#login-activity-table").html(`<p class="text-muted text-center py-4">Could not load login activity.</p>`);
+            });
         });
     }
 
+    // ── Initial load ──────────────────────────────────────────────────────────
     load_dashboard();
     load_login_activity();
 };
