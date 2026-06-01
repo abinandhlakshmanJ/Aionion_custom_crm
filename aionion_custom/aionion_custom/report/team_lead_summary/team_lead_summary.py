@@ -62,7 +62,7 @@ def get_data(filters):
     from_dt = f"{from_date} 00:00:00"
     to_dt   = f"{to_date} 23:59:59"
 
-    # ── Step 1: Fetch all active employees ────────────────────────────────────
+    # ── Step 1: Fetch ALL active employees (limit=0 bypasses default 20 cap) ──
     employees = frappe.get_all(
         "Employee",
         filters={"status": "Active"},
@@ -74,6 +74,7 @@ def get_data(filters):
             "designation",
             "company",
         ],
+        limit=0,             # ← CRITICAL: fetch all, not just first 20
     )
 
     emp_map = {e.name: e for e in employees}
@@ -83,7 +84,7 @@ def get_data(filters):
         rt = e.get("reports_to")
         e["reports_to_name"] = emp_map[rt].employee_name if (rt and rt in emp_map) else None
 
-    # ── Step 2: Fetch CRM Leads in date range ─────────────────────────────────
+    # ── Step 2: Fetch ALL CRM Leads in date range ─────────────────────────────
     lead_filters = [
         ["creation", "between", [from_dt, to_dt]],
     ]
@@ -96,6 +97,7 @@ def get_data(filters):
         "CRM Lead",
         filters=lead_filters,
         fields=["custom_sales_rm", "lead_owner"],
+        limit=0,             # ← CRITICAL: you have 7000+ leads, must fetch all
     )
 
     # Build employee_code → lead count map
@@ -151,7 +153,6 @@ def get_data(filters):
         all_member_ids = [emp.name] + descendants   # self + entire sub-tree
 
         # Team total = sum of leads across every member in sub-tree
-        # Uses employee code directly — works for both custom_sales_rm and lead_owner
         team_leads = sum(lead_count_map.get(m, 0) for m in all_member_ids)
 
         # Own leads = only this employee's employee code
