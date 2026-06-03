@@ -159,10 +159,11 @@ scheduler_events = {
     ],
     "daily": [
         "aionion_custom.aionion_custom.controllers.crm_lead.send_us_subscription_expiry_notifications",
+    ],
+    "daily_long": [
         "aionion_custom.aionion_custom.tasks.techexcel_sync.sync_customers_from_s3",
     ],
 }
-
 # Testing
 # -------
 
