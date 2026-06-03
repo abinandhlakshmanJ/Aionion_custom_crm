@@ -1,0 +1,128 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-06-03 14:37:33.405773",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "enabled",
+  "aws_section",
+  "aws_access_key_id",
+  "aws_secret_access_key",
+  "aws_region",
+  "col_break_1",
+  "s3_bucket_name",
+  "s3_file_key",
+  "sync_section",
+  "last_sync_datetime",
+  "last_sync_created",
+  "col_break_2",
+  "last_sync_updated",
+  "last_sync_errors"
+ ],
+ "fields": [
+  {
+   "default": "1",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled"
+  },
+  {
+   "fieldname": "aws_section",
+   "fieldtype": "Section Break",
+   "label": "AWS Configuration"
+  },
+  {
+   "fieldname": "aws_access_key_id",
+   "fieldtype": "Data",
+   "label": "AWS Access Key ID"
+  },
+  {
+   "fieldname": "aws_secret_access_key",
+   "fieldtype": "Password",
+   "label": "AWS Secret Access Key"
+  },
+  {
+   "default": "ap-south-1",
+   "fieldname": "aws_region",
+   "fieldtype": "Data",
+   "label": "AWS Region"
+  },
+  {
+   "fieldname": "col_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "techexcel-client-list",
+   "fieldname": "s3_bucket_name",
+   "fieldtype": "Data",
+   "label": "S3 Bucket Name"
+  },
+  {
+   "default": "techexcel/clients.json",
+   "fieldname": "s3_file_key",
+   "fieldtype": "Data",
+   "label": "S3 File Key"
+  },
+  {
+   "fieldname": "sync_section",
+   "fieldtype": "Section Break",
+   "label": "Last Sync Info"
+  },
+  {
+   "fieldname": "last_sync_datetime",
+   "fieldtype": "Datetime",
+   "label": "Last Sync DateTime",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_sync_created",
+   "fieldtype": "Int",
+   "label": "Created",
+   "read_only": 1
+  },
+  {
+   "fieldname": "col_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "last_sync_updated",
+   "fieldtype": "Int",
+   "label": "Updated",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_sync_errors",
+   "fieldtype": "Int",
+   "label": "Errors",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-06-03 14:37:33.405773",
+ "modified_by": "Administrator",
+ "module": "Aionion Custom",
+ "name": "TechExcel Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

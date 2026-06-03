@@ -149,11 +149,18 @@ doc_events = {
 # ---------------
 
 scheduler_events = {
-	"cron": {
-		"*/2 * * * *": [
-			"frappe.email.doctype.email_account.email_account.pull",
-		],
-	},
+    "cron": {
+        "*/2 * * * *": [
+            "frappe.email.doctype.email_account.email_account.pull",
+        ],
+    },
+    "hourly": [
+        "aionion_custom.aionion_custom.controllers.customer.sync_all_customer_product_rms",
+    ],
+    "daily": [
+        "aionion_custom.aionion_custom.controllers.crm_lead.send_us_subscription_expiry_notifications",
+        "aionion_custom.aionion_custom.tasks.techexcel_sync.sync_customers_from_s3",
+    ],
 }
 
 # Testing

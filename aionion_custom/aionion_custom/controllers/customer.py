@@ -140,3 +140,52 @@ def get_customer_360(customer=None, customer_name=None):
                 ["name", "pan", "client_code"]),
         }
     }
+
+# ── PRODUCT RM SYNC ──────────────────────────────────────────────────────────
+
+@frappe.whitelist()
+def sync_customer_product_rms(customer_name):
+	"""
+	Fetch the most recent RM from each product DocType
+	and write them to the Customer's custom RM fields.
+	"""
+	product_rm_map = {
+		"custom_us_rm":        ("US Subscription Record", "sales_done_by"),
+		"custom_bonds_rm":     ("Bonds Purchase Record",  "rm_employee_code"),
+		"custom_mf_rm":        ("Mutual Funds Record",    "sales_done_by"),
+		"custom_equity_rm":    ("Equity Record",          "sales_done_by"),
+		"custom_insurance_rm": ("Insurance Record",       "rm_employee_code"),
+	}
+
+	updates = {}
+	for customer_field, (doctype, rm_field) in product_rm_map.items():
+		rows = frappe.get_all(
+			doctype,
+			filters={"customer": customer_name},
+			fields=[rm_field],
+			order_by="creation desc",
+			limit=1,
+		)
+		updates[customer_field] = rows[0].get(rm_field) if rows else None
+
+	if any(v for v in updates.values()):
+		frappe.db.set_value("Customer", customer_name, updates, update_modified=False)
+
+	return updates
+
+
+def sync_all_customer_product_rms():
+	"""
+	Hourly scheduler entry point.
+	Iterates every customer and syncs product RMs.
+	"""
+	customers = frappe.get_all("Customer", fields=["name"], limit=0)
+	for c in customers:
+		try:
+			sync_customer_product_rms(c.name)
+		except Exception:
+			frappe.log_error(
+				title=f"Product RM Sync failed: {c.name}",
+				message=frappe.get_traceback(),
+			)
+	frappe.db.commit()
