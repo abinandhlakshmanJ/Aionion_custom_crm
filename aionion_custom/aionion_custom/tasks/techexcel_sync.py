@@ -7,9 +7,11 @@ def sync_customers_from_s3():
     """
     Daily scheduled job — pulls TechExcel client list from S3
     and upserts into Customer DocType.
-    Only processes records modified since last sync (delta sync).
+    Called via hooks.py scheduler.
     """
     try:
+        frappe.logger().info("TechExcel Sync: Starting...")
+
         settings = frappe.get_single("TechExcel Settings")
 
         if not settings.enabled:
@@ -17,72 +19,118 @@ def sync_customers_from_s3():
             return
 
         if not settings.aws_access_key_id:
-            frappe.log_error("TechExcel Sync: AWS credentials not configured.", "TechExcel Sync")
+            frappe.log_error("TechExcel Sync: AWS Access Key ID not configured.", "TechExcel Sync")
             return
 
         import boto3
         import json
         from datetime import datetime
 
-        s3 = boto3.client(
-            "s3",
-            region_name=settings.aws_region or "ap-south-1",
-            aws_access_key_id=settings.aws_access_key_id,
-            aws_secret_access_key=get_decrypted_password(
-                "TechExcel Settings", "TechExcel Settings", "aws_secret_access_key"
-            ),
-        )
+        # Step 1: Connect to S3
+        try:
+            s3 = boto3.client(
+                "s3",
+                region_name=settings.aws_region or "ap-south-1",
+                aws_access_key_id=settings.aws_access_key_id,
+                aws_secret_access_key=get_decrypted_password(
+                    "TechExcel Settings", "TechExcel Settings", "aws_secret_access_key"
+                ),
+            )
+            response = s3.get_object(
+                Bucket=settings.s3_bucket_name,
+                Key=settings.s3_file_key or "techexcel/clients.json"
+            )
+            raw = response["Body"].read().decode("utf-8")
+            all_data = json.loads(raw)
+            frappe.logger().info(f"TechExcel Sync: Loaded {len(all_data)} records from S3")
+        except Exception as e:
+            frappe.log_error(f"TechExcel Sync: S3 connection failed — {str(e)}", "TechExcel Sync")
+            return
 
-        response = s3.get_object(
-            Bucket=settings.s3_bucket_name,
-            Key=settings.s3_file_key or "techexcel/clients.json"
-        )
-        raw = response["Body"].read().decode("utf-8")
-        all_data = json.loads(raw)
+        # Step 2: Delta filter
+        try:
+            last_sync = settings.last_sync_datetime
+            if last_sync:
+                last_sync_str = str(last_sync)
+                try:
+                    last_sync_dt = datetime.strptime(last_sync_str, "%Y-%m-%d %H:%M:%S.%f")
+                except ValueError:
+                    last_sync_dt = datetime.strptime(last_sync_str, "%Y-%m-%d %H:%M:%S")
+                data = [r for r in all_data if _is_modified_after(r, last_sync_dt)]
+                frappe.logger().info(f"TechExcel Sync: Delta mode — {len(data)} records to process")
+            else:
+                data = all_data
+                frappe.logger().info(f"TechExcel Sync: Full sync mode — {len(data)} records to process")
+        except Exception as e:
+            frappe.log_error(f"TechExcel Sync: Delta filter failed — {str(e)}", "TechExcel Sync")
+            return
 
-        # Delta sync — only process records modified since last sync
-        last_sync = settings.last_sync_datetime
-        if last_sync:
-            last_sync_dt = last_sync if hasattr(last_sync, "strftime") else datetime.strptime(str(last_sync), "%Y-%m-%d %H:%M:%S.%f")
-            data = []
-            for record in all_data:
-                last_modified = record.get("LAST_MODIFIED_DATE", "")
-                if last_modified:
-                    try:
-                        rec_dt = datetime.strptime(last_modified, "%Y-%m-%d %H:%M:%S.%f")
-                    except Exception:
-                        try:
-                            rec_dt = datetime.strptime(last_modified, "%Y-%m-%d %H:%M:%S")
-                        except Exception:
-                            rec_dt = None
-                    if rec_dt and rec_dt > last_sync_dt:
-                        data.append(record)
-                else:
-                    data.append(record)
-        else:
-            # First run — process all
-            data = all_data
+        # Step 3: Load existing customers into memory (avoids N+1)
+        try:
+            existing_customers = frappe.get_all(
+                "Customer",
+                filters={"custom_client_id": ["!=", ""]},
+                fields=["name", "custom_client_id", "custom_aionion_master_id"],
+                limit=0
+            )
+            existing_map = {c.custom_client_id: c for c in existing_customers}
+            frappe.logger().info(f"TechExcel Sync: {len(existing_map)} existing customers loaded")
+        except Exception as e:
+            frappe.log_error(f"TechExcel Sync: Failed to load existing customers — {str(e)}", "TechExcel Sync")
+            return
 
-        total = len(data)
-        frappe.logger().info(f"TechExcel Sync: {total} records to process (out of {len(all_data)} total)")
-        print(f"TechExcel Sync: {total} records to process (out of {len(all_data)} total)")
+        # Step 4: Split into creates and updates
+        to_create = []
+        to_update = []
+        for record in data:
+            client_id = record.get("Client_ID")
+            if not client_id:
+                continue
+            if client_id in existing_map:
+                to_update.append(record)
+            else:
+                to_create.append(record)
 
-        results = {"created": 0, "updated": 0, "skipped": 0, "errors": 0}
+        frappe.logger().info(f"TechExcel Sync: {len(to_create)} to create, {len(to_update)} to update")
+        results = {"created": 0, "updated": 0, "errors": 0}
 
-        for i, record in enumerate(data):
+        # Step 5: Process CREATES first
+        frappe.logger().info("TechExcel Sync: Starting creates...")
+        for i, record in enumerate(to_create):
             try:
-                result = _upsert_customer(record)
-                results[result] = results.get(result, 0) + 1
+                _create_customer(record)
+                results["created"] += 1
+                if results["created"] % 100 == 0:
+                    frappe.db.commit()
+                    frappe.logger().info(f"TechExcel Sync: Created {results['created']}/{len(to_create)}")
             except Exception as e:
                 results["errors"] += 1
                 frappe.log_error(
-                    f"TechExcel sync error for {record.get('Client_ID')}: {str(e)}",
+                    f"TechExcel create error for {record.get('Client_ID')}: {str(e)}",
                     "TechExcel Customer Sync"
                 )
 
-            if (i + 1) % 1000 == 0:
-                print(f"Progress: {i+1}/{total} | {results}")
+        frappe.db.commit()
+        frappe.logger().info(f"TechExcel Sync: Creates done — {results['created']} created, {results['errors']} errors")
 
+        # Step 6: Process UPDATES in batches of 500
+        frappe.logger().info("TechExcel Sync: Starting updates...")
+        batch_size = 500
+        for i in range(0, len(to_update), batch_size):
+            batch = to_update[i:i + batch_size]
+            try:
+                _bulk_update_customers(batch, existing_map)
+                results["updated"] += len(batch)
+                frappe.db.commit()
+                frappe.logger().info(f"TechExcel Sync: Updated {results['updated']}/{len(to_update)}")
+            except Exception as e:
+                results["errors"] += len(batch)
+                frappe.log_error(
+                    f"TechExcel bulk update error at batch {i}: {str(e)}",
+                    "TechExcel Customer Sync"
+                )
+
+        # Step 7: Save final stats
         frappe.db.set_value("TechExcel Settings", "TechExcel Settings", {
             "last_sync_datetime": now_datetime(),
             "last_sync_created": results.get("created", 0),
@@ -90,18 +138,29 @@ def sync_customers_from_s3():
             "last_sync_errors": results.get("errors", 0),
         })
         frappe.db.commit()
-
-        print(f"TechExcel Sync Complete: {results}")
         frappe.logger().info(f"TechExcel Sync Complete: {results}")
 
     except Exception as e:
         frappe.log_error(f"TechExcel Sync Failed: {str(e)}", "TechExcel Sync")
-        print(f"TechExcel Sync Failed: {str(e)}")
 
 
-def _upsert_customer(record):
+def _is_modified_after(record, last_sync_dt):
     from datetime import datetime
-    from aionion_custom.aionion_custom.controllers.crm_lead import _generate_aionion_master_id
+    last_modified = record.get("LAST_MODIFIED_DATE", "")
+    if not last_modified:
+        return True
+    try:
+        rec_dt = datetime.strptime(last_modified, "%Y-%m-%d %H:%M:%S.%f")
+    except Exception:
+        try:
+            rec_dt = datetime.strptime(last_modified, "%Y-%m-%d %H:%M:%S")
+        except Exception:
+            return True
+    return rec_dt > last_sync_dt
+
+
+def _get_fields(record):
+    from datetime import datetime
 
     def parse_date(date_str):
         if not date_str:
@@ -122,11 +181,7 @@ def _upsert_customer(record):
             except Exception:
                 return None
 
-    client_id = record.get("Client_ID")
-    if not client_id:
-        return "skipped"
-
-    fields = {
+    return {
         "custom_client_code":             record.get("Code"),
         "custom_pan":                     record.get("PAN_NO"),
         "custom_mobile":                  str(record.get("Mobile_No", "") or ""),
@@ -151,31 +206,32 @@ def _upsert_customer(record):
         "custom_account_category":        record.get("CATEGORY_DESC"),
     }
 
-    existing = frappe.db.get_value(
-        "Customer",
-        {"custom_client_id": client_id},
-        ["name", "custom_aionion_master_id"],
-        as_dict=True,
-    )
 
-    if existing:
-        frappe.db.set_value("Customer", existing.name, fields, update_modified=False)
-        if not existing.custom_aionion_master_id:
-            customer = frappe.get_doc("Customer", existing.name)
-            _generate_aionion_master_id(customer)
-        frappe.db.commit()
-        return "updated"
-
+def _create_customer(record):
+    from aionion_custom.aionion_custom.controllers.crm_lead import _generate_aionion_master_id
+    fields = _get_fields(record)
     doc = frappe.get_doc({
         "doctype": "Customer",
         "customer_name": record.get("Client_Name"),
         "customer_type": "Individual",
         "customer_group": "Individual",
         "territory": "India",
-        "custom_client_id": client_id,
+        "custom_client_id": record.get("Client_ID"),
         **fields,
     })
     doc.insert(ignore_permissions=True, ignore_links=True)
     _generate_aionion_master_id(doc)
-    frappe.db.commit()
-    return "created"
+
+
+def _bulk_update_customers(batch, existing_map):
+    from aionion_custom.aionion_custom.controllers.crm_lead import _generate_aionion_master_id
+    for record in batch:
+        client_id = record.get("Client_ID")
+        existing = existing_map.get(client_id)
+        if not existing:
+            continue
+        fields = _get_fields(record)
+        frappe.db.set_value("Customer", existing.name, fields, update_modified=False)
+        if not existing.custom_aionion_master_id:
+            customer = frappe.get_doc("Customer", existing.name)
+            _generate_aionion_master_id(customer)
