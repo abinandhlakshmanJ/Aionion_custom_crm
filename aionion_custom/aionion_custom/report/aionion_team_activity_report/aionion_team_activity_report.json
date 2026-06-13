@@ -11,10 +11,10 @@
  "modified": "2026-06-12 00:00:00.000000",
  "modified_by": "Administrator",
  "module": "Aionion Custom",
- "name": "Team Wise Login Report",
+ "name": "Aionion Team Activity Report",
  "owner": "Administrator",
  "ref_doctype": "Employee",
- "report_name": "Team Wise Login Report",
+ "report_name": "Aionion Team Activity Report",
  "report_type": "Script Report",
  "roles": [
   {"role": "System Manager"},

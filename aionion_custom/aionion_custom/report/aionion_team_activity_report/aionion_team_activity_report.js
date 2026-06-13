@@ -1,4 +1,4 @@
-frappe.query_reports["Team Wise Login Report"] = {
+frappe.query_reports["Aionion Team Activity Report"] = {
     filters: [
         {
             fieldname: "from_date",
