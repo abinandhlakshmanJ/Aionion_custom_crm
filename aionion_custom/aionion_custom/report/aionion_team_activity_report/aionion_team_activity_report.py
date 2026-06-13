@@ -43,6 +43,7 @@ def get_data(filters):
         limit=0,
     )
     emp_map = {e.name: e for e in employees}
+    emp_code_to_uid = {e.name: e.user_id for e in employees if e.user_id}
 
     # Step 2: Logged in users in date range
     logs = frappe.get_all(
@@ -57,28 +58,38 @@ def get_data(filters):
     )
     logged_in_users = set(l.user for l in logs)
 
-    # Step 3: Leads created in date range
-    leads_today = frappe.get_all(
+    # Step 3: Leads today - union of lead_owner and custom_sales_rm
+    leads_today_raw = frappe.get_all(
         "CRM Lead",
         filters=[["creation", ">=", from_dt], ["creation", "<=", to_dt]],
-        fields=["lead_owner"],
+        fields=["name", "lead_owner", "custom_sales_rm"],
         limit=0,
     )
     leads_today_map = {}
-    for l in leads_today:
-        o = l.lead_owner or ""
-        leads_today_map[o] = leads_today_map.get(o, 0) + 1
+    for l in leads_today_raw:
+        matched_uids = set()
+        if l.lead_owner:
+            matched_uids.add(l.lead_owner)
+        if l.custom_sales_rm and l.custom_sales_rm in emp_code_to_uid:
+            matched_uids.add(emp_code_to_uid[l.custom_sales_rm])
+        for uid in matched_uids:
+            leads_today_map[uid] = leads_today_map.get(uid, 0) + 1
 
-    # Step 4: Total leads all time
-    leads_total = frappe.get_all(
+    # Step 4: Total leads all time - union of lead_owner and custom_sales_rm
+    leads_total_raw = frappe.get_all(
         "CRM Lead",
-        fields=["lead_owner"],
+        fields=["name", "lead_owner", "custom_sales_rm"],
         limit=0,
     )
     leads_total_map = {}
-    for l in leads_total:
-        o = l.lead_owner or ""
-        leads_total_map[o] = leads_total_map.get(o, 0) + 1
+    for l in leads_total_raw:
+        matched_uids = set()
+        if l.lead_owner:
+            matched_uids.add(l.lead_owner)
+        if l.custom_sales_rm and l.custom_sales_rm in emp_code_to_uid:
+            matched_uids.add(emp_code_to_uid[l.custom_sales_rm])
+        for uid in matched_uids:
+            leads_total_map[uid] = leads_total_map.get(uid, 0) + 1
 
     # Step 5: Emails sent in date range
     emails_today = frappe.get_all(
@@ -98,7 +109,6 @@ def get_data(filters):
         emails_today_map[o] = emails_today_map.get(o, 0) + 1
 
     # Step 6: Calls in date range
-    # Outgoing: caller = user, Incoming: receiver = user
     calls_outgoing = frappe.get_all(
         "CRM Call Log",
         filters=[
@@ -180,7 +190,7 @@ def get_data(filters):
         logged_in_count = sum(1 for u in member_user_ids if u in logged_in_users)
         not_logged_in_count = len(member_user_ids) - logged_in_count
 
-        # Leads
+        # Leads - own vs team (union logic applied)
         own_leads_today = leads_today_map.get(uid, 0)
         team_leads_today = sum(leads_today_map.get(u, 0) for u in member_user_ids)
         own_total_leads = leads_total_map.get(uid, 0)

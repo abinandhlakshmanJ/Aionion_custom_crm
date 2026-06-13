@@ -1,0 +1,19 @@
+{
+ "content": "[]",
+ "creation": "2026-06-13 00:00:00.000000",
+ "docstatus": 0,
+ "doctype": "Page",
+ "idx": 0,
+ "modified": "2026-06-13 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Aionion Custom",
+ "name": "aionion-team-activity",
+ "owner": "Administrator",
+ "page_name": "aionion-team-activity",
+ "roles": [
+  {"role": "System Manager"},
+  {"role": "Aionion CRM User"}
+ ],
+ "standard": "Yes",
+ "title": "Team Activity Dashboard"
+}
