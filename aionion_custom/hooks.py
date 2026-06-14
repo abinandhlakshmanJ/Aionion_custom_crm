@@ -17,6 +17,7 @@ app_include_css = ["/assets/aionion_custom/css/crm_custom.css"]
 # -----------
 permission_query_conditions = {
     "CRM Lead": "aionion_custom.aionion_custom.controllers.crm_lead.get_permission_query_conditions",
+    "Customer": "aionion_custom.controllers.customer_permissions.get_customer_permission_query",
 }
 
 # Document Events
