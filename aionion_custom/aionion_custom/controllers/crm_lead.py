@@ -43,7 +43,8 @@ def set_sales_rm_defaults(doc, method):
                 doc.custom_sales_rm_branch = emp.branch
 
     # Service RM must NEVER be auto-set on creation
-    if doc.is_new():
+    # Allow if explicitly provided during import
+    if doc.is_new() and not doc.custom_service_rm:
         doc.custom_service_rm = None
         doc.custom_service_rm_name = None
 
