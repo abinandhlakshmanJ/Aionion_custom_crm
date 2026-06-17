@@ -2,6 +2,8 @@ import frappe
 from frappe import _
 from frappe.utils import today
 
+UNASSIGNED_LABEL = "Unassigned / No Employee Match"
+
 
 def execute(filters=None):
     filters = frappe._dict(filters or {})
@@ -43,6 +45,8 @@ def get_data(filters):
         limit=0,
     )
     emp_map = {e.name: e for e in employees}
+    emp_code_to_uid = {e.name: e.user_id for e in employees if e.user_id}
+    active_uids = set(emp_code_to_uid.values())
 
     # Step 2: Logged in users in date range
     logs = frappe.get_all(
@@ -57,30 +61,45 @@ def get_data(filters):
     )
     logged_in_users = set(l.user for l in logs)
 
-    # Step 3: Leads today — count by owner only (1 lead = 1 count, matches CRM list view)
+    # Step 3: Leads today — owner first, fallback to custom_sales_rm if owner has no active Employee
+    # Leads with neither resolving go to UNASSIGNED bucket so totals always tie to raw CRM Lead count
     leads_today_raw = frappe.get_all(
         "CRM Lead",
         filters=[["creation", ">=", from_dt], ["creation", "<=", to_dt]],
-        fields=["owner"],
+        fields=["name", "owner", "custom_sales_rm"],
         limit=0,
     )
     leads_today_map = {}
+    unassigned_today = 0
     for l in leads_today_raw:
-        uid = l.owner or ""
+        uid = None
+        if l.owner in active_uids:
+            uid = l.owner
+        elif l.custom_sales_rm and l.custom_sales_rm in emp_code_to_uid:
+            uid = emp_code_to_uid[l.custom_sales_rm]
         if uid:
             leads_today_map[uid] = leads_today_map.get(uid, 0) + 1
+        else:
+            unassigned_today += 1
 
-    # Step 4: Total leads all time — count by owner only (1 lead = 1 count, matches CRM list view)
+    # Step 4: Total leads all time — same owner-first, sales_rm-fallback logic
     leads_total_raw = frappe.get_all(
         "CRM Lead",
-        fields=["owner"],
+        fields=["name", "owner", "custom_sales_rm"],
         limit=0,
     )
     leads_total_map = {}
+    unassigned_total = 0
     for l in leads_total_raw:
-        uid = l.owner or ""
+        uid = None
+        if l.owner in active_uids:
+            uid = l.owner
+        elif l.custom_sales_rm and l.custom_sales_rm in emp_code_to_uid:
+            uid = emp_code_to_uid[l.custom_sales_rm]
         if uid:
             leads_total_map[uid] = leads_total_map.get(uid, 0) + 1
+        else:
+            unassigned_total += 1
 
     # Step 5: Emails sent in date range
     emails_today = frappe.get_all(
@@ -182,7 +201,7 @@ def get_data(filters):
         logged_in_count = sum(1 for u in member_user_ids if u in logged_in_users)
         not_logged_in_count = len(member_user_ids) - logged_in_count
 
-        # Leads — owner-based, matches CRM list view exactly (1 lead = 1 count)
+        # Leads — owner-first with sales_rm fallback, no double counting
         own_leads_today = leads_today_map.get(uid, 0)
         team_leads_today = sum(leads_today_map.get(u, 0) for u in member_user_ids)
         own_total_leads = leads_total_map.get(uid, 0)
@@ -219,5 +238,26 @@ def get_data(filters):
 
     for root in roots:
         build_rows(root, level=0)
+
+    # Step 11: Append Unassigned bucket row (admin view only) so grand total always
+    # ties out to the raw CRM Lead count, even for leads with no resolvable owner
+    if is_admin and (unassigned_total > 0 or unassigned_today > 0):
+        rows.append(frappe._dict({
+            "employee_name": UNASSIGNED_LABEL,
+            "designation": "",
+            "department": "",
+            "team_strength": 0,
+            "logged_in_count": 0,
+            "not_logged_in_count": 0,
+            "own_leads_today": unassigned_today,
+            "team_leads_today": unassigned_today,
+            "own_total_leads": unassigned_total,
+            "team_total_leads": unassigned_total,
+            "own_emails_today": 0,
+            "team_emails_today": 0,
+            "own_calls_today": 0,
+            "team_calls_today": 0,
+            "indent": 0,
+        }))
 
     return rows
