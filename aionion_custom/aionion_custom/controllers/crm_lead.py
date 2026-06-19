@@ -439,80 +439,11 @@ def get_suggested_service_rm(lead_name):
     # Determine role and entity based on product/entity
     lead_doc = frappe.get_doc("CRM Lead", lead_name)
 
-    if lead_doc.custom_entity == "US Subscription":
-        rm_role = "US Subscription RM"
-        filter_entity = "US Subscription"
-    elif lead_doc.custom_entity == "Aionion Capital":
-        rm_role = "Capital RM"
-        filter_entity = "Aionion Capital"
-    elif lead_doc.custom_product == "SME Insurance":
-        rm_role = "SME Insurance RM"
-        filter_entity = "Aionion Insurance"
-    elif lead_doc.custom_product == "Insurance Renewals":
-        rm_role = "Insurance Renewals RM"
-        filter_entity = "Aionion Insurance"
-    elif lead_doc.custom_product == "Insurance Sales":
-        rm_role = "Insurance Service RM"
-        filter_entity = "Aionion Insurance"
-    else:
-        rm_role = "Insurance Service RM"
-        filter_entity = "Aionion Insurance"
-
-    service_rm_users = frappe.get_all("Has Role",
-        filters={"role": rm_role, "parenttype": "User"},
-        fields=["parent"])
-    service_rm_user_ids = [r.parent for r in service_rm_users]
-
-    if not service_rm_user_ids:
-        employees = frappe.get_all("Employee",
-            filters={"status": "Active", "user_id": ["!=", ""]},
-            fields=["name", "employee_name", "user_id"])
-    else:
-        employees = frappe.get_all("Employee",
-            filters={"status": "Active", "user_id": ["in", service_rm_user_ids]},
-            fields=["name", "employee_name", "user_id"])
-
-    if not employees:
-        return {"service_rm": None, "reason": f"No {rm_role} available"}
-
-    # Count active leads per RM in ONE query — no N+1 problem
-    from frappe.query_builder import DocType
-    from frappe.query_builder.functions import Count
-    CRMLead = DocType("CRM Lead")
-
-    emp_names = [e.name for e in employees]
-    lead_counts = (
-        frappe.qb.from_(CRMLead)
-        .select(CRMLead.custom_service_rm, Count("*").as_("lead_count"))
-        .where(
-            (CRMLead.custom_service_rm.isin(emp_names))
-            & (CRMLead.custom_entity == filter_entity)
-            & (CRMLead.docstatus == 0)
-        )
-        .groupby(CRMLead.custom_service_rm)
-    ).run(as_dict=True)
-
-    # Build count map
-    count_map = {r.custom_service_rm: r.lead_count for r in lead_counts}
-
-    # Find RM with lowest count
-    best_rm = None
-    best_count = float("inf")
-    for emp in employees:
-        count = count_map.get(emp.name, 0)
-        if count < best_count:
-            best_count = count
-            best_rm = emp
-
-    if best_rm:
-        return {
-            "service_rm": best_rm.name,
-            "service_rm_name": best_rm.employee_name,
-            "active_leads": best_count,
-            "reason": "Round robin — fewest active leads"
-        }
-
-    return {"service_rm": None, "reason": "Could not determine Service RM"}
+    # Priority 2: configurable assignment engine (replaces hardcoded
+    # role-lookup-and-round-robin). See Lead Assignment Rule / Lead
+    # Assignment Pool DocTypes for configuration.
+    from aionion_custom.aionion_custom.assignment.engine import suggest_employee
+    return suggest_employee(lead_doc)
 
 
 @frappe.whitelist()
@@ -544,9 +475,11 @@ def assign_service_rm(lead_name, service_rm):
 
     doc.flags.ignore_permissions = True
     doc.flags.allow_lead_owner_change = True
+    frappe.flags.allow_lead_owner_change = True
     frappe.flags.allow_crm_lead_assignment = True
     doc.save(ignore_permissions=True)
     frappe.flags.allow_crm_lead_assignment = False
+    frappe.flags.allow_lead_owner_change = False
 
     # Share lead with original owner (Sales RM or Renewals Manager)
     # so they retain visibility after lead_owner changes to Service/Renewals RM
@@ -2049,40 +1982,62 @@ def auto_extend_month_options():
     frappe.logger().info(f"Month options extended to {end_year}")
 
 
+from aionion_custom.aionion_custom.assignment.engine import _get_pool_employees
+
+
 @frappe.whitelist()
 def get_rm_list_for_manager(lead_name):
-    """Returns full list of RMs for manager to choose from + checks if user is manager"""
+    """Returns full list of RMs for manager to choose from + checks if user is manager.
+    Candidate list now comes from the matching Lead Assignment Pool/Rule
+    (same source as get_suggested_service_rm) instead of a hardcoded role
+    lookup, so the manual-pick dropdown stays consistent with the
+    automatic suggestion."""
     lead = frappe.get_cached_doc("CRM Lead", lead_name)
     user_roles = frappe.get_roles(frappe.session.user)
 
-    # Determine if current user is a manager for this entity/product
-    is_manager = False
-    rm_role = None
+    manager_roles = [
+        "US Subscription Admin", "Insurance Renewals Manager",
+        "SME Insurance Manager", "Insurance Sales Manager", "System Manager",
+    ]
+    is_manager = any(r in user_roles for r in manager_roles)
 
-    if lead.custom_entity == "US Subscription":
-        is_manager = "US Subscription Admin" in user_roles or "System Manager" in user_roles
-        rm_role = "US Subscription RM"
-    elif lead.custom_product == "Insurance Renewals":
-        is_manager = "Insurance Renewals Manager" in user_roles or "System Manager" in user_roles
-        rm_role = "Insurance Renewals RM"
-    elif lead.custom_entity == "Aionion Insurance" and lead.custom_product == "SME Insurance":
-        is_manager = "SME Insurance Manager" in user_roles or "System Manager" in user_roles
-        rm_role = "SME Insurance RM"
-    elif lead.custom_entity == "Aionion Insurance":
-        is_manager = "Insurance Sales Manager" in user_roles or "System Manager" in user_roles
-        rm_role = "Insurance Service RM"
+    # RM can do the FIRST assignment when no Service RM is set yet.
+    # Once a Service RM exists, only a manager can change it.
+    if lead.custom_service_rm and not is_manager:
+        frappe.throw(
+            "Service RM already assigned. Contact your manager to change.",
+            frappe.PermissionError
+        )
 
-    if not is_manager:
-        frappe.throw("Only managers can assign Service RM.")
+    rules = frappe.get_all(
+        "Lead Assignment Rule",
+        filters={"enabled": 1},
+        fields=["name", "condition", "pool"],
+        order_by="priority asc",
+        limit=0,
+    )
+    pool_name = None
+    for rule in rules:
+        if not rule.condition or frappe.safe_eval(rule.condition, None, {"doc": lead, "get_pool_employees": _get_pool_employees}):
+            pool_name = rule.pool
+            break
 
-    # Get all RMs with this role
-    rm_users = frappe.get_all("Has Role",
-        filters={"role": rm_role, "parenttype": "User"},
-        pluck="parent")
-
-    employees = frappe.get_all("Employee",
-        filters={"status": "Active", "user_id": ["in", rm_users]},
-        fields=["name", "employee_name", "user_id"])
+    employees = []
+    if pool_name:
+        members = frappe.get_all(
+            "Lead Assignment Pool Member",
+            filters={"parent": pool_name, "enabled": 1},
+            fields=["employee"],
+            order_by="idx asc",
+            limit=0,
+        )
+        emp_names_in_pool = [m.employee for m in members]
+        if emp_names_in_pool:
+            employees = frappe.get_all(
+                "Employee",
+                filters={"name": ["in", emp_names_in_pool], "status": "Active"},
+                fields=["name", "employee_name", "user_id"],
+            )
 
     # Get lead count per RM
     from frappe.query_builder import DocType
@@ -2149,6 +2104,8 @@ def validate_lead_owner_change(doc, method):
     # Allow if triggered by our assign_service_rm function (flagged)
     if doc.flags.get("allow_lead_owner_change"):
         return
+    if frappe.flags.get("allow_lead_owner_change"):
+        return
 
     if not is_manager:
         frappe.throw(
@@ -2160,7 +2117,6 @@ def validate_lead_owner_change(doc, method):
 
 def validate_crm_lead_assignment(doc, method):
     """Block ToDo reassignment to CRM Lead by non-managers"""
-    frappe.log_error(f"ToDo hook fired: ref={doc.reference_type}, user={frappe.session.user}, allocated_to={doc.allocated_to}, flag={frappe.flags.get('allow_crm_lead_assignment')}", "ToDo Assignment Debug")
     if doc.reference_type != "CRM Lead":
         return
 
