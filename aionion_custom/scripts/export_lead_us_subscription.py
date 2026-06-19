@@ -1,199 +1,63 @@
 """
-Export CRM Lead + US Subscription Record to a single CSV.
-
-Run via bench console:
-    from aionion_custom.scripts.export_lead_us_subscription import export
-    export("/home/frappe/frappe-bench/sites/airplane.local/private/files/lead_us_export.csv")
+Export script: CRM Lead (US entity) + US Subscription Record
+Place at:
+  aionion_custom/aionion_custom/scripts/export_lead_us_subscription.py
 """
 
 import csv
 import frappe
 from frappe.query_builder import DocType
 
-
-# ──────────────────────────────────────────────
-# Exact CRM Lead fields (no UI-only types)
-# ──────────────────────────────────────────────
+# ── CRM Lead fields to export ──────────────────────────────────────────────
 LEAD_FIELDS = [
     "name",
-    "naming_series",
     "first_name",
-    "middle_name",
     "last_name",
-    "lead_name",
-    "salutation",
-    "gender",
-    "custom_dob",
     "email",
     "mobile_no",
-    "custom_secondary_email",
-    "custom_alternate_mobile",
-    "phone",
-    "custom_address_line_1",
-    "custom_address_line_2",
-    "custom_city",
-    "custom_state",
-    "custom_postal_code",
-    "custom_country",
-    "custom_working_country",
-    "organization",
-    "job_title",
-    "no_of_employees",
-    "annual_revenue",
-    "website",
-    "industry",
-    "territory",
-    "status",
-    "source",
-    "lead_owner",
-    "custom_lead_owner_emp",
-    "custom_lead_owner_name",
-    "custom_lead_medium",
-    "converted",
-    "custom_is_existing_customer",
-    "custom_customer",
-    "custom_description",
     "custom_entity",
     "custom_product",
-    "custom_business_type",
     "custom_lead_date",
-    "custom_client_category",
-    "custom_residency",
-    "custom_employee_status",
-    "custom_client_indian_investments",
-    "custom_client_intended_investment_in_us_market",
-    "custom_event_date",
-    "custom_event_location",
-    "custom_event_type",
-    "custom_rm_feedback",
-    "custom_tl_feedback",
-    "custom_bm_feedback",
     "custom_sales_rm",
     "custom_sales_rm_code",
     "custom_sales_rm_branch",
     "custom_sales_rm_team",
-    "custom_aionion_client_code",
     "custom_service_rm",
-    "custom_service_rm_name",
     "custom_lead_status_1",
     "custom_lead_status_2",
-    "custom_insurance_remarks",
     "custom_pan_number",
-    "custom_insurance_company",
-    "custom_insurance_type",
-    "custom_tenure",
-    "custom_expiry_date",
-    "custom_fresh_port",
-    "custom_proposal_number",
-    "custom_sum_assured",
-    "custom_gross_premium",
-    "custom_net_premium",
-    "custom_policy_status",
-    "custom_policy_number",
-    "custom_mis_status",
-    "custom_mis_verified_by",
-    "custom_mis_verified_date",
-    "custom_health_type",
-    "custom_ped",
-    "custom_ped_description",
-    "custom_health_members",
-    "custom_health_company",
-    "custom_term_age",
-    "custom_term_dob",
-    "custom_term_occupation",
-    "custom_term_itr",
-    "custom_term_income",
-    "custom_term_education",
-    "custom_term_smoker",
-    "custom_term_height",
-    "custom_term_weight",
-    "custom_term_company",
-    "custom_motor_vehicle_year",
-    "custom_motor_vehicle_type",
-    "custom_motor_policy_copy",
-    "custom_motor_company",
-    "custom_travel_country",
-    "custom_travel_duration",
-    "custom_travel_members",
-    "custom_travel_coverage",
-    "custom_travel_company",
-    "custom_parent_policy",
-    "custom_parent_expiry_date",
-    "custom_source_lead",
-    "custom_renewal_company",
-    "custom_bonds_number_of_units",
-    "custom_bonds_amount",
-    "custom_bonds_face_value",
-    "custom_bonds_order_type",
-    "custom_bonds_isin",
-    "custom_bonds_company_name",
-    "custom_bonds_execution_date",
-    "custom_bonds_poa_status",
-    "custom_bonds_client_confirmation",
-    "custom_mf_investment_type",
-    "custom_mf_scheme_name",
-    "custom_mf_amount",
-    "custom_mf_order_type",
-    "custom_mf_ucc_code",
-    "custom_mf_bank_name",
-    "custom_mf_client_confirmation",
-    "custom_equity_client_code",
-    "custom_equity_pan",
-    "custom_equity_account_type",
-    "custom_equity_dp_id",
-    "custom_equity_activation_date",
-    "custom_us_payment_date",
+    "custom_dob",
+    "custom_aionion_client_code",
     "custom_us_amount",
-    "custom_us_subscription_type",
-    "custom_us_mode_of_payment",
     "custom_us_quantity",
-    "custom_us_currency",
     "custom_us_subscription_end_date",
-    "sla",
-    "sla_status",
-    "facebook_lead_id",
-    "facebook_form_id",
-    "lost_reason",
-    "lost_notes",
+    "custom_us_currency",
+    "custom_us_mode_of_payment",
+    "custom_us_subscription_type",
+    "custom_us_payment_date",
+    "status",
+    "source",
 ]
 
-
-# ──────────────────────────────────────────────
-# Exact US Subscription Record fields (no UI-only types)
-# ──────────────────────────────────────────────
+# ── US Subscription Record fields to export ────────────────────────────────
 US_FIELDS = [
     "name",
-    "lead",                     # Link → CRM Lead  (join key)
-    "task",
-    "customer",
-    "company",
-    "client_status",
-    "branch",
-    "department",
-    "subscription_type",
-    "mode_of_payment",
-    "chola_client_code",
-    "quantity",
-    "currency",
-    "subscription_end_date",
-    "rm_employee_code",
-    "rm_employee_name",
-    "lead_entry_date",
+    "lead",
+    # Lead Generation Sheet columns
     "data_entry_date",
     "email_address",
     "emp_code",
     "emp_name",
     "emp_team",
     "emp_branch",
-    "alternate_email_id",
+    "emp_phone",
     "aionion_client_code",
     "client_name",
     "contact_number",
     "client_email",
     "intended_investment",
     "indian_investments",
-    "country_of_residence",
-    "country_code",
+    "country_of_residence",       # = "Current Country" in sheet
     "employment_status",
     "month",
     "year",
@@ -204,11 +68,12 @@ US_FIELDS = [
     "detailed_remarks",
     "reminder_date",
     "alternative_phone",
-    "current_country",
     "alternative_email",
-    "emp_phone",
+    "alternate_email_id",
+    # CRM Details columns
     "new_email_id",
     "old_email_id",
+    "country_code",
     "mode_of_payment_new",
     "payment_date",
     "payment_month",
@@ -223,7 +88,6 @@ US_FIELDS = [
     "sub_start_date",
     "sub_end_date",
     "old_subscription_end_month",
-    "old_subscription_month",
     "lead_source",
     "sales_done_by",
     "service_rm",
@@ -231,46 +95,142 @@ US_FIELDS = [
     "team",
     "email_sent",
     "risk_declaration",
-    "payment_status",
     "us_remarks",
     "attended_webinar",
+    # RM Details
+    "rm_employee_code",
+    "rm_employee_name",
+    "lead_entry_date",
 ]
+
+# ── Human-readable header labels for the CSV ──────────────────────────────
+# Format: "us__fieldname": "Sheet Column Label"
+US_FIELD_LABELS = {
+    "us__name":                    "US Record ID",
+    "us__lead":                    "CRM Lead ID",
+    "us__data_entry_date":         "Time / Data Entry Date",
+    "us__email_address":           "Email Address",
+    "us__emp_code":                "EMP Code (Sales RM)",
+    "us__emp_name":                "EMP Name",
+    "us__emp_team":                "EMP Team",
+    "us__emp_branch":              "EMP Branch",
+    "us__emp_phone":               "EMP Phone No",
+    "us__aionion_client_code":     "Aionion Client Code",
+    "us__client_name":             "Client Name",
+    "us__contact_number":          "Client Contact Number",
+    "us__client_email":            "Client Email ID",
+    "us__intended_investment":     "Client Intended Investment in US Market",
+    "us__indian_investments":      "Client Current Indian Investments",
+    "us__country_of_residence":    "Current Country / Country of Residence",
+    "us__employment_status":       "Client Employment Status",
+    "us__month":                   "Month",
+    "us__year":                    "Year",
+    "us__assigned_by":             "Assigned To (Service RM)",
+    "us__eligibility":             "Eligibility",
+    "us__us_status":               "Status",
+    "us__progress":                "Progress",
+    "us__detailed_remarks":        "Detailed Remarks",
+    "us__reminder_date":           "Reminder Date / Postponed Month",
+    "us__alternative_phone":       "Alternative Phone Number",
+    "us__alternative_email":       "Alternative Email",
+    "us__alternate_email_id":      "Alternate Email ID",
+    "us__new_email_id":            "New Email ID",
+    "us__old_email_id":            "Old Email ID",
+    "us__country_code":            "Country Code",
+    "us__mode_of_payment_new":     "Mode of Payment",
+    "us__payment_date":            "Payment Date",
+    "us__payment_month":           "Payment Month",
+    "us__subscription_type_new":   "Subscription Type",
+    "us__client_status_new":       "Client Status",
+    "us__second_client_status":    "Second Client Status",
+    "us__quantity_new":            "Quantity",
+    "us__currency_new":            "Currency",
+    "us__amount_paid_us_subs":     "Amount Paid (US Subs)",
+    "us__sub_start_month":         "Subscription Start Month-Year",
+    "us__sub_end_month":           "Subscription End Month-Year",
+    "us__sub_start_date":          "Subscription Start Date",
+    "us__sub_end_date":            "Subscription End Date",
+    "us__old_subscription_end_month": "Old Subscription End Month",
+    "us__lead_source":             "Lead Source",
+    "us__sales_done_by":           "Sales Done By",
+    "us__service_rm":              "Service RM",
+    "us__old_rm":                  "Old RM",
+    "us__team":                    "Team",
+    "us__email_sent":              "Acknowledgment Sent",
+    "us__risk_declaration":        "Risk Declaration Received",
+    "us__us_remarks":              "Remarks",
+    "us__attended_webinar":        "Attended Webinar",
+    "us__rm_employee_code":        "RM Employee Code",
+    "us__rm_employee_name":        "RM Employee Name",
+    "us__lead_entry_date":         "Lead Entry Date",
+    # Lead fields
+    "lead__name":                  "Lead ID",
+    "lead__first_name":            "First Name",
+    "lead__last_name":             "Last Name",
+    "lead__email":                 "Lead Email",
+    "lead__mobile_no":             "Mobile No",
+    "lead__custom_entity":         "Entity",
+    "lead__custom_product":        "Product",
+    "lead__custom_lead_date":      "Lead Date",
+    "lead__custom_sales_rm":       "Sales RM",
+    "lead__custom_sales_rm_code":  "Sales RM Code",
+    "lead__custom_sales_rm_branch":"Sales RM Branch",
+    "lead__custom_sales_rm_team":  "Sales RM Team",
+    "lead__custom_service_rm":     "Service RM (Lead)",
+    "lead__custom_lead_status_1":  "Lead Status 1",
+    "lead__custom_lead_status_2":  "Lead Status 2",
+    "lead__custom_pan_number":     "PAN Number",
+    "lead__custom_dob":            "Date of Birth",
+    "lead__custom_aionion_client_code": "Aionion Client Code (Lead)",
+    "lead__custom_us_amount":      "Amount Paid (Lead)",
+    "lead__custom_us_quantity":    "Quantity (Lead)",
+    "lead__custom_us_subscription_end_date": "Subscription End Date (Lead)",
+    "lead__custom_us_currency":    "Currency (Lead)",
+    "lead__custom_us_mode_of_payment": "Mode of Payment (Lead)",
+    "lead__custom_us_subscription_type": "Subscription Type (Lead)",
+    "lead__custom_us_payment_date":"Payment Date (Lead)",
+    "lead__status":                "Lead Status",
+    "lead__source":                "Lead Source (Lead)",
+}
 
 
 def export(file_path):
     """
-    Exports all CRM Leads joined with their US Subscription Record (if any).
-    CSV columns are prefixed: lead__<fieldname> and us__<fieldname>
+    Exports all Aionion Global CRM Leads joined with their US Subscription Records.
+    CSV uses human-readable column headers with fieldname in brackets for import mapping.
     """
-    Lead = DocType("CRM Lead")
+    Lead  = DocType("CRM Lead")
     USSub = DocType("US Subscription Record")
-
-    # Build select list with explicit aliases to avoid column name conflicts
-    lead_selects = [
-        getattr(Lead, f).as_(f"lead__{f}") for f in LEAD_FIELDS
-    ]
-    us_selects = [
-        getattr(USSub, f).as_(f"us__{f}") for f in US_FIELDS
-    ]
 
     rows = (
         frappe.qb.from_(Lead)
         .left_join(USSub)
         .on(USSub.lead == Lead.name)
-        .select(*lead_selects, *us_selects)
+        .select(
+            *[Lead[f].as_(f"lead__{f}") for f in LEAD_FIELDS],
+            *[USSub[f].as_(f"us__{f}") for f in US_FIELDS],
+        )
+        .where(Lead.custom_entity == "Aionion Global")
         .run(as_dict=True)
     )
 
-    if not rows:
-        print("No records found.")
-        return
-
+    # Build fieldnames in order: lead fields first, then us fields
     fieldnames = [f"lead__{f}" for f in LEAD_FIELDS] + [f"us__{f}" for f in US_FIELDS]
 
-    with open(file_path, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
-        writer.writeheader()
-        for row in rows:
-            writer.writerow({k: (v if v is not None else "") for k, v in row.items()})
+    # Build display headers: "Label [fieldname]" — makes import mapping obvious
+    display_headers = [
+        f"{US_FIELD_LABELS.get(fn, fn)} [{fn}]"
+        for fn in fieldnames
+    ]
 
-    print(f"✅ Exported {len(rows)} records → {file_path}")
+    with open(file_path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        # Row 1: display headers (human readable)
+        writer.writerow(display_headers)
+        # Row 2: raw fieldnames (for import reference)
+        writer.writerow(fieldnames)
+        # Data rows
+        for row in rows:
+            writer.writerow([row.get(fn, "") for fn in fieldnames])
+
+    return len(rows)

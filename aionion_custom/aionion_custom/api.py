@@ -222,3 +222,74 @@ def get_email_summary(from_date=None, to_date=None):
         "managers": [r for r in enriched_team if any("Manager" in x for x in r["roles"])],
         "team_leads": [r for r in enriched_team if any("TL" in x or "Lead" in x for x in r["roles"])]
     }
+
+
+# ── Import / Export API ────────────────────────────────────────────────────
+import csv
+import io
+
+
+@frappe.whitelist()
+def run_lead_us_export():
+    from aionion_custom.scripts.export_lead_us_subscription import export
+    file_name = "lead_us_export.csv"
+    file_path = frappe.utils.get_site_path("private", "files", file_name)
+    row_count = export(file_path)
+    existing = frappe.db.get_value("File", {"file_name": file_name, "is_private": 1}, "name")
+    if existing:
+        frappe.delete_doc("File", existing, ignore_permissions=True)
+    with open(file_path, "rb") as f:
+        content = f.read()
+    file_doc = frappe.get_doc({"doctype": "File", "file_name": file_name, "is_private": 1, "content": content})
+    file_doc.insert(ignore_permissions=True)
+    frappe.db.commit()
+    return {"file_url": file_doc.file_url, "file_name": file_name, "row_count": row_count}
+
+
+@frappe.whitelist()
+def download_import_template():
+    from aionion_custom.scripts.export_lead_us_subscription import LEAD_FIELDS, US_FIELDS
+    fieldnames = [f"lead__{f}" for f in LEAD_FIELDS] + [f"us__{f}" for f in US_FIELDS]
+    output = io.StringIO()
+    writer = csv.DictWriter(output, fieldnames=fieldnames)
+    writer.writeheader()
+    writer.writerow({f: "" for f in fieldnames})
+    content = output.getvalue().encode("utf-8")
+    file_name = "lead_us_import_template.csv"
+    existing = frappe.db.get_value("File", {"file_name": file_name, "is_private": 1}, "name")
+    if existing:
+        frappe.delete_doc("File", existing, ignore_permissions=True)
+    file_doc = frappe.get_doc({"doctype": "File", "file_name": file_name, "is_private": 1, "content": content})
+    file_doc.insert(ignore_permissions=True)
+    frappe.db.commit()
+    return {"file_url": file_doc.file_url, "file_name": file_name}
+
+
+@frappe.whitelist()
+def preview_import_file(file_url):
+    site_path = frappe.utils.get_site_path()
+    if file_url.startswith("/private/"):
+        file_path = site_path + file_url
+    else:
+        file_path = frappe.utils.get_site_path("public") + file_url
+    rows = []
+    headers = []
+    with open(file_path, "r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        headers = list(reader.fieldnames or [])
+        for i, row in enumerate(reader):
+            if i >= 5:
+                break
+            rows.append(dict(row))
+    return {"headers": headers, "rows": rows}
+
+
+@frappe.whitelist()
+def run_lead_us_import(file_url):
+    from aionion_custom.scripts.import_lead_us_subscription import import_records
+    site_path = frappe.utils.get_site_path()
+    if file_url.startswith("/private/"):
+        file_path = site_path + file_url
+    else:
+        file_path = frappe.utils.get_site_path("public") + file_url
+    return import_records(file_path)
