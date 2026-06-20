@@ -43,8 +43,8 @@ def set_sales_rm_defaults(doc, method):
                 doc.custom_sales_rm_branch = emp.branch
 
     # Service RM must NEVER be auto-set on creation
-    # Allow if explicitly provided during import
-    if doc.is_new() and not doc.custom_service_rm:
+    # Always clear on new doc — frontend cannot pre-populate this field
+    if doc.is_new():
         doc.custom_service_rm = None
         doc.custom_service_rm_name = None
 
@@ -377,6 +377,20 @@ def get_suggested_service_rm(lead_name):
     """
     lead = frappe.get_doc("CRM Lead", lead_name)
 
+    # Block non-managers from re-assigning if Service RM already set
+    if lead.custom_service_rm:
+        user_roles = frappe.get_roles(frappe.session.user)
+        manager_roles = [
+            "Insurance Sales Manager", "Insurance Renewals Manager",
+            "US Subscription Admin", "Capital Manager", "Global RM Manager",
+            "System Manager", "Administrator"
+        ]
+        if not any(r in user_roles for r in manager_roles):
+            frappe.throw(
+                _("Service RM already assigned. Contact your manager to change."),
+                frappe.PermissionError
+            )
+
     # ── Priority Chain ──────────────────────────────────────────────────────
     # 1. PAN match (most accurate — unique identifier)
     # 2. Mobile + Name match (high confidence)
@@ -458,6 +472,20 @@ def assign_service_rm(lead_name, service_rm):
 
     if doc.docstatus == 1:
         frappe.throw(_("Cannot assign Service RM on a submitted lead."))
+
+    # Block re-assignment by non-managers once Service RM is already set
+    if doc.custom_service_rm:
+        user_roles = frappe.get_roles(frappe.session.user)
+        manager_roles = [
+            "Insurance Sales Manager", "Insurance Renewals Manager",
+            "US Subscription Admin", "Capital Manager", "Global RM Manager",
+            "System Manager", "Administrator"
+        ]
+        if not any(r in user_roles for r in manager_roles):
+            frappe.throw(
+                _("Service RM already assigned. Contact your manager to change."),
+                frappe.PermissionError
+            )
 
     # Save Sales RM user before changing lead_owner
     sales_rm_user = None
@@ -2001,13 +2029,8 @@ def get_rm_list_for_manager(lead_name):
     ]
     is_manager = any(r in user_roles for r in manager_roles)
 
-    # RM can do the FIRST assignment when no Service RM is set yet.
-    # Once a Service RM exists, only a manager can change it.
-    if lead.custom_service_rm and not is_manager:
-        frappe.throw(
-            "Service RM already assigned. Contact your manager to change.",
-            frappe.PermissionError
-        )
+    if not is_manager:
+        frappe.throw("Only managers can assign Service RM.", frappe.PermissionError)
 
     rules = frappe.get_all(
         "Lead Assignment Rule",
