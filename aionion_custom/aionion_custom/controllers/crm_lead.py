@@ -44,7 +44,8 @@ def set_sales_rm_defaults(doc, method):
 
     # Service RM must NEVER be auto-set on creation
     # Always clear on new doc — frontend cannot pre-populate this field
-    if doc.is_new():
+    # EXCEPT during Data Import — let the imported value pass through
+    if doc.is_new() and not frappe.flags.in_import:
         doc.custom_service_rm = None
         doc.custom_service_rm_name = None
 
