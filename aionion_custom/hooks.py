@@ -59,6 +59,7 @@ fixtures = [
         "dt": "CRM Form Script",
         "filters": [["name", "in", [
             "CRM Lead Submit",
+            "CRM form lead",
             "Insurance MIS Actions",
             "Customer Actions",
             "Customer Call Button",
@@ -71,7 +72,12 @@ fixtures = [
             "Go to Customer from CRM Leads",
             "Product Details Script for CRM Deal",
             "Product Details Script for CRM Lead",
-            "Create Task against Lead"
+            "Create Task against Lead",
+            "Incoming call in Lead List",
+            "Click to call button in Lead",
+            "Whatsapp CRM form script",
+            "HD Ticket Alert - Toast and Sidebar",
+            "CRM Lead Email Button"
         ]]]
     },
     {
@@ -119,7 +125,7 @@ fixtures = [
     },
     {
         "dt": "Property Setter",
-        "filters": [["doc_type", "=", "US Subscription Record"]]
+        "filters": [["doc_type", "in", ["US Subscription Record", "Customer"]]]
     },
 ]
 
