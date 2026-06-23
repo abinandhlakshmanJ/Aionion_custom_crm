@@ -23,6 +23,9 @@ permission_query_conditions = {
 # Document Events
 # ---------------
 doc_events = {
+    "Employee": {
+        "before_save": "aionion_custom.controllers.customer_permissions.force_disable_user_permission"
+    },
     "CRM Lead": {
         "before_validate": [
             "aionion_custom.aionion_custom.controllers.crm_lead.set_sales_rm_defaults"

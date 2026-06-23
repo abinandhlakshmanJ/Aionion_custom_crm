@@ -25,3 +25,8 @@ def get_customer_permission_query(user=None):
 
     safe_rm_code = frappe.db.escape(rm_code)
     return f"`tabCustomer`.`custom_rm_code` = {safe_rm_code}"
+
+
+def force_disable_user_permission(doc, method):
+    if doc.create_user_permission:
+        doc.create_user_permission = 0
