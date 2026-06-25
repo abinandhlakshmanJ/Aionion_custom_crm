@@ -148,22 +148,6 @@
   "doc_type": "Customer",
   "docstatus": 0,
   "doctype": "Property Setter",
-  "doctype_or_field": "DocType",
-  "field_name": null,
-  "is_system_generated": 0,
-  "modified": "2026-06-23 17:58:39.605272",
-  "module": null,
-  "name": "Customer-main-field_order",
-  "property": "field_order",
-  "property_type": "Data",
-  "row_name": null,
-  "value": "[\"basic_info\", \"naming_series\", \"customer_name\", \"customer_type\", \"customer_group\", \"column_break0\", \"territory\", \"gender\", \"lead_name\", \"opportunity_name\", \"custom_country\", \"column_break_wlbg\", \"custom_relationship_manager\", \"custom_rm_name\", \"account_manager\", \"prospect_name\", \"custom_task\", \"section_break_objq\", \"image\", \"custom_client_details\", \"custom_client_id\", \"custom_account_category\", \"custom_nri_type\", \"custom_service_rm\", \"custom_service_rm_name\", \"custom_service_rm_user_id\", \"custom_column_break_liijn\", \"custom_dob\", \"custom_email\", \"custom_old_email\", \"custom_country_code\", \"custom_mobile\", \"custom_old_mobile\", \"defaults_tab\", \"default_currency\", \"default_bank_account\", \"column_break_14\", \"default_price_list\", \"internal_customer_section\", \"is_internal_customer\", \"represents_company\", \"column_break_70\", \"companies\", \"market_segment\", \"industry\", \"customer_pos_id\", \"column_break_hdmn\", \"website\", \"language\", \"customer_details\", \"supplier_numbers_section\", \"supplier_numbers\", \"connections_tab\", \"contact_and_address_tab\", \"address_contacts\", \"address_html\", \"column_break1\", \"contact_html\", \"primary_address_and_contact_detail\", \"column_break_26\", \"customer_primary_address\", \"primary_address\", \"column_break_nwor\", \"customer_primary_contact\", \"mobile_no\", \"email_id\", \"first_name\", \"last_name\", \"tax_tab\", \"tax_details_section\", \"gstin\", \"pan\", \"tax_details_column_break\", \"gst_category\", \"taxation_section\", \"tax_id\", \"tax_category\", \"column_break_21\", \"tax_withholding_category\", \"tax_withholding_group\", \"accounting_tab\", \"credit_limit_section\", \"payment_terms\", \"credit_limits\", \"default_receivable_accounts\", \"accounts\", \"loyalty_points_tab\", \"loyalty_program\", \"column_break_54\", \"loyalty_program_tier\", \"sales_team_tab\", \"sales_team\", \"sales_team_section\", \"default_sales_partner\", \"column_break_66\", \"default_commission_rate\", \"settings_tab\", \"so_required\", \"dn_required\", \"column_break_53\", \"is_frozen\", \"disabled\", \"portal_users_tab\", \"portal_users\", \"more_info_tab\"]"
- },
- {
-  "default_value": null,
-  "doc_type": "Customer",
-  "docstatus": 0,
-  "doctype": "Property Setter",
   "doctype_or_field": "DocField",
   "field_name": "territory",
   "is_system_generated": 0,
@@ -174,22 +158,6 @@
   "property_type": "Check",
   "row_name": null,
   "value": "1"
- },
- {
-  "default_value": null,
-  "doc_type": "Customer",
-  "docstatus": 0,
-  "doctype": "Property Setter",
-  "doctype_or_field": "DocType",
-  "field_name": null,
-  "is_system_generated": 0,
-  "modified": "2026-06-23 17:58:39.624282",
-  "module": null,
-  "name": "Customer-main-links_order",
-  "property": "links_order",
-  "property_type": "Small Text",
-  "row_name": null,
-  "value": "[\"47s9iavnmp\", \"1727d0s9rh\", \"172pgvghuv\", \"1729rh7j5b\", \"172j0nseov\", \"172cf2mpva\"]"
  },
  {
   "default_value": null,
@@ -558,5 +526,37 @@
   "property_type": "Link",
   "row_name": null,
   "value": "CRM Lead"
+ },
+ {
+  "default_value": null,
+  "doc_type": "Customer",
+  "docstatus": 0,
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocType",
+  "field_name": null,
+  "is_system_generated": 0,
+  "modified": "2026-06-25 22:09:33.753126",
+  "module": null,
+  "name": "Customer-main-field_order",
+  "property": "field_order",
+  "property_type": "Data",
+  "row_name": null,
+  "value": "[\"custom_techexcel_details_section\", \"custom_client_code\", \"custom_active_inactive\", \"custom_agreement_date\", \"custom_techexcel_last_modified\", \"custom_marital_status\", \"custom_occupation\", \"custom_nationality\", \"custom_residential_address\", \"custom_techexcel_col_break\", \"custom_rm_code\", \"custom_branch_code\", \"custom_branch_name\", \"custom_main_branch_code\", \"custom_bank_account_no\", \"custom_bank_name\", \"custom_micr_code\", \"custom_ifsc_code\", \"basic_info\", \"naming_series\", \"customer_name\", \"customer_type\", \"customer_group\", \"column_break0\", \"territory\", \"gender\", \"lead_name\", \"opportunity_name\", \"custom_country\", \"column_break_wlbg\", \"custom_relationship_manager\", \"custom_rm_name\", \"account_manager\", \"prospect_name\", \"custom_task\", \"section_break_objq\", \"image\", \"custom_client_details\", \"custom_client_id\", \"custom_aionion_master_id\", \"custom_random_part\", \"custom_account_category\", \"custom_nri_type\", \"custom_residency\", \"custom_service_rm\", \"custom_service_rm_name\", \"custom_service_rm_user_id\", \"custom_column_break_liijn\", \"custom_dob\", \"custom_email\", \"custom_old_email\", \"custom_country_code\", \"custom_mobile\", \"custom_old_mobile\", \"custom_product_rm_section\", \"custom_us_rm\", \"custom_bonds_rm\", \"custom_mf_rm\", \"custom_equity_rm\", \"custom_insurance_rm\", \"defaults_tab\", \"default_currency\", \"default_bank_account\", \"column_break_14\", \"default_price_list\", \"internal_customer_section\", \"is_internal_customer\", \"represents_company\", \"column_break_70\", \"companies\", \"market_segment\", \"industry\", \"customer_pos_id\", \"column_break_hdmn\", \"website\", \"language\", \"customer_details\", \"supplier_numbers_section\", \"supplier_numbers\", \"connections_tab\", \"contact_and_address_tab\", \"address_contacts\", \"address_html\", \"column_break1\", \"contact_html\", \"primary_address_and_contact_detail\", \"column_break_26\", \"customer_primary_address\", \"primary_address\", \"column_break_nwor\", \"customer_primary_contact\", \"mobile_no\", \"email_id\", \"first_name\", \"last_name\", \"tax_tab\", \"tax_details_section\", \"gstin\", \"pan\", \"custom_pan\", \"tax_details_column_break\", \"gst_category\", \"taxation_section\", \"tax_id\", \"tax_category\", \"column_break_21\", \"tax_withholding_category\", \"tax_withholding_group\", \"accounting_tab\", \"credit_limit_section\", \"payment_terms\", \"credit_limits\", \"default_receivable_accounts\", \"accounts\", \"loyalty_points_tab\", \"loyalty_program\", \"column_break_54\", \"loyalty_program_tier\", \"sales_team_tab\", \"sales_team\", \"sales_team_section\", \"default_sales_partner\", \"column_break_66\", \"default_commission_rate\", \"settings_tab\", \"so_required\", \"dn_required\", \"column_break_53\", \"is_frozen\", \"disabled\", \"portal_users_tab\", \"portal_users\", \"more_info_tab\"]"
+ },
+ {
+  "default_value": null,
+  "doc_type": "Customer",
+  "docstatus": 0,
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocType",
+  "field_name": null,
+  "is_system_generated": 0,
+  "modified": "2026-06-25 22:09:34.245952",
+  "module": null,
+  "name": "Customer-main-links_order",
+  "property": "links_order",
+  "property_type": "Small Text",
+  "row_name": null,
+  "value": "[\"1727d0s9rh\", \"172pgvghuv\", \"1729rh7j5b\", \"172j0nseov\", \"172cf2mpva\", \"g9jc4gohti\"]"
  }
 ]
