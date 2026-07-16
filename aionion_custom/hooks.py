@@ -55,6 +55,7 @@ doc_events = {
 # Fixtures
 # --------
 fixtures = [
+    "Server Script",
     "Insurance Company",
     {"dt": "Custom Field", "filters": [["dt", "in", ["CRM Lead", "Customer", "US Subscription Record"]]]},
     "CRM Lead Source",
