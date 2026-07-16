@@ -217,8 +217,8 @@
                     let text = (span.textContent || "").trim();
                     if (text === "Deals" || text === "Contacts" || text === "Organizations") {
                         let btn = span.closest('button');
-                        if (btn && btn.parentElement) {
-                            btn.parentElement.classList.add('aionion-hidden-link');
+                        if (btn) {
+                            btn.classList.add('aionion-hidden-link');
                         }
                     }
                 });
