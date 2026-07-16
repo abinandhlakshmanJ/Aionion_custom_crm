@@ -251,33 +251,19 @@
                 display: none !important;
             }
             
-            /* Center Nav Buttons properly */
-            .aionion-sidebar-collapsed nav.flex-col button,
-            .aionion-sidebar-collapsed nav.flex-col a {
-                display: flex !important;
-                justify-content: center !important;
-                align-items: center !important;
-                padding: 10px 0 !important;
-                margin: 4px auto !important;
-                width: 44px !important;
-                height: 44px !important;
-            }
-            .aionion-sidebar-collapsed nav.flex-col button > div,
-            .aionion-sidebar-collapsed nav.flex-col a > div {
-                justify-content: center !important;
-                margin: 0 !important;
-                padding: 0 !important;
-            }
-            .aionion-sidebar-collapsed nav.flex-col button svg,
-            .aionion-sidebar-collapsed nav.flex-col a svg {
-                margin: 0 auto !important;
-                display: block !important;
-                visibility: visible !important;
-            }
-            .aionion-sidebar-collapsed nav.flex-col button span.truncate,
-            .aionion-sidebar-collapsed nav.flex-col a span.truncate,
+            /* Simple Nav Icon Centering */
             .aionion-sidebar-collapsed span.truncate {
                 display: none !important;
+            }
+            .aionion-sidebar-collapsed nav {
+                align-items: center !important;
+            }
+            .aionion-sidebar-collapsed nav > * {
+                display: flex !important;
+                justify-content: center !important;
+                width: 100% !important;
+                padding-left: 0 !important;
+                padding-right: 0 !important;
             }
 
             /* Center Hamburger Menu */
