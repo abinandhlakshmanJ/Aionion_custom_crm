@@ -258,8 +258,14 @@
                 color: #334155 !important;
             }
 
+            /* Ensure main body area scrolls properly under the new top nav */
+            #app > div.flex.h-screen.w-screen > div.flex-1 {
+                overflow-y: auto !important;
+                background-color: #F8FAFC !important; /* Soft light background for the whole page */
+            }
+
             /* ========================================================================= */
-            /* 2. DASHBOARD BRAND THEMING                                                */
+            /* 2. DASHBOARD & LIST VIEW BRAND THEMING                                    */
             /* ========================================================================= */
 
             /* Redefine root CSS variables to inject Aionion Orange (#FF6B35) globally */
@@ -272,28 +278,34 @@
                 --bg-surface-gray-1: #ffffff !important;
             }
 
-            /* Restyle Buttons to use the Brand Color */
+            /* Restyle Primary Solid Buttons (like + Create) to use the Brand Color */
             button.bg-gray-900, 
-            button.bg-surface-gray-7, 
-            .btn-primary {
+            button.bg-surface-gray-9,
+            button.bg-surface-gray-8,
+            button[class*="bg-gray-900"],
+            button[class*="bg-surface-gray-9"] {
                 background-color: #FF6B35 !important;
                 color: #ffffff !important;
                 border-color: #FF6B35 !important;
+                box-shadow: 0 4px 12px rgba(255, 107, 53, 0.25) !important;
+                border-radius: 8px !important;
                 transition: all 0.2s ease-in-out !important;
             }
-            button.bg-gray-900:hover, 
-            button.bg-surface-gray-7:hover, 
-            .btn-primary:hover {
+            
+            button[class*="bg-gray-900"]:hover,
+            button[class*="bg-surface-gray-9"]:hover {
                 background-color: #E85D2A !important;
                 border-color: #E85D2A !important;
-                box-shadow: 0 4px 12px rgba(255, 107, 53, 0.2) !important;
+                transform: translateY(-1px) !important;
+                box-shadow: 0 6px 16px rgba(255, 107, 53, 0.35) !important;
             }
 
-            /* Dashboard Grid Cards Restyling */
+            /* Dashboard Grid Cards & List View Cards Restyling */
             .crm-dashboard .grid > div,
             .grid > div.bg-surface-white,
             .grid > div.bg-white,
-            div[class*="shadow-sm"] {
+            div[class*="shadow-sm"],
+            .list-view-container {
                 border: 1px solid rgba(255, 107, 53, 0.15) !important;
                 border-top: 3px solid #FF6B35 !important;
                 border-radius: 12px !important;
@@ -307,6 +319,29 @@
             .grid > div.bg-white:hover {
                 transform: translateY(-2px) !important;
                 box-shadow: 0 10px 15px -3px rgba(255, 107, 53, 0.15) !important;
+            }
+
+            /* Filter Bar Elements -> Pill Shape */
+            .form-control,
+            .list-filters button {
+                border-radius: 99px !important;
+                border: 1px solid #E2E8F0 !important;
+                box-shadow: 0 1px 2px rgba(0,0,0,0.02) !important;
+                background-color: #ffffff !important;
+                transition: all 0.2s ease-in-out !important;
+            }
+            .form-control:focus-within,
+            .list-filters button:hover {
+                border-color: #FF6B35 !important;
+                box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.15) !important;
+            }
+
+            /* Empty State Branding */
+            .h-full.flex.flex-col.items-center.justify-center svg {
+                color: #FF6B35 !important;
+                opacity: 0.9 !important;
+                transform: scale(1.3) !important;
+                margin-bottom: 12px !important;
             }
 
             /* Highlight specific icons with Brand Color */
