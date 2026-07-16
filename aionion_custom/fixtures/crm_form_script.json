@@ -38,9 +38,9 @@
   "dt": "CRM Lead",
   "enabled": 1,
   "is_standard": 0,
-  "modified": "2026-07-16 10:17:01.517445",
+  "modified": "2026-07-16 10:37:54.795580",
   "name": "Renewals Manager View",
-  "script": "function setupList({ call }) {\n    // Auto-filter to show only Insurance Renewals leads for Renewals Manager\n    call(\"aionion_custom.aionion_custom.controllers.crm_lead.get_current_user_roles\", {})\n    .then((roles) => {\n        if (roles && roles.includes(\"Insurance Renewals Manager\")) {\n            console.log(\"Would filter by custom_product = Insurance Renewals\");\n        }\n        if (roles && roles.includes(\"Insurance Renewals RM\") && !roles.includes(\"Insurance Renewals Manager\")) {\n            console.log(\"Would filter by custom_product = Insurance Renewals\");\n        }\n    })\n}",
+  "script": "function setupList({ list, call }) {\n    if (!list) return;\n\n    call(\"aionion_custom.aionion_custom.controllers.crm_lead.get_current_user_roles\", {})\n    .then((roles) => {\n        if (!roles) return;\n        \n        let shouldFilter = false;\n        if (roles.includes(\"Insurance Renewals Manager\")) {\n            shouldFilter = true;\n        } else if (roles.includes(\"Insurance Renewals RM\")) {\n            shouldFilter = true;\n        }\n        \n        if (shouldFilter) {\n            let currentFilters = list.params.filters || {};\n            if (typeof currentFilters === 'string') {\n                try { currentFilters = JSON.parse(currentFilters); } catch(e) { currentFilters = {}; }\n            }\n            \n            // Apply the custom_product filter\n            currentFilters[\"custom_product\"] = \"Insurance Renewals\";\n            list.params.filters = currentFilters;\n            \n            // Reload the list with the new filters\n            if (list.reload) list.reload();\n            else if (list.fetch) list.fetch();\n        }\n    });\n}",
   "view": "List"
  },
  {
@@ -71,9 +71,9 @@
   "dt": "CRM Lead",
   "enabled": 1,
   "is_standard": 0,
-  "modified": "2026-07-16 10:22:36.508216",
+  "modified": "2026-07-16 10:37:54.754396",
   "name": "Lead Hierarchy Filter",
-  "script": "function setupList({ list, call }) {\n    console.log(\"Lead Hierarchy Filter running.\");\n    \n    if (list) {\n        console.log(\"List keys:\", Object.keys(list));\n        if (list.filters) console.log(\"list.filters:\", list.filters);\n        if (list.params) console.log(\"list.params:\", list.params);\n        console.log(\"Does updateFilter exist?\", typeof list.updateFilter);\n        console.log(\"Does applyFilter exist?\", typeof list.applyFilter);\n    }\n    \n    call(\"aionion_custom.aionion_custom.controllers.crm_lead.get_my_team_employees\", {})\n    .then((employees) => {\n        if (!employees || employees.length === 0) return\n        call(\"aionion_custom.aionion_custom.controllers.crm_lead.get_user_ids_for_employees\",\n            { employee_names: employees }\n        ).then((userIds) => {\n            if (!userIds || userIds.length === 0) return\n            \n            // Filtering code will go here once we know the API\n        })\n    })\n}",
+  "script": "function setupList({ list, call }) {\n    if (!list) return;\n    \n    call(\"aionion_custom.aionion_custom.controllers.crm_lead.get_my_team_employees\", {})\n    .then((employees) => {\n        if (!employees || employees.length === 0) return;\n        call(\"aionion_custom.aionion_custom.controllers.crm_lead.get_user_ids_for_employees\",\n            { employee_names: employees }\n        ).then((userIds) => {\n            if (!userIds || userIds.length === 0) return;\n            \n            // Frappe UI list resource filtering\n            let currentFilters = list.params.filters || {};\n            if (typeof currentFilters === 'string') {\n                try { currentFilters = JSON.parse(currentFilters); } catch(e) { currentFilters = {}; }\n            }\n            \n            // Apply the lead_owner filter\n            currentFilters[\"lead_owner\"] = [\"in\", userIds];\n            list.params.filters = currentFilters;\n            \n            // Reload the list with the new filters\n            if (list.reload) list.reload();\n            else if (list.fetch) list.fetch();\n        });\n    });\n}",
   "view": "List"
  },
  {
