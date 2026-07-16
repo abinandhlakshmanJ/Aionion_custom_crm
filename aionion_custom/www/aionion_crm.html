@@ -212,6 +212,173 @@
             .p-2 button .h-8.max-w-16 {
                 display: none !important;
             }
+
+            /* ========================================================================= */
+            /* 1. LAYOUT TRANSFORMATION: SIDEBAR TO TOP NAVBAR                           */
+            /* ========================================================================= */
+            
+            /* Change root layout from row to column */
+            #app > div.flex.h-screen.w-screen {
+                flex-direction: column !important;
+            }
+
+            /* Transform the sidebar container into a top header */
+            #app > div.flex.h-screen.w-screen > div.h-full.border-r {
+                height: 60px !important;
+                width: 100vw !important;
+                border-right: none !important;
+                border-bottom: 1px solid var(--border-color) !important;
+                flex-shrink: 0 !important;
+                background-color: #ffffff !important;
+                box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+                z-index: 50 !important;
+            }
+
+            /* Modify the AppSidebar inner wrapper */
+            .h-full.border-r > div {
+                flex-direction: row !important;
+                width: 100% !important;
+                height: 60px !important;
+                align-items: center !important;
+                position: relative !important;
+            }
+
+            /* Hide the bottom section (banners/settings/clear demo) */
+            .h-full.border-r > div > div.m-2.flex-col {
+                display: none !important; 
+            }
+
+            /* Links Container (make it horizontal) */
+            .h-full.border-r > div > .flex-1.overflow-y-auto {
+                display: flex !important;
+                flex-direction: row !important;
+                overflow-y: visible !important;
+                overflow-x: auto !important;
+                align-items: center !important;
+                padding-left: 20px !important;
+                padding-right: 250px !important;
+                height: 100% !important;
+            }
+
+            /* Horizontal link groups */
+            .h-full.border-r > div > .flex-1.overflow-y-auto > div {
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                height: 100% !important;
+            }
+
+            /* Hide section toggles (the chevron and labels like "All Views") */
+            .h-full.border-r .cursor-pointer.text-base {
+                display: none !important;
+            }
+
+            /* Make nav links list horizontal */
+            .h-full.border-r nav.flex-col {
+                flex-direction: row !important;
+                height: 100% !important;
+                align-items: center !important;
+            }
+
+            /* Style the individual links as top nav items */
+            .h-full.border-r nav.flex-col > button {
+                margin: 0 4px !important;
+                padding: 6px 16px !important;
+                white-space: nowrap !important;
+                height: 40px !important;
+                border-radius: 8px !important;
+            }
+
+            /* Position User Dropdown at the far right */
+            .h-full.border-r > div > .p-2 {
+                position: absolute !important;
+                right: 15px !important;
+                top: 6px !important;
+                width: 180px !important;
+                padding: 0 !important;
+            }
+            .h-full.border-r > div > .p-2 button {
+                background: transparent !important;
+            }
+
+            /* Position Notifications Button near User Dropdown */
+            #notifications-btn {
+                position: absolute !important;
+                right: 210px !important;
+                top: 15px !important;
+                margin: 0 !important;
+                padding: 6px !important;
+                width: auto !important;
+                background: transparent !important;
+            }
+
+            /* Ensure main body area scrolls properly under the new top nav */
+            #app > div.flex.h-screen.w-screen > div.flex-1 {
+                overflow-y: auto !important;
+                background-color: #F8FAFC !important; /* Soft light background */
+            }
+
+            /* ========================================================================= */
+            /* 2. DASHBOARD BRAND THEMING                                                */
+            /* ========================================================================= */
+
+            /* Redefine root CSS variables to inject Aionion Orange (#FF6B35) globally */
+            :root {
+                --brand-color: #FF6B35 !important;
+                --text-brand: #FF6B35 !important;
+                --bg-brand: #FF6B35 !important;
+                --bg-brand-hover: #E85D2A !important;
+                --border-brand: #FF6B35 !important;
+                --bg-surface-gray-1: #ffffff !important;
+            }
+
+            /* Restyle Buttons to use the Brand Color */
+            button.bg-gray-900, 
+            button.bg-surface-gray-7, 
+            .btn-primary {
+                background-color: #FF6B35 !important;
+                color: #ffffff !important;
+                border-color: #FF6B35 !important;
+                transition: all 0.2s ease-in-out !important;
+            }
+            button.bg-gray-900:hover, 
+            button.bg-surface-gray-7:hover, 
+            .btn-primary:hover {
+                background-color: #E85D2A !important;
+                border-color: #E85D2A !important;
+                box-shadow: 0 4px 12px rgba(255, 107, 53, 0.2) !important;
+            }
+
+            /* Dashboard Grid Cards Restyling */
+            .crm-dashboard .grid > div,
+            .grid > div.bg-surface-white,
+            .grid > div.bg-white,
+            div[class*="shadow-sm"] {
+                border: 1px solid rgba(255, 107, 53, 0.15) !important;
+                border-top: 3px solid #FF6B35 !important;
+                border-radius: 12px !important;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+                background: #ffffff !important;
+                transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out !important;
+            }
+            
+            .crm-dashboard .grid > div:hover,
+            .grid > div.bg-surface-white:hover,
+            .grid > div.bg-white:hover {
+                transform: translateY(-2px) !important;
+                box-shadow: 0 10px 15px -3px rgba(255, 107, 53, 0.15) !important;
+            }
+
+            /* Highlight specific icons with Brand Color */
+            .text-ink-gray-5 svg,
+            .text-ink-gray-7 svg {
+                color: #FF6B35 !important;
+            }
+            
+            /* Keep Nav icons a bit more muted unless active */
+            .h-full.border-r nav.flex-col > button:hover svg {
+                color: #FF6B35 !important;
+            }
           </style>
           <script>
             function aionionGlobalScript() {
