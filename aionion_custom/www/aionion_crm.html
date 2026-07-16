@@ -481,6 +481,16 @@
                     if (userBtn) userBtn.classList.add('aionion-user-dropdown');
                 }
 
+                // 3.6 Hide Breadcrumbs ("Leads /")
+                document.querySelectorAll('span, div, p').forEach(el => {
+                    if (el.textContent.trim() === '/') {
+                        el.style.display = 'none';
+                        if (el.previousElementSibling) {
+                            el.previousElementSibling.style.display = 'none';
+                        }
+                    }
+                });
+
                 // 4. Dark primary buttons → Royal Blue
                 document.querySelectorAll('button').forEach(btn => {
                     if (btn.dataset.ai) return; // already processed
