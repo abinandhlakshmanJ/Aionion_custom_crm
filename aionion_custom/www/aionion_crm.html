@@ -251,18 +251,37 @@
                 display: none !important;
             }
             
-            /* Center Nav Buttons */
-            .aionion-sidebar-collapsed nav.flex-col > button {
+            /* Center Nav Buttons properly */
+            .aionion-sidebar-collapsed nav.flex-col > button,
+            .aionion-sidebar-collapsed nav.flex-col a > button,
+            .aionion-sidebar-collapsed nav.flex-col > a {
                 display: flex !important;
                 justify-content: center !important;
                 align-items: center !important;
-                padding: 10px !important;
+                padding: 0 !important;
                 margin: 4px auto !important;
                 width: 44px !important;
                 height: 44px !important;
             }
-            .aionion-sidebar-collapsed nav.flex-col > button svg {
+            .aionion-sidebar-collapsed nav.flex-col > button > div,
+            .aionion-sidebar-collapsed nav.flex-col a > button > div,
+            .aionion-sidebar-collapsed nav.flex-col > a > div {
+                justify-content: center !important;
                 margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+            }
+            .aionion-sidebar-collapsed nav.flex-col > button svg,
+            .aionion-sidebar-collapsed nav.flex-col a > button svg,
+            .aionion-sidebar-collapsed nav.flex-col > a svg {
+                margin: 0 !important;
+                display: block !important;
+                visibility: visible !important;
+            }
+            .aionion-sidebar-collapsed nav.flex-col > button span.truncate,
+            .aionion-sidebar-collapsed nav.flex-col a > button span.truncate,
+            .aionion-sidebar-collapsed nav.flex-col > a span.truncate {
+                display: none !important;
             }
 
             /* Center Hamburger Menu */
