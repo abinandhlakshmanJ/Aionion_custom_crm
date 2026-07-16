@@ -13,10 +13,7 @@ app_include_css = ["/assets/aionion_custom/css/crm_custom.css"]
 # web_include_css = "/assets/aionion_custom/css/aionion_custom.css"
 # web_include_js = "/assets/aionion_custom/js/aionion_custom.js"
 
-website_route_rules = [
-	{"from_route": "/crm/<path:app_path>", "to_route": "aionion_crm"},
-	{"from_route": "/crm", "to_route": "aionion_crm"},
-]
+
 
 # Permissions
 # -----------
