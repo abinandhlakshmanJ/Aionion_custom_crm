@@ -72,7 +72,8 @@ fixtures = [
             "Whatsapp CRM form script",
             "HD Ticket Alert - Toast and Sidebar",
             "CRM Lead Email Button",
-            "CRM form customer"
+            "CRM form customer",
+            "Aionion Brand - Notification Bell"
         ]]]
     },
     {
