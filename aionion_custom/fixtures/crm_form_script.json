@@ -38,9 +38,9 @@
   "dt": "CRM Lead",
   "enabled": 1,
   "is_standard": 0,
-  "modified": "2026-07-16 10:06:27.621018",
+  "modified": "2026-07-16 10:17:01.517445",
   "name": "Renewals Manager View",
-  "script": "function setupList({ call, columns, filters, // setFilters }) {\n    // Auto-filter to show only Insurance Renewals leads for Renewals Manager\n    call(\"aionion_custom.aionion_custom.controllers.crm_lead.get_current_user_roles\", {})\n    .then((roles) => {\n        if (roles && roles.includes(\"Insurance Renewals Manager\")) {\n            // setFilters([\n                { fieldname: \"custom_product\", operator: \"=\", value: \"Insurance Renewals\" }\n            ])\n        }\n        if (roles && roles.includes(\"Insurance Renewals RM\") && !roles.includes(\"Insurance Renewals Manager\")) {\n            // setFilters([\n                { fieldname: \"custom_product\", operator: \"=\", value: \"Insurance Renewals\" }\n            ])\n        }\n    })\n}",
+  "script": "function setupList({ call }) {\n    // Auto-filter to show only Insurance Renewals leads for Renewals Manager\n    call(\"aionion_custom.aionion_custom.controllers.crm_lead.get_current_user_roles\", {})\n    .then((roles) => {\n        if (roles && roles.includes(\"Insurance Renewals Manager\")) {\n            console.log(\"Would filter by custom_product = Insurance Renewals\");\n        }\n        if (roles && roles.includes(\"Insurance Renewals RM\") && !roles.includes(\"Insurance Renewals Manager\")) {\n            console.log(\"Would filter by custom_product = Insurance Renewals\");\n        }\n    })\n}",
   "view": "List"
  },
  {
@@ -71,9 +71,9 @@
   "dt": "CRM Lead",
   "enabled": 1,
   "is_standard": 0,
-  "modified": "2026-07-16 10:06:27.649095",
+  "modified": "2026-07-16 10:22:36.508216",
   "name": "Lead Hierarchy Filter",
-  "script": "function setupList({ call, columns, filters, // setFilters }) {\n    // Get current user's team employees from server\n    call(\"aionion_custom.aionion_custom.controllers.crm_lead.get_my_team_employees\", {})\n    .then((employees) => {\n        if (!employees || employees.length === 0) return\n\n        // Get user IDs for these employees\n        call(\"aionion_custom.aionion_custom.controllers.crm_lead.get_user_ids_for_employees\",\n            { employee_names: employees }\n        ).then((userIds) => {\n            if (!userIds || userIds.length === 0) return\n\n            // Set filter to show only leads owned by team members\n            // setFilters([\n                { fieldname: \"lead_owner\", operator: \"in\", value: userIds }\n            ])\n        })\n    })\n}",
+  "script": "function setupList({ list, call }) {\n    console.log(\"Lead Hierarchy Filter running.\");\n    \n    if (list) {\n        console.log(\"List keys:\", Object.keys(list));\n        if (list.filters) console.log(\"list.filters:\", list.filters);\n        if (list.params) console.log(\"list.params:\", list.params);\n        console.log(\"Does updateFilter exist?\", typeof list.updateFilter);\n        console.log(\"Does applyFilter exist?\", typeof list.applyFilter);\n    }\n    \n    call(\"aionion_custom.aionion_custom.controllers.crm_lead.get_my_team_employees\", {})\n    .then((employees) => {\n        if (!employees || employees.length === 0) return\n        call(\"aionion_custom.aionion_custom.controllers.crm_lead.get_user_ids_for_employees\",\n            { employee_names: employees }\n        ).then((userIds) => {\n            if (!userIds || userIds.length === 0) return\n            \n            // Filtering code will go here once we know the API\n        })\n    })\n}",
   "view": "List"
  },
  {
@@ -104,9 +104,9 @@
   "dt": "CRM Lead",
   "enabled": 1,
   "is_standard": 1,
-  "modified": "2026-07-16 09:55:31.936619",
+  "modified": "2026-07-16 10:32:05.862796",
   "name": "Aionion Brand - Notification Bell",
-  "script": "\nasync function setupList({ call, $dialog, store, columns }) {\n    // Aionion Custom App — Notification Bell Brand Color\n    // This script is stored in aionion_custom fixtures, NOT in Frappe CRM core!\n    const styleId = 'aionion-brand-style'\n    if (!document.getElementById(styleId)) {\n        const style = document.createElement('style')\n        style.id = styleId\n        style.innerHTML = `\n            #notifications-btn {\n                color: #FF6B35 !important;\n            }\n            #notifications-btn svg {\n                stroke: #FF6B35 !important;\n                fill: none !important;\n            }\n            #notifications-btn:hover {\n                background-color: rgba(255, 107, 53, 0.15) !important;\n                border-radius: 8px;\n            }\n        `\n        document.head.appendChild(style)\n        console.log('%c[Aionion Custom App] Notification Bell → Orange #FF6B35', 'color:#FF6B35;font-weight:bold;font-size:14px;')\n    }\n    return {}\n}\n",
+  "script": "function setupList() {\n    console.log(\"[Aionion Custom App] Applying Brand & Layout Changes\");\n    \n    function applyBrandStyles() {\n        // 1. Notification Bell -> Orange\n        let bellIcons = document.querySelectorAll('svg.feather-bell');\n        bellIcons.forEach(icon => {\n            icon.style.color = '#FF6B35';\n            let dot = icon.nextElementSibling;\n            if (dot && dot.tagName === 'circle') {\n                dot.style.fill = '#FF6B35';\n            }\n        });\n\n        // 2. Hide Deals, Contacts, Organizations from Sidebar\n        let sidebars = document.querySelectorAll('aside, .sidebar, [class*=\"sidebar\"]');\n        sidebars.forEach(sidebar => {\n            let links = sidebar.querySelectorAll('a');\n            links.forEach(link => {\n                let text = link.textContent.trim();\n                if (text === \"Deals\" || text === \"Contacts\" || text === \"Organizations\") {\n                    link.style.setProperty(\"display\", \"none\", \"important\");\n                }\n            });\n        });\n    }\n\n    // Run on load\n    setTimeout(applyBrandStyles, 100);\n    setTimeout(applyBrandStyles, 500);\n    setTimeout(applyBrandStyles, 1500);\n    \n    // Also set up a MutationObserver to catch them if Vue re-renders the sidebar\n    if (!window._aionionBrandObserver) {\n        window._aionionBrandObserver = new MutationObserver((mutations) => {\n            applyBrandStyles();\n        });\n        window._aionionBrandObserver.observe(document.body, { childList: true, subtree: true });\n    }\n}",
   "view": "List"
  }
 ]
