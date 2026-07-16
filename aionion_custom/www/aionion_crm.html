@@ -205,19 +205,25 @@
               {% endfor %}
           </script>
           <style>
-            /* 
-              Safe CSS to hide Deals (3), Contacts (4), and Organizations (5).
-              Targeting the specific DOM structure of the sidebar.
-            */
-            .overflow-y-auto > .flex-col:nth-child(1) .columns > .w-full:nth-child(3),
-            .overflow-y-auto > .flex-col:nth-child(1) .columns > .w-full:nth-child(4),
-            .overflow-y-auto > .flex-col:nth-child(1) .columns > .w-full:nth-child(5) {
+            .aionion-hidden-link {
                 display: none !important;
             }
           </style>
           <script>
             function aionionGlobalScript() {
-                // Change Notification Bell Color
+                // 1. Hide Links Safely
+                let spans = document.querySelectorAll('span.truncate');
+                spans.forEach(span => {
+                    let text = (span.textContent || "").trim();
+                    if (text === "Deals" || text === "Contacts" || text === "Organizations") {
+                        let btn = span.closest('button');
+                        if (btn && btn.parentElement) {
+                            btn.parentElement.classList.add('aionion-hidden-link');
+                        }
+                    }
+                });
+
+                // 2. Change Notification Bell Color
                 let notifBtn = document.getElementById('notifications-btn');
                 if (notifBtn) {
                     let svg = notifBtn.querySelector('svg');
