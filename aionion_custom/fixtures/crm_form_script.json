@@ -38,9 +38,9 @@
   "dt": "CRM Lead",
   "enabled": 1,
   "is_standard": 0,
-  "modified": "2026-05-05 17:33:56.752277",
+  "modified": "2026-07-16 10:06:27.621018",
   "name": "Renewals Manager View",
-  "script": "function setupList({ call, columns, filters, setFilters }) {\n    // Auto-filter to show only Insurance Renewals leads for Renewals Manager\n    call(\"aionion_custom.aionion_custom.controllers.crm_lead.get_current_user_roles\", {})\n    .then((roles) => {\n        if (roles && roles.includes(\"Insurance Renewals Manager\")) {\n            setFilters([\n                { fieldname: \"custom_product\", operator: \"=\", value: \"Insurance Renewals\" }\n            ])\n        }\n        if (roles && roles.includes(\"Insurance Renewals RM\") && !roles.includes(\"Insurance Renewals Manager\")) {\n            setFilters([\n                { fieldname: \"custom_product\", operator: \"=\", value: \"Insurance Renewals\" }\n            ])\n        }\n    })\n}",
+  "script": "function setupList({ call, columns, filters, // setFilters }) {\n    // Auto-filter to show only Insurance Renewals leads for Renewals Manager\n    call(\"aionion_custom.aionion_custom.controllers.crm_lead.get_current_user_roles\", {})\n    .then((roles) => {\n        if (roles && roles.includes(\"Insurance Renewals Manager\")) {\n            // setFilters([\n                { fieldname: \"custom_product\", operator: \"=\", value: \"Insurance Renewals\" }\n            ])\n        }\n        if (roles && roles.includes(\"Insurance Renewals RM\") && !roles.includes(\"Insurance Renewals Manager\")) {\n            // setFilters([\n                { fieldname: \"custom_product\", operator: \"=\", value: \"Insurance Renewals\" }\n            ])\n        }\n    })\n}",
   "view": "List"
  },
  {
@@ -71,9 +71,9 @@
   "dt": "CRM Lead",
   "enabled": 1,
   "is_standard": 0,
-  "modified": "2026-05-05 17:33:56.749102",
+  "modified": "2026-07-16 10:06:27.649095",
   "name": "Lead Hierarchy Filter",
-  "script": "function setupList({ call, columns, filters, setFilters }) {\n    // Get current user's team employees from server\n    call(\"aionion_custom.aionion_custom.controllers.crm_lead.get_my_team_employees\", {})\n    .then((employees) => {\n        if (!employees || employees.length === 0) return\n\n        // Get user IDs for these employees\n        call(\"aionion_custom.aionion_custom.controllers.crm_lead.get_user_ids_for_employees\",\n            { employee_names: employees }\n        ).then((userIds) => {\n            if (!userIds || userIds.length === 0) return\n\n            // Set filter to show only leads owned by team members\n            setFilters([\n                { fieldname: \"lead_owner\", operator: \"in\", value: userIds }\n            ])\n        })\n    })\n}",
+  "script": "function setupList({ call, columns, filters, // setFilters }) {\n    // Get current user's team employees from server\n    call(\"aionion_custom.aionion_custom.controllers.crm_lead.get_my_team_employees\", {})\n    .then((employees) => {\n        if (!employees || employees.length === 0) return\n\n        // Get user IDs for these employees\n        call(\"aionion_custom.aionion_custom.controllers.crm_lead.get_user_ids_for_employees\",\n            { employee_names: employees }\n        ).then((userIds) => {\n            if (!userIds || userIds.length === 0) return\n\n            // Set filter to show only leads owned by team members\n            // setFilters([\n                { fieldname: \"lead_owner\", operator: \"in\", value: userIds }\n            ])\n        })\n    })\n}",
   "view": "List"
  },
  {
