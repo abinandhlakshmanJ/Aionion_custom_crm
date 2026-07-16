@@ -226,11 +226,56 @@
 
             /* === SIDEBAR ========================================= */
 
-            /* Sidebar — pure white, single right border */
+            /* Sidebar — subtle slate background */
             .h-full.border-r {
-                background-color: #ffffff !important;
-                border-right: 1px solid #EBEBEB !important;
+                background-color: #F8FAFC !important; /* Soft slate-50 */
+                border-right: 1px solid #E2E8F0 !important;
                 box-shadow: none !important;
+                transition: width 0.3s ease !important;
+                overflow: hidden !important;
+                position: relative;
+            }
+
+            /* Collapsed Sidebar State */
+            .aionion-sidebar-collapsed {
+                width: 76px !important;
+            }
+            .aionion-sidebar-collapsed span.truncate {
+                display: none !important;
+            }
+            .aionion-sidebar-collapsed #aionion-logo-wrap img {
+                display: none !important;
+            }
+            .aionion-sidebar-collapsed .p-2 button > div.flex-col {
+                display: none !important;
+            }
+            .aionion-sidebar-collapsed .p-2 button svg {
+                display: none !important;
+            }
+            .aionion-sidebar-collapsed nav.flex-col > button {
+                justify-content: center !important;
+                padding: 8px !important;
+            }
+            .aionion-sidebar-collapsed nav.flex-col > button svg {
+                margin: 0 !important;
+            }
+
+            /* Hamburger Button */
+            .aionion-hamburger {
+                cursor: pointer;
+                color: #64748B;
+                transition: color 0.2s;
+                padding: 4px;
+                margin-left: auto;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .aionion-hamburger:hover {
+                color: #0F172A;
+            }
+            .aionion-sidebar-collapsed .aionion-hamburger {
+                margin: 0 auto;
             }
 
             /* Active item — subtle blue fill, bold blue text */
@@ -377,7 +422,7 @@
                     if (svg) svg.style.color = BRAND;
                 }
 
-                // 3. Inject Logo into Sidebar
+                // 3. Inject Logo into Sidebar + Hamburger Toggle
                 const sidebarContainer = document.querySelector('.h-full.border-r');
                 if (sidebarContainer && !document.getElementById('aionion-logo-wrap')) {
                     const logoWrap = document.createElement('div');
@@ -385,7 +430,35 @@
                     logoWrap.style.padding = '24px 20px 12px 20px';
                     logoWrap.style.display = 'flex';
                     logoWrap.style.alignItems = 'center';
-                    logoWrap.innerHTML = '<img src="/assets/aionion_custom/images/logo.png" style="max-height: 40px; width: auto; object-fit: contain;" alt="Logo" />';
+                    
+                    // Logo Image
+                    const img = document.createElement('img');
+                    img.src = '/assets/aionion_custom/images/logo.png';
+                    img.style.maxHeight = '32px';
+                    img.style.width = 'auto';
+                    img.style.objectFit = 'contain';
+                    
+                    // Hamburger Icon
+                    const hamburger = document.createElement('div');
+                    hamburger.className = 'aionion-hamburger';
+                    hamburger.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>';
+                    hamburger.onclick = () => {
+                        sidebarContainer.classList.toggle('aionion-sidebar-collapsed');
+                        // Optional: save state to localStorage so it persists across reloads
+                        if (sidebarContainer.classList.contains('aionion-sidebar-collapsed')) {
+                            localStorage.setItem('aionion-sidebar-state', 'collapsed');
+                        } else {
+                            localStorage.setItem('aionion-sidebar-state', 'expanded');
+                        }
+                    };
+                    
+                    // Restore state on load
+                    if (localStorage.getItem('aionion-sidebar-state') === 'collapsed') {
+                        sidebarContainer.classList.add('aionion-sidebar-collapsed');
+                    }
+                    
+                    logoWrap.appendChild(img);
+                    logoWrap.appendChild(hamburger);
                     sidebarContainer.insertBefore(logoWrap, sidebarContainer.firstChild);
                 }
 
