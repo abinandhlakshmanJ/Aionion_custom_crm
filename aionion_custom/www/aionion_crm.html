@@ -422,7 +422,7 @@
                 document.querySelectorAll('span.truncate').forEach(span => {
                     const text = (span.textContent || '').trim();
                     if (text === 'Deals' || text === 'Contacts' || text === 'Organizations') {
-                        const btn = span.closest('button');
+                        const btn = span.closest('button, a');
                         if (btn) btn.classList.add('aionion-hidden-link');
                     }
                 });
