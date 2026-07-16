@@ -434,7 +434,7 @@
                     if (svg) svg.style.color = BRAND;
                 }
 
-                // 3. Inject Logo into Sidebar + Hamburger Toggle
+                // 3. Inject Logo into Sidebar (No Hamburger Toggle)
                 const sidebarContainer = document.querySelector('.h-full.border-r');
                 if (sidebarContainer && !document.getElementById('aionion-logo-wrap')) {
                     const logoWrap = document.createElement('div');
@@ -450,27 +450,11 @@
                     img.style.width = 'auto';
                     img.style.objectFit = 'contain';
                     
-                    // Hamburger Icon
-                    const hamburger = document.createElement('div');
-                    hamburger.className = 'aionion-hamburger';
-                    hamburger.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>';
-                    hamburger.onclick = () => {
-                        sidebarContainer.classList.toggle('aionion-sidebar-collapsed');
-                        // Optional: save state to localStorage so it persists across reloads
-                        if (sidebarContainer.classList.contains('aionion-sidebar-collapsed')) {
-                            localStorage.setItem('aionion-sidebar-state', 'collapsed');
-                        } else {
-                            localStorage.setItem('aionion-sidebar-state', 'expanded');
-                        }
-                    };
-                    
-                    // Restore state on load
-                    if (localStorage.getItem('aionion-sidebar-state') === 'collapsed') {
-                        sidebarContainer.classList.add('aionion-sidebar-collapsed');
-                    }
+                    // Make sure sidebar is NOT collapsed (clear any saved state)
+                    localStorage.removeItem('aionion-sidebar-state');
+                    sidebarContainer.classList.remove('aionion-sidebar-collapsed');
                     
                     logoWrap.appendChild(img);
-                    logoWrap.appendChild(hamburger);
                     sidebarContainer.insertBefore(logoWrap, sidebarContainer.firstChild);
                 }
 
