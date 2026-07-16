@@ -209,13 +209,11 @@
                 // 1. Hide Deals, Contacts, Organizations safely
                 let buttons = document.querySelectorAll('button');
                 buttons.forEach(btn => {
-                    let span = btn.querySelector('span.truncate');
-                    if (span) {
-                        let text = span.innerText.trim();
-                        if (text === "Deals" || text === "Contacts" || text === "Organizations") {
-                            if (btn.parentElement && btn.parentElement.classList.contains('w-full')) {
-                                btn.parentElement.style.display = 'none';
-                            }
+                    let text = (btn.innerText || btn.textContent || "").toLowerCase().trim();
+                    if (text === "deals" || text === "contacts" || text === "organizations") {
+                        btn.style.setProperty("display", "none", "important");
+                        if (btn.parentElement) {
+                            btn.parentElement.style.setProperty("display", "none", "important");
                         }
                     }
                 });
