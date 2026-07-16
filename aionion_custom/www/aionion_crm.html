@@ -377,7 +377,19 @@
                     if (svg) svg.style.color = BRAND;
                 }
 
-                // 3. Dark primary buttons → Royal Blue
+                // 3. Inject Logo into Sidebar
+                const sidebarContainer = document.querySelector('.h-full.border-r');
+                if (sidebarContainer && !document.getElementById('aionion-logo-wrap')) {
+                    const logoWrap = document.createElement('div');
+                    logoWrap.id = 'aionion-logo-wrap';
+                    logoWrap.style.padding = '24px 20px 12px 20px';
+                    logoWrap.style.display = 'flex';
+                    logoWrap.style.alignItems = 'center';
+                    logoWrap.innerHTML = '<img src="/assets/aionion_custom/images/logo.png" style="max-height: 40px; width: auto; object-fit: contain;" alt="Logo" />';
+                    sidebarContainer.insertBefore(logoWrap, sidebarContainer.firstChild);
+                }
+
+                // 4. Dark primary buttons → Royal Blue
                 document.querySelectorAll('button').forEach(btn => {
                     if (btn.dataset.ai) return; // already processed
                     const bg = window.getComputedStyle(btn).backgroundColor;
@@ -399,7 +411,7 @@
                     }
                 });
 
-                // 4. Inputs → Blue focus ring
+                // 5. Inputs → Blue focus ring
                 document.querySelectorAll('input[type="text"], input:not([type]), input[type="search"]').forEach(el => {
                     if (el.dataset.ai) return;
                     el.dataset.ai = '1';
@@ -414,7 +426,7 @@
                     });
                 });
 
-                // 5. Empty state SVGs → Blue
+                // 6. Empty state SVGs → Blue
                 document.querySelectorAll('svg').forEach(svg => {
                     if (svg.dataset.ai) return;
                     const rect = svg.getBoundingClientRect();
