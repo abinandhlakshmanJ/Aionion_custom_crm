@@ -388,6 +388,107 @@
                 }
             }
             setInterval(aionionGlobalScript, 500);
+
+            function aionionThemeScript() {
+                const ORANGE = '#FF6B35';
+                const ORANGE_DARK = '#E85D2A';
+                const ORANGE_BG = 'rgba(255,107,53,0.08)';
+                const SLATE_BG = '#F8FAFC';
+
+                // 1. PAGE BACKGROUND - set the main content area to soft slate
+                document.querySelectorAll('#app > div > div:not(.border-r)').forEach(el => {
+                    el.style.backgroundColor = SLATE_BG;
+                });
+
+                // 2. ALL SOLID BLACK / DARK BUTTONS → Orange
+                // Frappe UI renders primary buttons as dark-background buttons
+                document.querySelectorAll('button').forEach(btn => {
+                    const style = window.getComputedStyle(btn);
+                    const bg = style.backgroundColor;
+                    // Match very dark backgrounds (black / near-black / dark gray)
+                    if (
+                        bg === 'rgb(17, 24, 39)' || // gray-900
+                        bg === 'rgb(24, 24, 27)' || // zinc-900
+                        bg === 'rgb(9, 9, 11)'   || // zinc-950
+                        bg === 'rgb(26, 26, 26)' || // near-black
+                        bg === 'rgb(31, 41, 55)' || // gray-800
+                        bg === 'rgb(15, 23, 42)'    // slate-900
+                    ) {
+                        btn.style.setProperty('background-color', ORANGE, 'important');
+                        btn.style.setProperty('border-color', ORANGE, 'important');
+                        btn.style.setProperty('color', '#fff', 'important');
+                        btn.style.setProperty('box-shadow', '0 4px 12px rgba(255,107,53,0.3)', 'important');
+                        btn.style.setProperty('border-radius', '8px', 'important');
+                        // Hover via mouseover/mouseout
+                        if (!btn.dataset.aionionStyled) {
+                            btn.dataset.aionionStyled = '1';
+                            btn.addEventListener('mouseover', () => {
+                                btn.style.setProperty('background-color', ORANGE_DARK, 'important');
+                                btn.style.setProperty('transform', 'translateY(-1px)', 'important');
+                            });
+                            btn.addEventListener('mouseout', () => {
+                                btn.style.setProperty('background-color', ORANGE, 'important');
+                                btn.style.setProperty('transform', '', 'important');
+                            });
+                        }
+                    }
+                });
+
+                // 3. ALL TEXT INPUTS & DROPDOWNS → Pill-shaped with brand focus
+                document.querySelectorAll('input[type="text"], input:not([type]), select').forEach(el => {
+                    el.style.setProperty('border-radius', '9999px', 'important');
+                    el.style.setProperty('padding-left', '14px', 'important');
+                    if (!el.dataset.aionionStyled) {
+                        el.dataset.aionionStyled = '1';
+                        el.addEventListener('focus', () => {
+                            el.style.setProperty('border-color', ORANGE, 'important');
+                            el.style.setProperty('box-shadow', '0 0 0 2px rgba(255,107,53,0.2)', 'important');
+                        });
+                        el.addEventListener('blur', () => {
+                            el.style.removeProperty('border-color');
+                            el.style.removeProperty('box-shadow');
+                        });
+                    }
+                });
+
+                // 4. FILTER DROPDOWN BUTTONS (the pill dropdowns like "Status", "Type") → rounded
+                document.querySelectorAll('button[class*="border"]').forEach(btn => {
+                    const style = window.getComputedStyle(btn);
+                    const bg = style.backgroundColor;
+                    // Light gray background = filter buttons
+                    if (
+                        bg === 'rgb(247, 247, 249)' ||
+                        bg === 'rgb(248, 248, 250)' ||
+                        bg === 'rgb(243, 244, 246)' ||
+                        bg === 'rgb(249, 250, 251)' ||
+                        bg === 'rgba(0, 0, 0, 0)' && style.borderWidth !== '0px'
+                    ) {
+                        btn.style.setProperty('border-radius', '9999px', 'important');
+                    }
+                });
+
+                // 5. EMPTY STATE ICON → orange
+                document.querySelectorAll('svg').forEach(svg => {
+                    const parent = svg.parentElement;
+                    if (!parent) return;
+                    const rect = svg.getBoundingClientRect();
+                    // Large centered SVGs in empty states
+                    if (rect.width >= 32 && rect.width <= 80 && rect.height >= 32) {
+                        const container = svg.closest('.flex-col');
+                        if (container) {
+                            svg.style.setProperty('color', ORANGE, 'important');
+                            svg.style.setProperty('opacity', '0.9', 'important');
+                        }
+                    }
+                });
+
+                // 6. TABLE ROW HOVER COLOR
+                document.querySelectorAll('tr:hover, [class*="list-row"]:hover').forEach(row => {
+                    row.style.setProperty('background-color', ORANGE_BG, 'important');
+                });
+            }
+
+            setInterval(aionionThemeScript, 500);
           </script>
           </body>
 </html>
