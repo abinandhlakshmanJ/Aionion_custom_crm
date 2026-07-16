@@ -354,6 +354,16 @@
             ::-webkit-scrollbar-track { background: transparent; }
             ::-webkit-scrollbar-thumb { background: #E0E0E0; border-radius: 99px; }
             ::-webkit-scrollbar-thumb:hover { background: #BDBDBD; }
+
+            /* === SIDEBAR COLLAPSE LOGO HIDING === */
+            .h-full.border-r {
+                container-type: inline-size;
+            }
+            @container (max-width: 100px) {
+                #aionion-logo-wrap {
+                    display: none !important;
+                }
+            }
           </style>
 
 
@@ -399,26 +409,12 @@
                     const img = document.createElement('img');
                     img.src = '/assets/aionion_custom/images/logo.png';
                     img.style.maxHeight = '32px';
-                    img.style.width = 'auto';
+                    // Force the image not to stretch its container
+                    img.style.maxWidth = '100%';
                     img.style.objectFit = 'contain';
-                    img.style.transition = 'all 0.2s ease-in-out';
                     
                     logoWrap.appendChild(img);
                     sidebarContainer.insertBefore(logoWrap, sidebarContainer.firstChild);
-
-                    // ResizeObserver to detect when native collapse happens
-                    const observer = new ResizeObserver(entries => {
-                        for (let entry of entries) {
-                            if (entry.contentRect.width < 100) {
-                                // Collapsed: completely hide the logo
-                                logoWrap.style.display = 'none';
-                            } else {
-                                // Expanded: show full logo
-                                logoWrap.style.display = 'flex';
-                            }
-                        }
-                    });
-                    observer.observe(sidebarContainer);
                 }
 
                 // 3.5 Tag user dropdown safely for collapsing
