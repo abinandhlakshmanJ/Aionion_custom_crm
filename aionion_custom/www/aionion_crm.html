@@ -273,20 +273,48 @@
                 display: none !important;
             }
 
-            /* Make nav links list horizontal */
+            /* Make nav links list horizontal and align to bottom for tabs */
             .h-full.border-r nav.flex-col {
                 flex-direction: row !important;
                 height: 100% !important;
-                align-items: center !important;
+                align-items: flex-end !important;
             }
 
-            /* Style the individual links as top nav items */
+            /* Style the individual links as clean Tailwind tabs */
             .h-full.border-r nav.flex-col > button {
-                margin: 0 4px !important;
-                padding: 6px 16px !important;
+                margin: 0 16px 0 0 !important;
+                padding: 0 4px 14px 4px !important; 
                 white-space: nowrap !important;
-                height: 40px !important;
-                border-radius: 8px !important;
+                height: auto !important;
+                border-radius: 0 !important;
+                border-bottom: 2px solid transparent !important;
+                background-color: transparent !important;
+                box-shadow: none !important;
+                font-weight: 500 !important;
+                color: #6B7280 !important; /* text-gray-500 */
+                transition: color 0.15s, border-color 0.15s !important;
+            }
+
+            /* Hover state for inactive tabs */
+            .h-full.border-r nav.flex-col > button:hover {
+                color: #374151 !important; /* text-gray-700 */
+                border-bottom-color: #D1D5DB !important; /* text-gray-300 */
+                background-color: transparent !important;
+            }
+
+            /* Active Tab State (Overrides Frappe's pill style) */
+            .h-full.border-r nav.flex-col > button.bg-white,
+            .h-full.border-r nav.flex-col > button.shadow-sm,
+            .h-full.border-r nav.flex-col > button.text-ink-gray-9 {
+                color: var(--brand-color, #FF6B35) !important;
+                border-bottom-color: var(--brand-color, #FF6B35) !important;
+                background-color: transparent !important;
+                box-shadow: none !important;
+            }
+
+            /* Ensure SVG icons inherit the text color perfectly */
+            .h-full.border-r nav.flex-col > button svg {
+                color: inherit !important;
             }
 
             /* Position User Dropdown at the far right */
@@ -294,11 +322,22 @@
                 position: absolute !important;
                 right: 15px !important;
                 top: 6px !important;
-                width: 180px !important;
+                width: auto !important;
+                min-width: 150px !important;
                 padding: 0 !important;
             }
             .h-full.border-r > div > .p-2 button {
                 background: transparent !important;
+            }
+            
+            /* Hide the "CRM" text in the User Dropdown, keep just the username */
+            .p-2 button > div.flex-col > div.text-base-medium {
+                display: none !important;
+            }
+            .p-2 button > div.flex-col > div.text-sm {
+                margin-top: 0 !important;
+                font-weight: 500 !important;
+                color: #374151 !important;
             }
 
             /* Position Notifications Button near User Dropdown */
