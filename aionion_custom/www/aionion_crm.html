@@ -410,17 +410,11 @@
                     const observer = new ResizeObserver(entries => {
                         for (let entry of entries) {
                             if (entry.contentRect.width < 100) {
-                                // Collapsed: crop to just the left infinity icon (approx 36px wide)
-                                img.style.width = '36px';
-                                img.style.objectFit = 'cover';
-                                img.style.objectPosition = 'left center';
-                                logoWrap.style.padding = '24px 0 12px 0';
+                                // Collapsed: completely hide the logo
+                                logoWrap.style.display = 'none';
                             } else {
                                 // Expanded: show full logo
-                                img.style.width = 'auto';
-                                img.style.objectFit = 'contain';
-                                img.style.objectPosition = 'center';
-                                logoWrap.style.padding = '24px 20px 12px 20px';
+                                logoWrap.style.display = 'flex';
                             }
                         }
                     });
