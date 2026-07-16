@@ -354,8 +354,19 @@
             ::-webkit-scrollbar-track { background: transparent; }
             ::-webkit-scrollbar-thumb { background: #E0E0E0; border-radius: 99px; }
             ::-webkit-scrollbar-thumb:hover { background: #BDBDBD; }
-          </style>
+            /* === PURE CSS SIDEBAR REFACTOR ===================== */
+            /* 1. Hide unwanted sidebar links based on their href */
+            a[href*="/deals"],
+            a[href*="/contacts"],
+            a[href*="/organizations"] {
+                display: none !important;
+            }
 
+            /* 2. Notification bell icon → Blue */
+            #notifications-btn svg {
+                color: #2563EB !important;
+            }
+          </style>
 
           <script>
             // ==========================================================
@@ -366,22 +377,6 @@
             const BRAND_DARK = '#1D4ED8';
 
             function aionionApply() {
-                // 1. Hide unwanted sidebar links
-                document.querySelectorAll('span.truncate').forEach(span => {
-                    const text = (span.textContent || '').trim();
-                    if (text === 'Deals' || text === 'Contacts' || text === 'Organizations') {
-                        const btn = span.closest('button, a');
-                        if (btn) btn.classList.add('aionion-hidden-link');
-                    }
-                });
-
-                // 2. Notification bell icon → Blue
-                const notifBtn = document.getElementById('notifications-btn');
-                if (notifBtn) {
-                    const svg = notifBtn.querySelector('svg');
-                    if (svg) svg.style.color = BRAND;
-                }
-
                 // 3. Inject Logo into Sidebar
                 const sidebarContainer = document.querySelector('.h-full.border-r');
                 if (sidebarContainer && !document.getElementById('aionion-logo-wrap')) {
