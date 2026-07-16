@@ -246,8 +246,8 @@
             .aionion-sidebar-collapsed #aionion-logo-wrap img {
                 display: none !important;
             }
-            /* Hide the whole user profile dropdown section in collapsed state to avoid floating chevrons */
-            .aionion-sidebar-collapsed .p-2 {
+            /* Hide only the user profile dropdown in collapsed state */
+            .aionion-sidebar-collapsed .aionion-user-dropdown {
                 display: none !important;
             }
             
@@ -471,6 +471,13 @@
                     logoWrap.appendChild(img);
                     logoWrap.appendChild(hamburger);
                     sidebarContainer.insertBefore(logoWrap, sidebarContainer.firstChild);
+                }
+
+                // 3.5 Tag user dropdown safely for collapsing
+                const userBtnText = document.querySelector('.p-2 button div.text-sm');
+                if (userBtnText) {
+                    const userBtn = userBtnText.closest('button');
+                    if (userBtn) userBtn.classList.add('aionion-user-dropdown');
                 }
 
                 // 4. Dark primary buttons → Royal Blue
