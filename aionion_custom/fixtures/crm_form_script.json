@@ -103,10 +103,10 @@
   "doctype": "CRM Form Script",
   "dt": "CRM Lead",
   "enabled": 1,
-  "is_standard": 0,
-  "modified": "2026-07-16 09:48:57.292973",
+  "is_standard": 1,
+  "modified": "2026-07-16 09:55:31.936619",
   "name": "Aionion Brand - Notification Bell",
-  "script": "\n// Aionion Custom App - Brand Proof\n// This script runs from aionion_custom fixtures — not from Frappe CRM core!\n(function injectAionionBrand() {\n    const style = document.createElement('style');\n    style.id = 'aionion-brand-style';\n    style.innerHTML = `\n        /* Aionion Custom App - Notification Bell Brand Color */\n        #notifications-btn {\n            color: #FF6B35 !important;\n        }\n        #notifications-btn svg {\n            stroke: #FF6B35 !important;\n            fill: none !important;\n        }\n        #notifications-btn:hover {\n            background-color: rgba(255, 107, 53, 0.1) !important;\n        }\n    `;\n    // Remove if already injected (for hot-reloads)\n    const existing = document.getElementById('aionion-brand-style');\n    if (existing) existing.remove();\n    document.head.appendChild(style);\n    console.log('%c[Aionion Custom App] Notification Bell styled successfully!', 'color: #FF6B35; font-weight: bold;');\n})();\n",
+  "script": "\nasync function setupList({ call, $dialog, store, columns }) {\n    // Aionion Custom App — Notification Bell Brand Color\n    // This script is stored in aionion_custom fixtures, NOT in Frappe CRM core!\n    const styleId = 'aionion-brand-style'\n    if (!document.getElementById(styleId)) {\n        const style = document.createElement('style')\n        style.id = styleId\n        style.innerHTML = `\n            #notifications-btn {\n                color: #FF6B35 !important;\n            }\n            #notifications-btn svg {\n                stroke: #FF6B35 !important;\n                fill: none !important;\n            }\n            #notifications-btn:hover {\n                background-color: rgba(255, 107, 53, 0.15) !important;\n                border-radius: 8px;\n            }\n        `\n        document.head.appendChild(style)\n        console.log('%c[Aionion Custom App] Notification Bell → Orange #FF6B35', 'color:#FF6B35;font-weight:bold;font-size:14px;')\n    }\n    return {}\n}\n",
   "view": "List"
  }
 ]
