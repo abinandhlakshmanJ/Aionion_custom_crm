@@ -214,147 +214,48 @@
             }
 
             /* ========================================================================= */
-            /* 1. LAYOUT TRANSFORMATION: SIDEBAR TO TOP NAVBAR                           */
+            /* 1. SIDEBAR LIGHT THEME                                                    */
             /* ========================================================================= */
             
-            /* Change root layout from row to column */
-            #app > div.flex.h-screen.w-screen {
-                flex-direction: column !important;
+            /* Clean Sidebar Background & Border */
+            .h-full.border-r.bg-surface-gray-1 {
+                background-color: #F8FAFC !important; /* Soft premium slate-50 */
+                border-right: 1px solid #E2E8F0 !important;
             }
 
-            /* Transform the sidebar container into a top header */
-            #app > div.flex.h-screen.w-screen > div.h-full.border-r {
-                height: 60px !important;
-                width: 100vw !important;
-                border-right: none !important;
-                border-bottom: 1px solid var(--border-color) !important;
-                flex-shrink: 0 !important;
-                background-color: #ffffff !important;
-                box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
-                z-index: 50 !important;
-            }
-
-            /* Modify the AppSidebar inner wrapper */
-            .h-full.border-r > div {
-                flex-direction: row !important;
-                width: 100% !important;
-                height: 60px !important;
-                align-items: center !important;
-                position: relative !important;
-            }
-
-            /* Hide the bottom section (banners/settings/clear demo) */
-            .h-full.border-r > div > div.m-2.flex-col {
-                display: none !important; 
-            }
-
-            /* Links Container (make it horizontal) */
-            .h-full.border-r > div > .flex-1.overflow-y-auto {
-                display: flex !important;
-                flex-direction: row !important;
-                overflow-y: visible !important;
-                overflow-x: auto !important;
-                align-items: center !important;
-                padding-left: 20px !important;
-                padding-right: 250px !important;
-                height: 100% !important;
-            }
-
-            /* Horizontal link groups */
-            .h-full.border-r > div > .flex-1.overflow-y-auto > div {
-                display: flex !important;
-                flex-direction: row !important;
-                align-items: center !important;
-                height: 100% !important;
-            }
-
-            /* Hide section toggles (the chevron and labels like "All Views") */
-            .h-full.border-r .cursor-pointer.text-base {
-                display: none !important;
-            }
-
-            /* Make nav links list horizontal and align to bottom for tabs */
-            .h-full.border-r nav.flex-col {
-                flex-direction: row !important;
-                height: 100% !important;
-                align-items: flex-end !important;
-            }
-
-            /* Style the individual links as clean Tailwind tabs */
-            .h-full.border-r nav.flex-col > button {
-                margin: 0 16px 0 0 !important;
-                padding: 0 4px 14px 4px !important; 
-                white-space: nowrap !important;
-                height: auto !important;
-                border-radius: 0 !important;
-                border-bottom: 2px solid transparent !important;
-                background-color: transparent !important;
-                box-shadow: none !important;
-                font-weight: 500 !important;
-                color: #6B7280 !important; /* text-gray-500 */
-                transition: color 0.15s, border-color 0.15s !important;
-            }
-
-            /* Hover state for inactive tabs */
-            .h-full.border-r nav.flex-col > button:hover {
-                color: #374151 !important; /* text-gray-700 */
-                border-bottom-color: #D1D5DB !important; /* text-gray-300 */
-                background-color: transparent !important;
-            }
-
-            /* Active Tab State (Overrides Frappe's pill style) */
-            .h-full.border-r nav.flex-col > button.bg-white,
-            .h-full.border-r nav.flex-col > button.shadow-sm,
-            .h-full.border-r nav.flex-col > button.text-ink-gray-9 {
+            /* Active Sidebar Item */
+            nav.flex-col > button.bg-white,
+            nav.flex-col > button.shadow-sm,
+            nav.flex-col > button.text-ink-gray-9 {
+                background-color: rgba(255, 107, 53, 0.08) !important; /* Soft Aionion Orange bg */
                 color: var(--brand-color, #FF6B35) !important;
-                border-bottom-color: var(--brand-color, #FF6B35) !important;
-                background-color: transparent !important;
                 box-shadow: none !important;
+                border-right: 3px solid var(--brand-color, #FF6B35) !important; /* Accent border on the right */
+                border-radius: 6px !important;
+                font-weight: 600 !important;
             }
 
-            /* Ensure SVG icons inherit the text color perfectly */
-            .h-full.border-r nav.flex-col > button svg {
+            /* Inactive Sidebar Items Hover */
+            nav.flex-col > button:not(.bg-white):hover {
+                background-color: #F1F5F9 !important; /* slate-100 */
+                color: #334155 !important;
+            }
+
+            /* Ensure active SVGs inherit color */
+            nav.flex-col > button.bg-white svg,
+            nav.flex-col > button.shadow-sm svg,
+            nav.flex-col > button.text-ink-gray-9 svg {
                 color: inherit !important;
             }
 
-            /* Position User Dropdown at the far right */
-            .h-full.border-r > div > .p-2 {
-                position: absolute !important;
-                right: 15px !important;
-                top: 6px !important;
-                width: auto !important;
-                min-width: 150px !important;
-                padding: 0 !important;
-            }
-            .h-full.border-r > div > .p-2 button {
-                background: transparent !important;
-            }
-            
-            /* Hide the "CRM" text in the User Dropdown, keep just the username */
+            /* Clean up User Dropdown (Hide redundant "CRM" text) */
             .p-2 button > div.flex-col > div.text-base-medium {
                 display: none !important;
             }
             .p-2 button > div.flex-col > div.text-sm {
                 margin-top: 0 !important;
                 font-weight: 500 !important;
-                color: #374151 !important;
-            }
-
-            /* Position Notifications Button near User Dropdown */
-            #notifications-btn {
-                position: absolute !important;
-                right: 210px !important;
-                top: 15px !important;
-                margin: 0 !important;
-                padding: 6px !important;
-                width: auto !important;
-                background: transparent !important;
-            }
-
-            /* Ensure main body area scrolls properly under the new top nav */
-            #app > div.flex.h-screen.w-screen > div.flex-1 {
-                overflow-y: auto !important;
-                background-color: #F8FAFC !important; /* Soft light background */
+                color: #334155 !important;
             }
 
             /* ========================================================================= */
