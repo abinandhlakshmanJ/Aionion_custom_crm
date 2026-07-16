@@ -258,17 +258,16 @@
                 color: #334155 !important;
             }
 
-            /* Ensure main body area scrolls properly under the new top nav */
+            /* Ensure main body area scrolls properly */
             #app > div.flex.h-screen.w-screen > div.flex-1 {
                 overflow-y: auto !important;
-                background-color: #F8FAFC !important; /* Soft light background for the whole page */
             }
 
             /* ========================================================================= */
             /* 2. DASHBOARD & LIST VIEW BRAND THEMING                                    */
             /* ========================================================================= */
 
-            /* Redefine root CSS variables to inject Aionion Orange (#FF6B35) globally */
+            /* Redefine root CSS variables */
             :root {
                 --brand-color: #FF6B35 !important;
                 --text-brand: #FF6B35 !important;
@@ -276,9 +275,10 @@
                 --bg-brand-hover: #E85D2A !important;
                 --border-brand: #FF6B35 !important;
                 --bg-surface-gray-1: #ffffff !important;
+                --bg-surface-base: #F8FAFC !important; /* Overrides Frappe UI main background to soft slate! */
             }
 
-            /* Restyle Primary Solid Buttons (like + Create) to use the Brand Color */
+            /* Restyle Primary Solid Buttons (like + Create) */
             button.bg-gray-900, 
             button.bg-surface-gray-9,
             button.bg-surface-gray-8,
@@ -300,12 +300,11 @@
                 box-shadow: 0 6px 16px rgba(255, 107, 53, 0.35) !important;
             }
 
-            /* Dashboard Grid Cards & List View Cards Restyling */
+            /* Dashboard Grid Cards Restyling */
             .crm-dashboard .grid > div,
             .grid > div.bg-surface-white,
             .grid > div.bg-white,
-            div[class*="shadow-sm"],
-            .list-view-container {
+            div[class*="shadow-sm"] {
                 border: 1px solid rgba(255, 107, 53, 0.15) !important;
                 border-top: 3px solid #FF6B35 !important;
                 border-radius: 12px !important;
@@ -321,27 +320,34 @@
                 box-shadow: 0 10px 15px -3px rgba(255, 107, 53, 0.15) !important;
             }
 
-            /* Filter Bar Elements -> Pill Shape */
-            .form-control,
-            .list-filters button {
-                border-radius: 99px !important;
-                border: 1px solid #E2E8F0 !important;
-                box-shadow: 0 1px 2px rgba(0,0,0,0.02) !important;
-                background-color: #ffffff !important;
-                transition: all 0.2s ease-in-out !important;
+            /* Force Inputs and Filter Buttons to be Pills */
+            input,
+            select,
+            button[class*="bg-surface-gray-2"],
+            button[class*="border-outline-gray-2"] {
+                border-radius: 9999px !important;
             }
-            .form-control:focus-within,
-            .list-filters button:hover {
+
+            /* Inputs Focus State */
+            input:focus,
+            select:focus {
                 border-color: #FF6B35 !important;
                 box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.15) !important;
             }
 
-            /* Empty State Branding */
-            .h-full.flex.flex-col.items-center.justify-center svg {
+            /* Empty State Icons (Frappe UI usually uses a large SVG inside a flex column) */
+            .flex-col > svg,
+            svg.w-12.h-12,
+            svg[class*="w-10"],
+            svg[class*="w-12"] {
+                color: #FF6B35 !important;
+            }
+            
+            /* Specific fix for "No Leads Found" icon size class */
+            div.text-ink-gray-5 > svg {
                 color: #FF6B35 !important;
                 opacity: 0.9 !important;
-                transform: scale(1.3) !important;
-                margin-bottom: 12px !important;
+                transform: scale(1.1) !important;
             }
 
             /* Highlight specific icons with Brand Color */
