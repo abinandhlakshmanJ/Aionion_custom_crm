@@ -238,7 +238,7 @@
 
             /* Collapsed Sidebar State */
             .aionion-sidebar-collapsed {
-                width: 76px !important;
+                width: 72px !important;
             }
             .aionion-sidebar-collapsed span.truncate {
                 display: none !important;
@@ -246,36 +246,47 @@
             .aionion-sidebar-collapsed #aionion-logo-wrap img {
                 display: none !important;
             }
-            .aionion-sidebar-collapsed .p-2 button > div.flex-col {
+            /* Hide the whole user profile dropdown section in collapsed state to avoid floating chevrons */
+            .aionion-sidebar-collapsed .p-2 {
                 display: none !important;
             }
-            .aionion-sidebar-collapsed .p-2 button svg {
-                display: none !important;
-            }
+            
+            /* Center Nav Buttons */
             .aionion-sidebar-collapsed nav.flex-col > button {
+                display: flex !important;
                 justify-content: center !important;
-                padding: 8px !important;
+                align-items: center !important;
+                padding: 10px !important;
+                margin: 4px auto !important;
+                width: 44px !important;
+                height: 44px !important;
             }
             .aionion-sidebar-collapsed nav.flex-col > button svg {
                 margin: 0 !important;
             }
 
-            /* Hamburger Button */
+            /* Center Hamburger Menu */
             .aionion-hamburger {
                 cursor: pointer;
                 color: #64748B;
                 transition: color 0.2s;
-                padding: 4px;
+                padding: 8px;
                 margin-left: auto;
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                border-radius: 6px;
             }
             .aionion-hamburger:hover {
                 color: #0F172A;
+                background-color: #F1F5F9;
             }
             .aionion-sidebar-collapsed .aionion-hamburger {
                 margin: 0 auto;
+            }
+            .aionion-sidebar-collapsed #aionion-logo-wrap {
+                padding: 16px 0 !important;
+                justify-content: center !important;
             }
 
             /* Active item — subtle blue fill, bold blue text */
