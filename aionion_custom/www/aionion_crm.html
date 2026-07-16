@@ -205,244 +205,352 @@
               {% endfor %}
           </script>
           <style>
+            /* ======================================================= */
+            /* AIONION CRM — ROYAL BLUE PREMIUM THEME                  */
+            /* Brand: #2563EB | Modern SaaS Design                     */
+            /* ======================================================= */
+
+            /* Google Font: Inter */
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+            /* Global Font Override */
+            *, *::before, *::after {
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+            }
+
+            /* Hidden links */
             .aionion-hidden-link {
                 display: none !important;
             }
-            /* Hide the CRM Brand Logo Icon at the top of the sidebar */
+
+            /* Hide CRM Brand Logo Icon */
             .p-2 button .h-8.max-w-16 {
                 display: none !important;
             }
 
-            /* ========================================================================= */
-            /* 1. SIDEBAR LIGHT THEME                                                    */
-            /* ========================================================================= */
-            
-            /* Clean Sidebar Background & Border */
-            .h-full.border-r.bg-surface-gray-1 {
-                background-color: #F8FAFC !important; /* Soft premium slate-50 */
-                border-right: 1px solid #E2E8F0 !important;
+            /* ======================================================= */
+            /* CSS VARIABLES — Royal Blue Palette                      */
+            /* ======================================================= */
+            :root {
+                --brand:          #2563EB;
+                --brand-dark:     #1D4ED8;
+                --brand-light:    #EFF6FF;
+                --brand-muted:    rgba(37, 99, 235, 0.10);
+                --brand-border:   rgba(37, 99, 235, 0.20);
+                --surface-page:   #F1F5F9;
+                --surface-card:   #FFFFFF;
+                --surface-sidebar:#FFFFFF;
+                --border-soft:    #E2E8F0;
+                --text-primary:   #0F172A;
+                --text-muted:     #64748B;
+                --shadow-card:    0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+                --shadow-hover:   0 8px 25px rgba(37,99,235,0.12);
+                --radius-card:    12px;
+                --radius-pill:    9999px;
+                --radius-btn:     8px;
+            }
+
+            /* ======================================================= */
+            /* 1. SIDEBAR — Clean White + Blue Accents                 */
+            /* ======================================================= */
+
+            /* Sidebar container */
+            .h-full.border-r {
+                background-color: var(--surface-sidebar) !important;
+                border-right: 1px solid var(--border-soft) !important;
+                box-shadow: 2px 0 8px rgba(0,0,0,0.04) !important;
             }
 
             /* Active Sidebar Item */
             nav.flex-col > button.bg-white,
             nav.flex-col > button.shadow-sm,
             nav.flex-col > button.text-ink-gray-9 {
-                background-color: rgba(255, 107, 53, 0.08) !important; /* Soft Aionion Orange bg */
-                color: var(--brand-color, #FF6B35) !important;
+                background-color: var(--brand-muted) !important;
+                color: var(--brand) !important;
                 box-shadow: none !important;
-                border-right: 3px solid var(--brand-color, #FF6B35) !important; /* Accent border on the right */
-                border-radius: 6px !important;
+                border-left: 3px solid var(--brand) !important;
+                border-right: none !important;
+                border-radius: 0 8px 8px 0 !important;
                 font-weight: 600 !important;
+                letter-spacing: -0.01em !important;
             }
 
-            /* Inactive Sidebar Items Hover */
-            nav.flex-col > button:not(.bg-white):hover {
-                background-color: #F1F5F9 !important; /* slate-100 */
-                color: #334155 !important;
-            }
-
-            /* Ensure active SVGs inherit color */
+            /* Active item SVG */
             nav.flex-col > button.bg-white svg,
             nav.flex-col > button.shadow-sm svg,
             nav.flex-col > button.text-ink-gray-9 svg {
-                color: inherit !important;
+                color: var(--brand) !important;
             }
 
-            /* Clean up User Dropdown (Hide redundant "CRM" text) */
+            /* Inactive Sidebar hover */
+            nav.flex-col > button:not(.bg-white):not(.shadow-sm):hover {
+                background-color: var(--brand-light) !important;
+                color: var(--brand) !important;
+                border-left: 3px solid transparent !important;
+                border-radius: 0 8px 8px 0 !important;
+            }
+            nav.flex-col > button:not(.bg-white):not(.shadow-sm):hover svg {
+                color: var(--brand) !important;
+            }
+
+            /* Section labels in sidebar */
+            .cursor-pointer.text-base {
+                font-size: 10px !important;
+                font-weight: 700 !important;
+                letter-spacing: 0.08em !important;
+                text-transform: uppercase !important;
+                color: var(--text-muted) !important;
+                padding: 12px 12px 4px !important;
+            }
+
+            /* Clean up User Dropdown */
             .p-2 button > div.flex-col > div.text-base-medium {
                 display: none !important;
             }
             .p-2 button > div.flex-col > div.text-sm {
                 margin-top: 0 !important;
-                font-weight: 500 !important;
-                color: #334155 !important;
+                font-weight: 600 !important;
+                color: var(--text-primary) !important;
+                font-size: 13px !important;
             }
 
-            /* Ensure main body area scrolls properly */
+            /* ======================================================= */
+            /* 2. PAGE LAYOUT                                           */
+            /* ======================================================= */
+
+            /* Main content background */
             #app > div.flex.h-screen.w-screen > div.flex-1 {
                 overflow-y: auto !important;
+                background-color: var(--surface-page) !important;
             }
 
-            /* ========================================================================= */
-            /* 2. DASHBOARD & LIST VIEW BRAND THEMING                                    */
-            /* ========================================================================= */
+            /* ======================================================= */
+            /* 3. PAGE HEADER — Blue Gradient Banner                   */
+            /* ======================================================= */
 
-            /* Redefine root CSS variables */
-            :root {
-                --brand-color: #FF6B35 !important;
-                --text-brand: #FF6B35 !important;
-                --bg-brand: #FF6B35 !important;
-                --bg-brand-hover: #E85D2A !important;
-                --border-brand: #FF6B35 !important;
-                --bg-surface-gray-1: #ffffff !important;
-                --bg-surface-base: #F8FAFC !important; /* Overrides Frappe UI main background to soft slate! */
+            /* Top bar of each page (contains title + breadcrumb) */
+            .sticky.top-0,
+            div[class*="border-b"]:first-of-type {
+                background: linear-gradient(135deg, #1E40AF 0%, #2563EB 60%, #3B82F6 100%) !important;
+                color: #fff !important;
+                border-bottom: none !important;
+                box-shadow: 0 4px 20px rgba(37,99,235,0.25) !important;
+            }
+            .sticky.top-0 *,
+            div[class*="border-b"]:first-of-type * {
+                color: #fff !important;
+                border-color: rgba(255,255,255,0.2) !important;
             }
 
-            /* Restyle Primary Solid Buttons (like + Create) */
-            button.bg-gray-900, 
+            /* ======================================================= */
+            /* 4. BUTTONS — Royal Blue Primary Actions                 */
+            /* ======================================================= */
+
+            /* CSS fallback for dark buttons */
+            button.bg-gray-900,
             button.bg-surface-gray-9,
-            button.bg-surface-gray-8,
             button[class*="bg-gray-900"],
-            button[class*="bg-surface-gray-9"] {
-                background-color: #FF6B35 !important;
-                color: #ffffff !important;
-                border-color: #FF6B35 !important;
-                box-shadow: 0 4px 12px rgba(255, 107, 53, 0.25) !important;
-                border-radius: 8px !important;
-                transition: all 0.2s ease-in-out !important;
+            button[class*="bg-surface-gray-9"],
+            button[class*="bg-surface-gray-8"] {
+                background-color: var(--brand) !important;
+                border-color: var(--brand) !important;
+                color: #fff !important;
+                border-radius: var(--radius-btn) !important;
+                box-shadow: 0 4px 12px rgba(37,99,235,0.30) !important;
+                font-weight: 600 !important;
+                transition: all 0.2s ease !important;
             }
-            
-            button[class*="bg-gray-900"]:hover,
+            button.bg-gray-900:hover,
             button[class*="bg-surface-gray-9"]:hover {
-                background-color: #E85D2A !important;
-                border-color: #E85D2A !important;
+                background-color: var(--brand-dark) !important;
                 transform: translateY(-1px) !important;
-                box-shadow: 0 6px 16px rgba(255, 107, 53, 0.35) !important;
+                box-shadow: 0 6px 20px rgba(37,99,235,0.40) !important;
             }
 
-            /* Dashboard Grid Cards Restyling */
-            .crm-dashboard .grid > div,
+            /* ======================================================= */
+            /* 5. INPUTS — Pill Shape with Blue Focus                  */
+            /* ======================================================= */
+
+            input, select {
+                border-radius: var(--radius-pill) !important;
+                transition: border-color 0.2s, box-shadow 0.2s !important;
+            }
+            input:focus, select:focus {
+                border-color: var(--brand) !important;
+                box-shadow: 0 0 0 3px rgba(37,99,235,0.15) !important;
+                outline: none !important;
+            }
+
+            /* Filter bar wrapper - soft card look */
+            .flex.items-center.gap-2.px-4,
+            .flex.items-center.gap-2.py-2 {
+                background: var(--surface-card) !important;
+                border-bottom: 1px solid var(--border-soft) !important;
+                box-shadow: var(--shadow-card) !important;
+                padding: 10px 20px !important;
+            }
+
+            /* ======================================================= */
+            /* 6. LIST ROWS — Card Style                               */
+            /* ======================================================= */
+
+            /* Row container */
+            .mx-3.sm\:mx-5,
+            [class*="overflow-y-auto"] > div {
+                padding: 4px 0 !important;
+            }
+
+            /* Individual rows */
+            [class*="list-row"],
+            tr {
+                background: var(--surface-card) !important;
+                border-radius: 8px !important;
+                margin-bottom: 4px !important;
+                border: 1px solid var(--border-soft) !important;
+                transition: box-shadow 0.15s, transform 0.15s !important;
+            }
+            [class*="list-row"]:hover,
+            tr:hover {
+                box-shadow: var(--shadow-hover) !important;
+                border-color: var(--brand-border) !important;
+                transform: translateY(-1px) !important;
+            }
+
+            /* Table column headers - bold */
+            [class*="list-header"] *,
+            th {
+                font-weight: 700 !important;
+                font-size: 11px !important;
+                letter-spacing: 0.06em !important;
+                text-transform: uppercase !important;
+                color: var(--text-muted) !important;
+            }
+
+            /* ======================================================= */
+            /* 7. DASHBOARD CARDS                                      */
+            /* ======================================================= */
+
             .grid > div.bg-surface-white,
             .grid > div.bg-white,
             div[class*="shadow-sm"] {
-                border: 1px solid rgba(255, 107, 53, 0.15) !important;
-                border-top: 3px solid #FF6B35 !important;
-                border-radius: 12px !important;
-                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
-                background: #ffffff !important;
-                transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out !important;
+                border: 1px solid var(--brand-border) !important;
+                border-top: 3px solid var(--brand) !important;
+                border-radius: var(--radius-card) !important;
+                box-shadow: var(--shadow-card) !important;
+                background: var(--surface-card) !important;
+                transition: transform 0.2s, box-shadow 0.2s !important;
             }
-            
-            .crm-dashboard .grid > div:hover,
             .grid > div.bg-surface-white:hover,
             .grid > div.bg-white:hover {
-                transform: translateY(-2px) !important;
-                box-shadow: 0 10px 15px -3px rgba(255, 107, 53, 0.15) !important;
+                transform: translateY(-3px) !important;
+                box-shadow: var(--shadow-hover) !important;
             }
 
-            /* Force Inputs and Filter Buttons to be Pills */
-            input,
-            select,
-            button[class*="bg-surface-gray-2"],
-            button[class*="border-outline-gray-2"] {
-                border-radius: 9999px !important;
-            }
-
-            /* Inputs Focus State */
-            input:focus,
-            select:focus {
-                border-color: #FF6B35 !important;
-                box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.15) !important;
-            }
-
-            /* Empty State Icons (Frappe UI usually uses a large SVG inside a flex column) */
+            /* ======================================================= */
+            /* 8. EMPTY STATE — Blue Icon                              */
+            /* ======================================================= */
             .flex-col > svg,
             svg.w-12.h-12,
             svg[class*="w-10"],
-            svg[class*="w-12"] {
-                color: #FF6B35 !important;
-            }
-            
-            /* Specific fix for "No Leads Found" icon size class */
+            svg[class*="w-12"],
             div.text-ink-gray-5 > svg {
-                color: #FF6B35 !important;
-                opacity: 0.9 !important;
-                transform: scale(1.1) !important;
+                color: var(--brand) !important;
+                opacity: 0.8 !important;
             }
 
-            /* Highlight specific icons with Brand Color */
-            .text-ink-gray-5 svg,
+            /* ======================================================= */
+            /* 9. MISC — Brand Color Accents                           */
+            /* ======================================================= */
             .text-ink-gray-7 svg {
-                color: #FF6B35 !important;
+                color: var(--brand) !important;
             }
-            
-            /* Keep Nav icons a bit more muted unless active */
             .h-full.border-r nav.flex-col > button:hover svg {
-                color: #FF6B35 !important;
+                color: var(--brand) !important;
             }
+
+            /* Scrollbar styling */
+            ::-webkit-scrollbar { width: 6px; height: 6px; }
+            ::-webkit-scrollbar-track { background: transparent; }
+            ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 99px; }
+            ::-webkit-scrollbar-thumb:hover { background: var(--brand); }
           </style>
+
           <script>
+            // ============================================================
+            // AIONION GLOBAL SCRIPT — Runs every 500ms to apply branding
+            // ============================================================
+            const BRAND       = '#2563EB';
+            const BRAND_DARK  = '#1D4ED8';
+            const BRAND_BG    = 'rgba(37,99,235,0.08)';
+            const SLATE_BG    = '#F1F5F9';
+
             function aionionGlobalScript() {
-                // 1. Hide Links Safely
-                let spans = document.querySelectorAll('span.truncate');
-                spans.forEach(span => {
-                    let text = (span.textContent || "").trim();
-                    if (text === "Deals" || text === "Contacts" || text === "Organizations") {
-                        let btn = span.closest('button');
-                        if (btn) {
-                            btn.classList.add('aionion-hidden-link');
-                        }
+                // 1. Hide unwanted sidebar links
+                document.querySelectorAll('span.truncate').forEach(span => {
+                    const text = (span.textContent || '').trim();
+                    if (text === 'Deals' || text === 'Contacts' || text === 'Organizations') {
+                        const btn = span.closest('button');
+                        if (btn) btn.classList.add('aionion-hidden-link');
                     }
                 });
 
-                // 2. Change Notification Bell Color
-                let notifBtn = document.getElementById('notifications-btn');
+                // 2. Notification bell → Blue
+                const notifBtn = document.getElementById('notifications-btn');
                 if (notifBtn) {
-                    let svg = notifBtn.querySelector('svg');
-                    if (svg) svg.style.color = '#FF6B35';
-                    let dot = notifBtn.querySelector('circle') || notifBtn.querySelector('.bg-surface-gray-9');
-                    if (dot) {
-                        dot.style.fill = '#FF6B35';
-                        dot.style.backgroundColor = '#FF6B35';
-                    }
+                    const svg = notifBtn.querySelector('svg');
+                    if (svg) svg.style.color = BRAND;
                 }
             }
-            setInterval(aionionGlobalScript, 500);
 
             function aionionThemeScript() {
-                const ORANGE = '#FF6B35';
-                const ORANGE_DARK = '#E85D2A';
-                const ORANGE_BG = 'rgba(255,107,53,0.08)';
-                const SLATE_BG = '#F8FAFC';
-
-                // 1. PAGE BACKGROUND - set the main content area to soft slate
+                // 3. Page background → soft slate
                 document.querySelectorAll('#app > div > div:not(.border-r)').forEach(el => {
-                    el.style.backgroundColor = SLATE_BG;
+                    el.style.setProperty('background-color', SLATE_BG, 'important');
                 });
 
-                // 2. ALL SOLID BLACK / DARK BUTTONS → Orange
-                // Frappe UI renders primary buttons as dark-background buttons
+                // 4. Dark/black primary buttons → Royal Blue
                 document.querySelectorAll('button').forEach(btn => {
-                    const style = window.getComputedStyle(btn);
-                    const bg = style.backgroundColor;
-                    // Match very dark backgrounds (black / near-black / dark gray)
-                    if (
-                        bg === 'rgb(17, 24, 39)' || // gray-900
-                        bg === 'rgb(24, 24, 27)' || // zinc-900
-                        bg === 'rgb(9, 9, 11)'   || // zinc-950
-                        bg === 'rgb(26, 26, 26)' || // near-black
-                        bg === 'rgb(31, 41, 55)' || // gray-800
-                        bg === 'rgb(15, 23, 42)'    // slate-900
-                    ) {
-                        btn.style.setProperty('background-color', ORANGE, 'important');
-                        btn.style.setProperty('border-color', ORANGE, 'important');
+                    const bg = window.getComputedStyle(btn).backgroundColor;
+                    const isDark =
+                        bg === 'rgb(17, 24, 39)'  || // gray-900
+                        bg === 'rgb(24, 24, 27)'  || // zinc-900
+                        bg === 'rgb(9, 9, 11)'    || // zinc-950
+                        bg === 'rgb(26, 26, 26)'  || // near-black
+                        bg === 'rgb(31, 41, 55)'  || // gray-800
+                        bg === 'rgb(15, 23, 42)';    // slate-900
+
+                    if (isDark) {
+                        btn.style.setProperty('background-color', BRAND, 'important');
+                        btn.style.setProperty('border-color', BRAND, 'important');
                         btn.style.setProperty('color', '#fff', 'important');
-                        btn.style.setProperty('box-shadow', '0 4px 12px rgba(255,107,53,0.3)', 'important');
+                        btn.style.setProperty('box-shadow', '0 4px 12px rgba(37,99,235,0.30)', 'important');
                         btn.style.setProperty('border-radius', '8px', 'important');
-                        // Hover via mouseover/mouseout
+                        btn.style.setProperty('font-weight', '600', 'important');
                         if (!btn.dataset.aionionStyled) {
                             btn.dataset.aionionStyled = '1';
                             btn.addEventListener('mouseover', () => {
-                                btn.style.setProperty('background-color', ORANGE_DARK, 'important');
+                                btn.style.setProperty('background-color', BRAND_DARK, 'important');
                                 btn.style.setProperty('transform', 'translateY(-1px)', 'important');
+                                btn.style.setProperty('box-shadow', '0 6px 20px rgba(37,99,235,0.40)', 'important');
                             });
                             btn.addEventListener('mouseout', () => {
-                                btn.style.setProperty('background-color', ORANGE, 'important');
+                                btn.style.setProperty('background-color', BRAND, 'important');
                                 btn.style.setProperty('transform', '', 'important');
+                                btn.style.setProperty('box-shadow', '0 4px 12px rgba(37,99,235,0.30)', 'important');
                             });
                         }
                     }
                 });
 
-                // 3. ALL TEXT INPUTS & DROPDOWNS → Pill-shaped with brand focus
-                document.querySelectorAll('input[type="text"], input:not([type]), select').forEach(el => {
+                // 5. Text inputs → Pill shape + blue focus
+                document.querySelectorAll('input[type="text"], input:not([type]), input[type="search"]').forEach(el => {
                     el.style.setProperty('border-radius', '9999px', 'important');
                     el.style.setProperty('padding-left', '14px', 'important');
                     if (!el.dataset.aionionStyled) {
                         el.dataset.aionionStyled = '1';
                         el.addEventListener('focus', () => {
-                            el.style.setProperty('border-color', ORANGE, 'important');
-                            el.style.setProperty('box-shadow', '0 0 0 2px rgba(255,107,53,0.2)', 'important');
+                            el.style.setProperty('border-color', BRAND, 'important');
+                            el.style.setProperty('box-shadow', '0 0 0 3px rgba(37,99,235,0.15)', 'important');
                         });
                         el.addEventListener('blur', () => {
                             el.style.removeProperty('border-color');
@@ -451,44 +559,48 @@
                     }
                 });
 
-                // 4. FILTER DROPDOWN BUTTONS (the pill dropdowns like "Status", "Type") → rounded
-                document.querySelectorAll('button[class*="border"]').forEach(btn => {
+                // 6. Filter dropdown buttons → Pill shape
+                document.querySelectorAll('button').forEach(btn => {
                     const style = window.getComputedStyle(btn);
                     const bg = style.backgroundColor;
-                    // Light gray background = filter buttons
-                    if (
+                    const isFilterBtn =
                         bg === 'rgb(247, 247, 249)' ||
                         bg === 'rgb(248, 248, 250)' ||
                         bg === 'rgb(243, 244, 246)' ||
                         bg === 'rgb(249, 250, 251)' ||
-                        bg === 'rgba(0, 0, 0, 0)' && style.borderWidth !== '0px'
-                    ) {
+                        bg === 'rgb(242, 244, 247)';
+                    if (isFilterBtn) {
                         btn.style.setProperty('border-radius', '9999px', 'important');
-                    }
-                });
-
-                // 5. EMPTY STATE ICON → orange
-                document.querySelectorAll('svg').forEach(svg => {
-                    const parent = svg.parentElement;
-                    if (!parent) return;
-                    const rect = svg.getBoundingClientRect();
-                    // Large centered SVGs in empty states
-                    if (rect.width >= 32 && rect.width <= 80 && rect.height >= 32) {
-                        const container = svg.closest('.flex-col');
-                        if (container) {
-                            svg.style.setProperty('color', ORANGE, 'important');
-                            svg.style.setProperty('opacity', '0.9', 'important');
+                        if (!btn.dataset.aionionStyled) {
+                            btn.dataset.aionionStyled = '1';
+                            btn.addEventListener('mouseover', () => {
+                                btn.style.setProperty('border-color', BRAND, 'important');
+                                btn.style.setProperty('color', BRAND, 'important');
+                            });
+                            btn.addEventListener('mouseout', () => {
+                                btn.style.removeProperty('border-color');
+                                btn.style.removeProperty('color');
+                            });
                         }
                     }
                 });
 
-                // 6. TABLE ROW HOVER COLOR
-                document.querySelectorAll('tr:hover, [class*="list-row"]:hover').forEach(row => {
-                    row.style.setProperty('background-color', ORANGE_BG, 'important');
+                // 7. Empty state icons → Blue
+                document.querySelectorAll('svg').forEach(svg => {
+                    if (!svg.parentElement) return;
+                    const rect = svg.getBoundingClientRect();
+                    if (rect.width >= 32 && rect.width <= 80 && rect.height >= 32) {
+                        if (svg.closest('.flex-col') || svg.closest('[class*="empty"]')) {
+                            svg.style.setProperty('color', BRAND, 'important');
+                            svg.style.setProperty('opacity', '0.85', 'important');
+                        }
+                    }
                 });
             }
 
+            setInterval(aionionGlobalScript, 500);
             setInterval(aionionThemeScript, 500);
           </script>
           </body>
 </html>
+
