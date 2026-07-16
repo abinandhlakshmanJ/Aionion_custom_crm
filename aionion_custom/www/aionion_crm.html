@@ -204,21 +204,20 @@
               window["{{ key }}"] = {{ boot[key] | tojson }};
               {% endfor %}
           </script>
+          <style>
+            /* 
+              Safe CSS to hide Deals (3), Contacts (4), and Organizations (5).
+              Targeting the specific DOM structure of the sidebar.
+            */
+            .overflow-y-auto > .flex-col:nth-child(1) .columns > .w-full:nth-child(3),
+            .overflow-y-auto > .flex-col:nth-child(1) .columns > .w-full:nth-child(4),
+            .overflow-y-auto > .flex-col:nth-child(1) .columns > .w-full:nth-child(5) {
+                display: none !important;
+            }
+          </style>
           <script>
             function aionionGlobalScript() {
-                // 1. Hide Deals, Contacts, Organizations safely
-                let buttons = document.querySelectorAll('button');
-                buttons.forEach(btn => {
-                    let text = (btn.innerText || btn.textContent || "").toLowerCase().trim();
-                    if (text === "deals" || text === "contacts" || text === "organizations") {
-                        btn.style.setProperty("display", "none", "important");
-                        if (btn.parentElement) {
-                            btn.parentElement.style.setProperty("display", "none", "important");
-                        }
-                    }
-                });
-
-                // 2. Change Notification Bell Color
+                // Change Notification Bell Color
                 let notifBtn = document.getElementById('notifications-btn');
                 if (notifBtn) {
                     let svg = notifBtn.querySelector('svg');
