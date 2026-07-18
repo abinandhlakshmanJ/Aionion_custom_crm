@@ -1,3 +1,4 @@
+window.__ = window.__ || ((msg) => msg);
 import './index.css'
 
 import { createApp } from 'vue'
