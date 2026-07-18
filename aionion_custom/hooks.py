@@ -141,3 +141,10 @@ scheduler_events = {
         "aionion_custom.aionion_custom.tasks.techexcel_sync.sync_customers_from_s3",
     ],
 }
+override_whitelisted_methods = {
+    "crm.api.notifications.get_notifications": "aionion_custom.overrides.notifications.get_notifications"
+}
+
+website_route_rules = [
+    {"from_route": "/aionion_crm/<path:app_path>", "to_route": "aionion_crm"},
+]

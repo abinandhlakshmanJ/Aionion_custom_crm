@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/assets/aionion_custom/frontend/favicon.png" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover, user-scalable=no"
+    />
+    <title>Frappe UI App</title>
+    <script>
+      window.__ = function(message) { return message; };
+    </script>
+    <script type="module" crossorigin src="/assets/aionion_custom/frontend/assets/index-ef5ce452.js"></script>
+    <link rel="stylesheet" href="/assets/aionion_custom/frontend/assets/index-df2041c3.css">
+  </head>
+  <body class="h-full">
+    <div id="app" class="h-full"></div>
+    
+  
+          <script>
+              {% for key in boot %}
+              window["{{ key }}"] = {{ boot[key] | tojson }};
+              {% endfor %}
+          </script>
+          </body>
+          
+</html>

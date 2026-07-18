@@ -1,0 +1,11 @@
+@import 'frappe-ui/style.css';
+@import '../../../crm/frontend/src/index.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* disable webkit tap highlight color */
+body {
+  -webkit-tap-highlight-color: transparent;
+}
