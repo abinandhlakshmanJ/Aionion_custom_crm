@@ -33,7 +33,18 @@ export default defineConfig({
       'vue-router$': path.resolve(__dirname, 'node_modules/vue-router'),
       'pinia$': path.resolve(__dirname, 'node_modules/pinia'),
     },
-    dedupe: ['vue', 'vue-router', 'pinia', 'frappe-ui'],
+    dedupe: [
+      'vue',
+      'vue-router',
+      'pinia',
+      'frappe-ui',
+      '@tiptap/core',
+      '@tiptap/vue-3',
+      'prosemirror-state',
+      'prosemirror-view',
+      'prosemirror-model',
+      'prosemirror-transform'
+    ],
   },
   optimizeDeps: {
     include: [
