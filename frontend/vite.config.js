@@ -1,7 +1,15 @@
 import vue from '@vitejs/plugin-vue'
 import frappeui from 'frappe-ui/vite'
+import fs from 'fs'
 import path from 'path'
 import { defineConfig } from 'vite'
+
+const tiptapPkgs = fs.existsSync(path.resolve(__dirname, 'node_modules/@tiptap')) 
+  ? fs.readdirSync(path.resolve(__dirname, 'node_modules/@tiptap')).map(d => '@tiptap/' + d) 
+  : []
+const pmPkgs = fs.existsSync(path.resolve(__dirname, 'node_modules'))
+  ? fs.readdirSync(path.resolve(__dirname, 'node_modules')).filter(d => d.startsWith('prosemirror-'))
+  : []
 
 export default defineConfig({
   define: {
@@ -38,12 +46,8 @@ export default defineConfig({
       'vue-router',
       'pinia',
       'frappe-ui',
-      '@tiptap/core',
-      '@tiptap/vue-3',
-      'prosemirror-state',
-      'prosemirror-view',
-      'prosemirror-model',
-      'prosemirror-transform'
+      ...tiptapPkgs,
+      ...pmPkgs
     ],
   },
   optimizeDeps: {
