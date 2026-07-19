@@ -50,6 +50,11 @@ doc_events = {
             "aionion_custom.aionion_custom.controllers.crm_lead.validate_crm_lead_assignment",
         ],
     },
+    "Communication": {
+        "after_insert": [
+            "aionion_custom.aionion_custom.api.route_incoming_email_to_rm",
+        ],
+    },
 }
 
 # Fixtures
@@ -58,6 +63,8 @@ fixtures = [
     "Insurance Company",
     {"dt": "Custom Field", "filters": [["dt", "in", ["CRM Lead", "Customer", "US Subscription Record"]]]},
     "CRM Lead Source",
+    "Custom DocPerm",
+    {"dt": "Role", "filters": [["is_custom", "=", 1]]},
     {
         "dt": "CRM Form Script",
         "filters": [["name", "in", [

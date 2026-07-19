@@ -1,2 +1,0 @@
-import{e as c,u as i,a_ as m,f as a,c as l,t as u,ax as t,L as o,h as r,aw as y}from"./index-c236329a.js";const f={__name:"Icon",props:{icon:{type:[String,Object],required:!0}},setup(e){return(n,k)=>{const s=c("FeatherIcon");return i(m)(e.icon)?(a(),l("div",t(o({key:0},n.$attrs)),u(e.icon),17)):typeof e.icon=="string"?(a(),r(s,o({key:1,name:e.icon},n.$attrs),null,16,["name"])):(a(),r(y(e.icon),t(o({key:2},n.$attrs)),null,16))}}};export{f as _};
-//# sourceMappingURL=Icon-c50620f8.js.map

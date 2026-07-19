@@ -7,7 +7,7 @@ import { createDialog } from '@crm/utils/dialogs'
 import { initSocket } from '@crm/socket'
 import router from './router'
 import translationPlugin from '@crm/translation'
-import App from '@crm/App.vue'
+import App from './App.vue'
 
 import {
   FrappeUI,
@@ -46,11 +46,11 @@ app.use(FrappeUI)
 app.use(pinia)
 app.use(router)
 app.use(translationPlugin)
-app.config.globalProperties.__ = (msg) => {
+app.config.globalProperties.__ = (...args) => {
   if (window.__ && window.__.name === 'translate') {
-    return window.__(msg);
+    return window.__(...args);
   }
-  return msg;
+  return args[0];
 }
 for (let key in globalComponents) {
   app.component(key, globalComponents[key])

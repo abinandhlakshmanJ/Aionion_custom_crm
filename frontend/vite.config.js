@@ -1,5 +1,5 @@
 import vue from '@vitejs/plugin-vue'
-import frappeui from 'frappe-ui/vite'
+import frappeui from '../../crm/frontend/node_modules/frappe-ui/vite/index.js'
 import fs from 'fs'
 import path from 'path'
 import { defineConfig } from 'vite'
@@ -27,7 +27,14 @@ export default defineConfig({
     __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false',
   },
   plugins: [
-    vue(),
+    vue({
+      script: {
+        fs: {
+          fileExists: fs.existsSync,
+          readFile: (file) => fs.readFileSync(file, 'utf-8'),
+        },
+      },
+    }),
     frappeui({
       frappeProxy: true,
       lucideIcons: true,
@@ -51,6 +58,7 @@ export default defineConfig({
       'vue$': path.resolve(__dirname, 'node_modules/vue'),
       'vue-router$': path.resolve(__dirname, 'node_modules/vue-router'),
       'pinia$': path.resolve(__dirname, 'node_modules/pinia'),
+      '@vueuse/core': path.resolve(crmNodeModules, '@vueuse/core'),
       ...extraAliases
     },
     dedupe: [

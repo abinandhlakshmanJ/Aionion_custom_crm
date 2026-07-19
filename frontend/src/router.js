@@ -35,7 +35,12 @@ const routes = [
   {
     path: '/dashboard',
     name: 'Dashboard',
-    component: () => import('@crm/pages/Dashboard.vue'),
+    component: () => import('./pages/Dashboard.vue'),
+  },
+  {
+    path: '/email',
+    name: 'Email',
+    component: () => import('./pages/GmailApp.vue'),
   },
   {
     alias: '/leads',

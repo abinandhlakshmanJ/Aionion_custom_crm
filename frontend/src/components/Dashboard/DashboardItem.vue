@@ -1,0 +1,44 @@
+<template>
+  <div class="h-full w-full">
+    <div
+      v-if="item.type == 'number_chart' && item.data"
+      class="flex h-full w-full rounded shadow overflow-hidden cursor-pointer"
+    >
+      <Tooltip :text="item.data.tooltip ? __(item.data.tooltip) : ''">
+        <NumberChart
+          :key="index"
+          class="!items-start"
+          :config="item.data"
+        />
+      </Tooltip>
+    </div>
+    <div
+      v-else-if="item.type == 'spacer'"
+      class="rounded bg-surface-base h-full overflow-hidden text-ink-gray-5 flex items-center justify-center"
+      :class="editing ? 'border border-dashed border-outline-gray-2' : ''"
+    >
+      {{ editing ? __('Spacer') : '' }}
+    </div>
+    <div
+      v-else-if="item.type == 'axis_chart' && item.data"
+      class="h-full w-full rounded-md bg-surface-base shadow"
+    >
+      <AxisChart :config="item.data" />
+    </div>
+    <div
+      v-else-if="item.type == 'donut_chart' && item.data"
+      class="h-full w-full rounded-md bg-surface-base shadow overflow-hidden"
+    >
+      <DonutChart :config="item.data" />
+    </div>
+  </div>
+</template>
+<script setup>
+import { AxisChart, DonutChart, NumberChart, Tooltip } from 'frappe-ui'
+
+defineProps({
+  index: { type: Number, required: true },
+  item: { type: Object, required: true },
+  editing: { type: Boolean, default: false },
+})
+</script>
