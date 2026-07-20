@@ -1,4 +1,5 @@
 import vue from '@vitejs/plugin-vue'
+import vueJsx from '@vitejs/plugin-vue-jsx'
 import frappeui from '../../crm/frontend/node_modules/frappe-ui/vite/index.js'
 import fs from 'fs'
 import path from 'path'
@@ -35,6 +36,7 @@ export default defineConfig({
         },
       },
     }),
+    vueJsx(),
     frappeui({
       frappeProxy: true,
       lucideIcons: true,

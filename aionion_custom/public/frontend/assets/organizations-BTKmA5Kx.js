@@ -1,0 +1,2 @@
+import{aZ as i,a0 as s,m as c,l as u}from"./index-DsJNS-nA.js";const m=i("crm-organizations",()=>{let t=u({});const a=s(),n=c({url:"crm.api.session.get_organizations",cache:"organizations",initialData:[],auto:!0,transform(o){for(let r of o)t[r.name]=r;return o},onError(o){o&&o.exc_type==="AuthenticationError"&&a.push("/login")}});function e(o){return t[o]}return{organizations:n,getOrganization:e}});export{m as o};
+//# sourceMappingURL=organizations-BTKmA5Kx.js.map

@@ -1,0 +1,2 @@
+import{r as s,u as i,cf as m,b as o,c as l,t as u,av as t,$ as a,h as r,a3 as y}from"./index-DsJNS-nA.js";const f={__name:"Icon",props:{icon:{type:[String,Object],required:!0}},setup(e){return(n,k)=>{const c=s("FeatherIcon");return i(m)(e.icon)?(o(),l("div",t(a({key:0},n.$attrs)),u(e.icon),17)):typeof e.icon=="string"?(o(),r(c,a({key:1,name:e.icon},n.$attrs),null,16,["name"])):(o(),r(y(e.icon),t(a({key:2},n.$attrs)),null,16))}}};export{f as _};
+//# sourceMappingURL=Icon-r_BJ72qM.js.map

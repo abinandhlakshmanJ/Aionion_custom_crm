@@ -1,4 +1,17 @@
 window.__ = window.__ || ((msg) => msg);
+
+// Patch ResizeObserver to avoid crashing when element is not an Element
+const OriginalResizeObserver = window.ResizeObserver;
+if (OriginalResizeObserver) {
+  window.ResizeObserver = class ResizeObserver extends OriginalResizeObserver {
+    observe(target, options) {
+      if (!(target instanceof Element)) {
+        return;
+      }
+      super.observe(target, options);
+    }
+  };
+}
 import './index.css'
 
 import { createApp } from 'vue'
