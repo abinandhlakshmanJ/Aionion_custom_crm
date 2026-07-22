@@ -179,3 +179,15 @@ def get_user_info():
 @frappe.whitelist(allow_guest=True)
 def boot_config(*args, **kwargs):
     return {}
+
+@frappe.whitelist(allow_guest=True)
+def get_single_value(doctype, field):
+    if doctype == "FCRM Settings" and field == "persona_captured":
+        try:
+            from frappe.client import get_single_value as original_get_single_value
+            return original_get_single_value(doctype, field)
+        except Exception:
+            return 0
+    from frappe.client import get_single_value as original_get_single_value
+    return original_get_single_value(doctype, field)
+
