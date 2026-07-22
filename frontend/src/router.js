@@ -11,15 +11,20 @@ export const PERSONA_DONE_KEY = 'crm_persona_captured'
 async function shouldCapturePersona() {
   // Client-side flag guards against re-prompting if the server persist failed.
   if (localStorage.getItem(PERSONA_DONE_KEY)) return false
-  const captured = await call('frappe.client.get_single_value', {
-    doctype: 'FCRM Settings',
-    field: 'persona_captured',
-  })
-  if (captured) return false
-  // The wizard only feeds telemetry; skip it entirely if the user opted out.
-  const { enabled } =
-    (await call('frappe.utils.telemetry.pulse.client.boot_config')) || {}
-  return !!enabled
+  try {
+    const captured = await call('frappe.client.get_single_value', {
+      doctype: 'FCRM Settings',
+      field: 'persona_captured',
+    })
+    if (captured) return false
+    // The wizard only feeds telemetry; skip it entirely if the user opted out.
+    const result = await call('frappe.utils.telemetry.pulse.client.boot_config').catch(() => ({}))
+    const { enabled } = result || {}
+    return !!enabled
+  } catch (e) {
+    // Silently skip the persona wizard if backend is not ready yet
+    return false
+  }
 }
 
 const routes = [
