@@ -164,3 +164,18 @@ def get_email_hub_data():
         "communications": communications,
         "failed_emails": failed_emails
     }
+
+
+@frappe.whitelist(allow_guest=True)
+def get_user_info():
+    if frappe.session.user == "Guest":
+        return {}
+    return {
+        "name": frappe.session.user,
+        "full_name": frappe.utils.get_fullname(frappe.session.user),
+        "roles": frappe.get_roles(frappe.session.user)
+    }
+
+@frappe.whitelist(allow_guest=True)
+def boot_config(*args, **kwargs):
+    return {}

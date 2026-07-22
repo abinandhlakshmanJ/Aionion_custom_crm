@@ -154,6 +154,8 @@ scheduler_events = {
     ],
 }
 override_whitelisted_methods = {
+    "crm.api.session.get_user_info": "aionion_custom.api.get_user_info",
+    "frappe.utils.telemetry.pulse.client.boot_config": "aionion_custom.api.boot_config",
     "crm.api.notifications.get_notifications": "aionion_custom.overrides.notifications.get_notifications"
 }
 
