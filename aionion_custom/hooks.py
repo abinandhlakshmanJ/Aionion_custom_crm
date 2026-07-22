@@ -66,7 +66,7 @@ doc_events = {
 fixtures = [
     "Server Script",
     "Insurance Company",
-    {"dt": "Custom Field", "filters": [["dt", "in", ["CRM Lead", "Customer", "US Subscription Record"]]]},
+    {"dt": "Custom Field", "filters": [["dt", "in", ["CRM Lead", "Customer", "US Subscription Record", "FCRM Settings"]]]},
     "CRM Lead Source",
     "Custom DocPerm",
     {"dt": "Role", "filters": [["is_custom", "=", 1]]},
