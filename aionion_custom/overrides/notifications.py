@@ -4,6 +4,14 @@ from crm.api.notifications import get_hash
 
 @frappe.whitelist()
 def get_notifications():
+	# Flush cached app_hooks in Redis so new override_whitelisted_methods are immediately picked up
+	try:
+		if hasattr(frappe, "client_cache") and frappe.client_cache:
+			frappe.client_cache.delete_value("app_hooks")
+		frappe.cache().delete_value("app_hooks")
+	except Exception:
+		pass
+
 	Notification = frappe.qb.DocType("CRM Notification")
 	query = (
 		frappe.qb.from_(Notification)
