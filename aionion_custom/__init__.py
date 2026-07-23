@@ -41,5 +41,45 @@ def _apply_crm_patches():
     except ImportError:
         pass  # Frappe not available in this context — skip silently
 
+    try:
+        # ── Patch 3 – Telemetry boot_config missing method ────────────────
+        import frappe.utils.telemetry.pulse.client as _pulse_client
+
+        if not hasattr(_pulse_client, "boot_config"):
+            import frappe
+            @frappe.whitelist(allow_guest=True)
+            def boot_config(*args, **kwargs):
+                return {}
+            _pulse_client.boot_config = boot_config
+
+    except (ImportError, AttributeError):
+        pass
+
+    try:
+        # ── Patch 4 – FCRM Settings persona_captured missing field ────────
+        import frappe
+        import frappe.client as _client
+
+        if not getattr(_client, "_aionion_patched", False):
+            _orig_get_single_value = _client.get_single_value
+
+            @frappe.whitelist()
+            def _safe_get_single_value(doctype, field):
+                if doctype == "FCRM Settings" and field == "persona_captured":
+                    try:
+                        val = frappe.db.get_value("Singles", {"doctype": doctype, "field": field}, "value")
+                        return int(val) if val is not None else 0
+                    except Exception:
+                        return 0
+                return _orig_get_single_value(doctype, field)
+
+
+            _client.get_single_value = _safe_get_single_value
+            _client._aionion_patched = True
+
+    except Exception:
+        pass
+
 
 _apply_crm_patches()
+
