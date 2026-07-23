@@ -183,11 +183,10 @@ def boot_config(*args, **kwargs):
 @frappe.whitelist(allow_guest=True)
 def get_single_value(doctype, field):
     if doctype == "FCRM Settings" and field == "persona_captured":
-        try:
-            from frappe.client import get_single_value as original_get_single_value
-            return original_get_single_value(doctype, field)
-        except Exception:
-            return 0
+        val = frappe.db.get_value("Singles", {"doctype": doctype, "field": field}, "value")
+        return int(val) if val is not None else 0
+
     from frappe.client import get_single_value as original_get_single_value
     return original_get_single_value(doctype, field)
+
 
