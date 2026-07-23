@@ -17,6 +17,41 @@ def get_context():
 	if not check_app_permission():
 		frappe.throw(_("You do not have permission to access Frappe CRM"), frappe.PermissionError)
 
+	# Clear stale Redis app_hooks cache on every page load
+	frappe.cache().delete_value("app_hooks")
+
+	# Ensure telemetry pulse client has boot_config attached in Python memory
+	try:
+		import frappe.utils.telemetry.pulse.client as _pulse_client
+		if not hasattr(_pulse_client, "boot_config"):
+			@frappe.whitelist(allow_guest=True)
+			def _boot_config(*args, **kwargs):
+				return {"enabled": False}
+			_pulse_client.boot_config = _boot_config
+	except Exception:
+		pass
+
+	# Ensure frappe.client.get_single_value handles persona_captured safely
+	try:
+		import frappe.client as _client
+		if not getattr(_client, "_aionion_patched", False):
+			_orig_get_single_value = _client.get_single_value
+
+			@frappe.whitelist()
+			def _safe_get_single_value(doctype, field):
+				if doctype == "FCRM Settings" and field == "persona_captured":
+					try:
+						val = frappe.db.get_value("Singles", {"doctype": doctype, "field": field}, "value")
+						return int(val) if val is not None else 0
+					except Exception:
+						return 0
+				return _orig_get_single_value(doctype, field)
+
+			_client.get_single_value = _safe_get_single_value
+			_client._aionion_patched = True
+	except Exception:
+		pass
+
 	frappe.db.commit()
 	context = frappe._dict()
 	context.boot = get_boot()
@@ -55,8 +90,11 @@ def get_boot():
 				or get_system_timezone(),
 			},
 			"state_options": get_state_options(),
+			"telemetry_provider": [],
+			"telemetry": {"enabled": False},
 		}
 	)
+
 
 
 def get_state_options() -> dict[str, list[str]]:
